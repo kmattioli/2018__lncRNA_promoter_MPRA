@@ -427,7 +427,7 @@ g.savefig("Fig_S17_K562.pdf", dpi="figure", bbox_inches="tight")
 
 # ## 9. plot overlap of SNPs & deletions
 
-# In[44]:
+# In[41]:
 
 
 seq_len = 94
@@ -483,7 +483,7 @@ for cell, snps, dels in zip(["HepG2", "K562"], [hepg2_snps, k562_snps], [hepg2_d
             if "DLEU" in seq:
                 print(snp_info)
                 plot_peaks_and_snps((5.6, 2), seq_len, seq, widths, scores, yerrs, scores_filt, scaled_scores, 
-                                    snp_vals, snp_sigs, bases, "Fig_4E_%s" % cell, ".")
+                                    snp_vals, snp_sigs, bases, "Fig_4E_%s.pdf" % cell, ".")
 
 
 # In[ ]:
