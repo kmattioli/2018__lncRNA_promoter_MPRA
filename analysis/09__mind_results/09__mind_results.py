@@ -68,6 +68,7 @@ mind_path = "../../../mind"
 
 # arguments required for MIND that already exist
 pwm_file = "%s/pfm_vertebrates_meme_motifNameChanged.txt" % mind_req_dir
+offset = 11
 seq_len = 94
 score_type = "loss"
 cores = 32
@@ -191,14 +192,14 @@ get_ipython().system('mkdir -p $k562_out_dir')
 
 
 # hepg2
-get_ipython().system('python $mind_path/mind.py -p $pwm_file -d $hepg2_del_info_file -l $seq_len -t $score_type -c $cores -n $n_shuffles -e $hepg2_tfs_f -o $hepg2_out_dir')
+get_ipython().system('python $mind_path/mind.py -p $pwm_file -d $hepg2_del_info_file -l $seq_len -t $score_type -c $cores -n $n_shuffles -e $hepg2_tfs_f -f $offset -o $hepg2_out_dir')
 
 
 # In[16]:
 
 
 # k562
-get_ipython().system('python $mind_path/mind.py -p $pwm_file -d $k562_del_info_file -l $seq_len -t $score_type -c $cores -n $n_shuffles -e $k562_tfs_f -o $k562_out_dir')
+get_ipython().system('python $mind_path/mind.py -p $pwm_file -d $k562_del_info_file -l $seq_len -t $score_type -c $cores -n $n_shuffles -e $k562_tfs_f -f $offset -o $k562_out_dir')
 
 
 # ## 6. make heatmap with TFs mapped in each sequence

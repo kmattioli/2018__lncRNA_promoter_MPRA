@@ -4,12 +4,12 @@
 # # 12__haplotypes
 # # determining whether SNPs act additively vs epistatically
 # 
-# in this notebook, i ...
+# in this notebook, i determine whether SNPs interact together additively or epistatically. whenever multiple SNPs show up together in a tile (i.e., a "haplotype"), i determine the "expected" (additive) effect size of the haplotype by adding all of the effect sizes of the individual SNPs together. i then bootstrap this expected effect size 1000 times and call those falling outside of the 90% confidence interval as being epistatic.
 # 
 # ------
 # 
 # figures in this notebook:
-# - **Fig x**: ...
+# - **Fig 4D**: swarm plots of 2 representative haplotypes -- one additive and one not
 
 # In[1]:
 
@@ -499,7 +499,7 @@ for haplo_sig_ids, haplo_sig_wts, all_additive_results, data, cell in zipped:
 
 # ## 3. find % of additive and non additive haplotypes
 
-# In[30]:
+# In[29]:
 
 
 hepg2_results = pd.DataFrame.from_dict(data=hepg2_all_additive_results, orient="index").reset_index()
@@ -507,7 +507,7 @@ hepg2_results.columns = ["name", "status", "additiveness", "min_dist"]
 hepg2_results.head()
 
 
-# In[31]:
+# In[30]:
 
 
 k562_results = pd.DataFrame.from_dict(data=k562_all_additive_results, orient="index").reset_index()
@@ -515,13 +515,13 @@ k562_results.columns = ["name", "status", "additiveness", "min_dist"]
 k562_results.head()
 
 
-# In[32]:
+# In[31]:
 
 
 hepg2_results.status.value_counts()
 
 
-# In[33]:
+# In[32]:
 
 
 k562_results.status.value_counts()

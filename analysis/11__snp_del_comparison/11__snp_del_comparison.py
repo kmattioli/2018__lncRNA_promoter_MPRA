@@ -4,12 +4,13 @@
 # # 11__snp_del_comparison
 # # comparing SNP effect sizes to deletion effect sizes
 # 
-# in this notebook, i ...
+# in this notebook, i compare SNP effect sizes (log2(alt/ref)) to deletion effect sizes (log2(del/ref)) and also determine how often a regulatory SNP overlaps "peaks" found by MIND
 # 
 # ------
 # 
 # figures in this notebook:
-# - **Fig x**: ...
+# - **Fig S17A**: scatter plot b/w SNP and del effect sizes in HepG2 and K562
+# - **Fig 4E and S17B**: bar plot of del effect sizes with SNP plot below for DLEU1 and MEG3
 
 # In[1]:
 
@@ -412,7 +413,7 @@ g = sns.jointplot(data=hepg2_snp_del_nonan, x="snp_val", y="del_val", kind="reg"
                   stat_func=spearmanr, 
                   marginal_kws={"hist": False}, color="darkgrey", scatter_kws={"s": 25})
 g.set_axis_labels("SNP effect size", "deletion effect size")
-g.savefig("Fig_S17_HepG2.pdf", dpi="figure", bbox_inches="tight")
+g.savefig("Fig_S17A_HepG2.pdf", dpi="figure", bbox_inches="tight")
 
 
 # In[40]:
@@ -422,7 +423,7 @@ g = sns.jointplot(data=k562_snp_del_nonan, x="snp_val", y="del_val", kind="reg",
                   stat_func=spearmanr, 
                   marginal_kws={"hist": False}, color="darkgrey", scatter_kws={"s": 25})
 g.set_axis_labels("SNP effect size", "deletion effect size")
-g.savefig("Fig_S17_K562.pdf", dpi="figure", bbox_inches="tight")
+g.savefig("Fig_S17A_K562.pdf", dpi="figure", bbox_inches="tight")
 
 
 # ## 9. plot overlap of SNPs & deletions
