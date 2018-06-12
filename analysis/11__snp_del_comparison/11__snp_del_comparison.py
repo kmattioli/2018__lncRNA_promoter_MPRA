@@ -57,15 +57,14 @@ np.random.seed(SEED)
 
 
 snp_dir = "../../data/07__snps"
-del_dir = "../../data/06__mind_results"
-mind_req_dir = "../../misc/06__mind_requirements"
+del_dir = "../../data/06__tfbs_results"
 
 
 # In[4]:
 
 
-hepg2_del_dir = "%s/HepG2/files/0__ntd_scores" % del_dir
-k562_del_dir = "%s/K562/files/0__ntd_scores" % del_dir
+hepg2_del_dir = "%s/HepG2/0__peaks" % del_dir
+k562_del_dir = "%s/K562/0__peaks" % del_dir
 
 
 # In[5]:
@@ -78,19 +77,12 @@ k562_snp_file = "%s/K562__POOL2_active_snp_results.txt" % snp_dir
 # In[6]:
 
 
-hepg2_info_file = "%s/HepG2_del_info.txt" % mind_req_dir
-k562_info_file = "%s/K562_del_info.txt" % mind_req_dir
-
-
-# In[7]:
-
-
 index_file = "../../data/00__index/dels_oligo_pool.index.txt"
 
 
 # ## 1. import data
 
-# In[8]:
+# In[7]:
 
 
 hepg2_snps = pd.read_table(hepg2_snp_file, sep="\t")
@@ -98,14 +90,14 @@ k562_snps = pd.read_table(k562_snp_file, sep="\t")
 hepg2_snps.head()
 
 
-# In[9]:
+# In[8]:
 
 
 index = pd.read_table(index_file, sep="\t")
 index.head()
 
 
-# In[10]:
+# In[9]:
 
 
 hepg2_files = []
@@ -114,13 +106,19 @@ for (dirpath, dirnames, filenames) in walk(hepg2_del_dir):
     break
 
 
-# In[11]:
+# In[10]:
 
 
 k562_files = []
 for (dirpath, dirnames, filenames) in walk(k562_del_dir):
     k562_files.extend(filenames)
     break
+
+
+# In[11]:
+
+
+k562_files[0:5]
 
 
 # In[12]:
@@ -471,19 +469,18 @@ for cell, snps, dels in zip(["HepG2", "K562"], [hepg2_snps, k562_snps], [hepg2_d
             scores = list(merged["mean.log2FC"])
             bases = list(merged["seq"])
             yerrs = list(merged["se"])
-            scores_filt = list(merged["filtered_score"])
-            scaled_scores = list(merged["loss_score_raw_scaled"])
+            scaled_scores = [1] * len(scores)
 
             snp_vals = list(merged["combined_l2fc"].fillna(0))
             snp_sigs = list(merged["combined_sig"].fillna("NA"))
             
             if "MEG3" in seq:
                 print(snp_info)
-                plot_peaks_and_snps((5.6, 2), seq_len, seq, widths, scores, yerrs, scores_filt, scaled_scores, 
+                plot_peaks_and_snps((5.6, 2), seq_len, seq, widths, scores, yerrs, scaled_scores, 
                                     snp_vals, snp_sigs, bases, "Fig_S17B_%s" % cell, ".")
             if "DLEU" in seq:
                 print(snp_info)
-                plot_peaks_and_snps((5.6, 2), seq_len, seq, widths, scores, yerrs, scores_filt, scaled_scores, 
+                plot_peaks_and_snps((5.6, 2), seq_len, seq, widths, scores, yerrs, scaled_scores, 
                                     snp_vals, snp_sigs, bases, "Fig_4E_%s.pdf" % cell, ".")
 
 

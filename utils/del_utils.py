@@ -362,3 +362,45 @@ def fix_names(key, cell_type, data, name_dict, loc_dict):
     clean_name = "%s__%s" % (name, text_strand)
     return filename, clean_name
 
+
+# In[1]:
+
+
+def fix_fimo_names(row, name_dict, loc_dict):
+    old_name = row["unique_id"]
+    chrom = old_name.split("__")[3].split(":")[0]
+    start = int(old_name.split("__")[3].split(":")[1].split("..")[0])
+    end = int(old_name.split("__")[3].split(":")[1].split("..")[1].split(",")[0])
+    strand = old_name.split("__")[3].split(",")[1]
+    locs = "%s:%s-%s" % (chrom, start, end)
+    if strand == "+":
+        text_strand = "plus"
+    else:
+        text_strand = "minus"
+    tile_num = int(old_name.split("__")[4].split(".")[1])
+    
+    name = old_name.split("__")[2]
+    coords = old_name.split("__")[3].split(",")[0]
+    try:
+        gene = name.split(",")[0].split("@")[1]
+        prom = name.split(",")[0].split("@")[0]
+    except:
+        gene = "X"
+        prom = "pX"
+    
+    if gene not in name_dict.keys() and coords not in loc_dict.keys():
+        name = "%s__%s__tile%s" % (gene, prom, tile_num)
+    elif gene in name_dict.keys():
+        name = "%s__%s__tile%s" % (name_dict[gene], prom, tile_num)
+    elif coords in loc_dict.keys():
+        name = "%s__%s__tile%s" % (loc_dict[coords], prom, tile_num)
+    
+    clean_name = "%s__%s" % (name, text_strand)
+    return clean_name
+
+
+# In[ ]:
+
+
+
+

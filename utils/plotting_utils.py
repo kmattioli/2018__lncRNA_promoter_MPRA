@@ -446,7 +446,7 @@ def paired_swarmplots_w_pval(n_rows, n_cols, figsize, snp_df, data_df, fontsize,
 # In[ ]:
 
 
-def plot_peaks_and_snps(figsize, seq_len, seq_name, widths, scores, yerrs, scores_filt, scaled_scores, snp_vals, snp_sigs, bases, plotname, figs_dir):
+def plot_peaks_and_snps(figsize, seq_len, seq_name, widths, scores, yerrs, scaled_scores, snp_vals, snp_sigs, bases, plotname, figs_dir):
     sns.set(style="ticks", font="Helvetica", context="paper", rc={"font.size":7,"axes.titlesize":7,
                                                               "axes.labelsize":7, 'axes.linewidth':0.5,
                                                               "legend.fontsize":6, "xtick.labelsize":6,
@@ -476,15 +476,13 @@ def plot_peaks_and_snps(figsize, seq_len, seq_name, widths, scores, yerrs, score
     xs = list(range(0, seq_len))
     peak_ax.bar(xs, scores, yerr=yerrs, color="lightgray", edgecolor="gray", linewidth=0.5, ecolor="gray", 
                 error_kw={"elinewidth": 0.75})
-    flipped_scores_filt = [-1*x for x in scores_filt]
-    peak_ax.plot(flipped_scores_filt, linestyle="dashed", color="black", zorder=2, label="smoothed data")
     
     # labels
     peak_ax.set_xlim((-0.5, seq_len))
     peak_ax.set_xlabel("")
     peak_ax.set_ylabel("log2(del/WT)")
     peak_ax.xaxis.set_visible(False)
-    peak_ax.set_title("filtered scores and peaks: %s" % (seq_name))
+    peak_ax.set_title(seq_name)
     
     # plot snp values
     xs = list(range(0, seq_len))
