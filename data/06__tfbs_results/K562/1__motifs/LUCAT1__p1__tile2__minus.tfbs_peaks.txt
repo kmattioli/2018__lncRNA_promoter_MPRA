@@ -1,0 +1,11 @@
+motif	start	end
+Nkx2-5(var.2)	6	16
+ZNF263	16	36
+MAF::NFE2	20	34
+MAFG	20	40
+MAF::NFE2	21	35
+JUN(var.2)	21	34
+MAFG	21	41
+JUN(var.2)	22	35
+Bach1::Mafk	23	37
+BATF::JUN	23	33

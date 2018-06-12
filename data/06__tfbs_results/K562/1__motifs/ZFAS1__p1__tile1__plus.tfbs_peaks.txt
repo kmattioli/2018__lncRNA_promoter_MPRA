@@ -1,0 +1,5 @@
+motif	start	end
+ZIC3	32	46
+REST	34	54
+SMAD3	48	57
+BATF::JUN	54	64

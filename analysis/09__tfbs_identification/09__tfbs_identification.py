@@ -272,13 +272,14 @@ for data_peaks, data_motifs, cell in zip([hepg2_data_peaks, k562_data_peaks], [h
         data_motifs[key] = {"motif": filtered_motifs, "start": filtered_starts, "end": filtered_ends}
 
 
-# In[81]:
+# In[104]:
 
 
 hepg2_motif_dfs = {}
 k562_motif_dfs = {}
 
-for data_motifs, dfs in zip([hepg2_motif_peaks, k562_motif_peaks], [hepg2_motif_dfs, k562_motif_dfs]):
+for data_motifs, dfs, cell in zip([hepg2_motif_peaks, k562_motif_peaks], [hepg2_motif_dfs, k562_motif_dfs], 
+                                  ["HepG2", "K562"]):
     for key in data_motifs:
         data = data_motifs[key]
         df = pd.DataFrame.from_dict(data)
@@ -290,7 +291,7 @@ for data_motifs, dfs in zip([hepg2_motif_peaks, k562_motif_peaks], [hepg2_motif_
         cell_dir = "%s/%s/1__motifs" % (out_dir, cell)
         get_ipython().system('mkdir -p $cell_dir')
         df = df.sort_values(by="start", ascending=True)
-        df.to_csv("%s/%s.tfbs_peaks.txt" % (cell_dir, gene_name), sep="\t", index=False)
+        df.to_csv("%s/%s.tfbs_peaks.txt" % (cell_dir, key), sep="\t", index=False)
 
 hepg2_motif_dfs["GAS5__p1__tile2__minus"].head()
 

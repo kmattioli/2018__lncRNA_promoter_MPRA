@@ -1,0 +1,15 @@
+motif	start	end
+Tcf21	53	66
+Tcf21	54	67
+NRF1	57	67
+HIC2	60	68
+Hes2	66	78
+Rfx1	70	83
+TFAP2A(var.3)	72	84
+TFAP2B(var.3)	72	84
+TFAP2C(var.3)	72	84
+EGR1	72	85
+TFAP2A	72	82
+TFAP2B(var.2)	72	82
+Barhl1	81	90
+Barhl1	82	91

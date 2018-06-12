@@ -1,0 +1,8 @@
+motif	start	end
+Bach1::Mafk	4	18
+ESR2	9	23
+Myb	10	19
+USF1	10	20
+TFAP4	11	20
+NFYB	13	27
+NFYB	14	28

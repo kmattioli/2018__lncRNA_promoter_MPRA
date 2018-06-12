@@ -1,0 +1,2 @@
+motif	start	end
+Myb	56	65
