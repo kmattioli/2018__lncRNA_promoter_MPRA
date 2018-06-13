@@ -1,39 +1,23 @@
-motif	start	end
-PAX9	8	24
-PAX5	9	27
-REST	11	31
-Myod1	20	32
-EGR3	20	34
-NRF1	21	31
-PKNOX2	22	33
-NRF1	22	32
-HES7	22	33
-NR2C2	25	39
-YY1	33	44
-YY1	34	45
-Znf423	37	51
-CENPB	43	57
-NFIL3	44	54
-HLF	45	56
-NFIL3	45	55
-TEF	45	56
-DBP	45	56
-DBP	46	57
-HLF	46	57
-ZNF410	46	62
-TEF	46	57
-TBP	47	61
-EWSR1-FLI1	53	70
-Rarb	57	72
-EWSR1-FLI1	57	74
-NR2C2	58	72
-Nr2f6(var.2)	58	72
-RARA	58	75
-ESR2	59	73
-RARA::RXRA	60	76
-Ar	65	81
-IRF2	66	83
-Sox3	71	80
-Sox2	71	78
-SOX9	71	79
-Sox6	71	80
+motif	start	end	peak_overlap
+NRF1	11	21	in peak
+NRF1	12	22	in peak
+TCF4	13	22	in peak
+SNAI2	13	21	in peak
+NHLH1	13	22	in peak
+ID4	13	22	in peak
+TCF3	13	22	in peak
+ZEB1	15	23	in peak
+TBX21	15	24	in peak
+EOMES	15	27	in peak
+TBX2	15	25	in peak
+TBX5	16	23	in peak
+MGA	16	23	in peak
+TBX1	16	23	in peak
+TBR1	16	25	in peak
+TBX15	16	23	in peak
+TBX4	16	23	in peak
+YY1	23	34	in peak
+NFIL3	34	44	in peak
+TEF	35	46	in peak
+DBP	35	46	in peak
+HLF	35	46	in peak

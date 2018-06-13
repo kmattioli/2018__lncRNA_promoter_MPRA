@@ -1,14 +1,10 @@
-motif	start	end
-PAX1	25	41
-Rarb	25	40
-ESR1	26	42
-RARA	26	43
-ESR2	27	41
-Nfe2l2	31	45
-Nfe2l2	32	46
-MAF::NFE2	35	49
-MAF::NFE2	36	50
-Hes1	38	47
-HEY1	38	47
-HEY2	38	47
-NRF1	42	52
+motif	start	end	peak_overlap
+Nfe2l2	21	35	no peak
+MAF::NFE2	25	39	no peak
+NRF1	32	42	no peak
+NRF1	33	43	no peak
+NHLH1	34	43	no peak
+EGR3	36	50	no peak
+GCM2	38	47	no peak
+PLAG1	57	70	in peak
+SPIB	77	83	in peak

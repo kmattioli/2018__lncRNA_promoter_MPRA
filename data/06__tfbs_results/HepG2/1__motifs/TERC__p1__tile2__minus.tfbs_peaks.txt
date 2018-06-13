@@ -1,8 +1,13 @@
-motif	start	end
-Bach1::Mafk	4	18
-ESR2	9	23
-Myb	10	19
-USF1	10	20
-TFAP4	11	20
-NFYB	13	27
-NFYB	14	28
+motif	start	end	peak_overlap
+NFYB	3	17	in peak
+NFYA	6	23	in peak
+TBP	30	44	in peak
+PAX5	48	66	in peak
+ZIC4	61	75	in peak
+ZIC3	61	75	in peak
+ZIC1	62	75	in peak
+SP2	72	86	in peak
+SP1	76	86	in peak
+Klf1	77	87	in peak
+Klf4	77	86	in peak
+PLAG1	80	93	in peak

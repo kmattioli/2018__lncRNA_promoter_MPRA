@@ -1,18 +1,31 @@
-motif	start	end
-ZNF263	44	64
-ZNF263	45	65
-ZNF263	46	66
-EWSR1-FLI1	49	66
-Foxo1	54	64
-E2F7	58	71
-E2F7	59	72
-HSF2	61	73
-HSF1	61	73
-Hoxa11	69	80
-HOXC10	70	79
-HOXC12	70	80
-HOXC11	70	80
-HOXC13	70	80
-HOXD12	70	80
-HOXD11	70	79
-NRF1	73	83
+motif	start	end	peak_overlap
+Tcf21	7	20	in peak
+TGIF1	8	19	in peak
+Tcf12	8	18	in peak
+Myog	8	18	in peak
+TGIF2	8	19	in peak
+ZBTB18	8	20	in peak
+PKNOX2	8	19	in peak
+PKNOX1	8	19	in peak
+Tcf12	9	19	in peak
+MYF6	9	18	in peak
+Myod1	9	21	in peak
+MSC	9	18	in peak
+NHLH1	9	18	in peak
+ID4	9	18	in peak
+TFAP4	9	18	in peak
+Ascl2	9	18	in peak
+MEIS2	13	20	in peak
+MEIS3	13	20	in peak
+MEIS1	14	20	in peak
+NR2C2	24	38	in peak
+ZNF263	25	45	in peak
+ZNF263	31	51	in peak
+ZNF263	34	54	in peak
+E2F7	48	61	in peak
+NRF1	64	74	in peak
+NR2C2	79	93	in peak
+KLF16	81	91	in peak
+SP3	81	91	in peak
+SP8	81	92	in peak
+ZNF740	83	92	in peak

@@ -1,30 +1,35 @@
-motif	start	end
-FOXP1	61	75
-Foxq1	65	75
-GRHL1	66	77
-GRHL1	67	78
-TFCP2	67	76
-TFCP2	68	77
-Stat6	72	86
-STAT1	73	83
-Stat6	73	87
-STAT3	73	83
-Stat4	73	86
-STAT1	74	84
-Stat4	74	87
-STAT3	74	84
-Stat5a::Stat5b	74	84
-IRF1	75	95
-Stat5a::Stat5b	75	85
-IRF1	76	96
-Foxo1	78	88
-STAT1::STAT2	79	93
-SPIC	79	92
-SPI1	79	92
-STAT1::STAT2	80	94
-SPI1	80	93
-SPIC	80	93
-EHF	81	92
-ELF3	81	93
-ELF4	81	92
-ELF1	81	92
+motif	start	end	peak_overlap
+Crx	5	15	in peak
+HOXC13	25	35	in peak
+PPARG	35	54	in peak
+GRHL1	56	67	in peak
+TFCP2	57	66	in peak
+Stat6	62	76	in peak
+STAT3	63	73	in peak
+STAT1	63	73	in peak
+Stat4	63	76	in peak
+Stat5a::Stat5b	64	74	in peak
+IRF1	65	85	in peak
+SPI1	69	82	in peak
+SPIC	69	82	in peak
+STAT1::STAT2	69	83	in peak
+EHF	71	82	in peak
+ELF3	71	83	in peak
+ELF1	71	82	in peak
+ELF4	71	82	in peak
+ELF5	72	82	in peak
+ETV2	72	82	in peak
+SPDEF	72	82	in peak
+ETV3	73	82	in peak
+ETV4	73	82	in peak
+ERG	73	82	in peak
+FLI1	73	82	in peak
+ELK1	73	82	in peak
+ETV1	73	82	in peak
+ELK3	73	82	in peak
+ERF	73	82	in peak
+ELK4	73	83	in peak
+ETS1	73	82	in peak
+FEV	73	82	in peak
+ETV6	73	82	in peak
+Gabpa	74	84	in peak

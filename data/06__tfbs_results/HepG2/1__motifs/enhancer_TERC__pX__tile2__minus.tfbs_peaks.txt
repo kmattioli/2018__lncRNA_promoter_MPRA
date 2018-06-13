@@ -1,1 +1,3 @@
-motif	start	end
+motif	start	end	peak_overlap
+CDX2	13	23	in peak
+CDX1	13	21	in peak

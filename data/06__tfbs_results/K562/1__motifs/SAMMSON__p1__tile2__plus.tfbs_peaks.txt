@@ -1,37 +1,39 @@
-motif	start	end
-ZNF263	19	39
-TFAP2B(var.3)	20	32
-ELK4	20	30
-FLI1	21	30
-FEV	21	30
-ETV1	21	30
-ETV4	21	30
-ERF	21	30
-ETV5	21	30
-ELK3	21	30
-ELK1	21	30
-ETS1	21	30
-E2F4	22	32
-EGR3	24	38
-EGR4	24	39
-EGR3	25	39
-EGR2	26	36
-SP4	26	42
-SP4	27	43
-EGR2	27	37
-KLF13	27	44
-Klf1	28	38
-KLF14	28	41
-Klf12	28	42
-KLF13	28	45
-Klf12	29	43
-SP1	29	39
-KLF5	29	38
-SP8	29	40
-Klf4	29	38
-Hes1	29	38
-Klf1	29	39
-KLF14	29	42
-KLF16	29	39
-SP2	29	43
-SP3	29	39
+motif	start	end	peak_overlap
+EGR3	14	28	no peak
+EGR2	16	26	no peak
+SP4	16	32	no peak
+KLF13	17	34	no peak
+KLF14	18	31	no peak
+Klf12	18	32	no peak
+Klf1	18	28	no peak
+KLF5	19	28	no peak
+Klf4	19	28	no peak
+KLF16	19	29	no peak
+SP3	19	29	no peak
+SP8	19	30	no peak
+INSM1	23	34	no peak
+Zfx	28	41	no peak
+HOXD13	38	47	in peak
+HOXB13	38	47	in peak
+HOXA13	38	47	in peak
+TBP	39	53	in peak
+SP4	42	58	in peak
+SP8	45	56	in peak
+KLF16	45	55	in peak
+CTCF	46	64	in peak
+ZBTB7C	48	59	in peak
+ZBTB7B	48	59	in peak
+GLIS2	49	62	in peak
+ZIC3	49	63	in peak
+ZIC1	49	62	in peak
+ZIC4	49	63	in peak
+TFAP2B(var.3)	51	63	in peak
+TFAP2C(var.3)	51	63	in peak
+TFAP2A(var.3)	51	63	in peak
+TFAP2A(var.2)	52	63	in peak
+TFAP2A	53	63	in peak
+TFAP2B(var.2)	53	63	in peak
+Zfx	58	71	in peak
+THAP1	66	74	in peak
+SMAD2::SMAD3::SMAD4	66	78	in peak
+SOX4	76	91	in peak

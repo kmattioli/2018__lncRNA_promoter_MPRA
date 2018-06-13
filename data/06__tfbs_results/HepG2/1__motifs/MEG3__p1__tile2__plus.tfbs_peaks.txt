@@ -1,55 +1,22 @@
-motif	start	end
-NHLH1	8	17
-YY1	10	21
-MAFF	11	28
-NRL	12	22
-Mafb	12	23
-MAFG	13	33
-MAF::NFE2	13	27
-Mafb	13	24
-NRL	13	23
-JUN(var.2)	14	27
-JUND(var.2)	14	28
-XBP1	15	28
-Gmeb1	15	31
-BATF::JUN	16	26
-Gmeb1	16	32
-CREB3L1	16	29
-CREB3	16	29
-Pax2	16	23
-BATF3	16	29
-ATF7	16	29
-JUN	16	28
-Bach1::Mafk	16	30
-Creb5	17	28
-JUNB	17	27
-CREB3	17	30
-ATF7	17	30
-FOSL2	17	27
-JDP2(var.2)	17	28
-Nfe2l2	17	31
-BATF3	17	30
-Crem	17	26
-ZBTB7B	28	39
-GLI2	28	39
-ZBTB7C	28	39
-ZNF263	29	49
-ZIC3	31	45
-ZIC4	31	45
-ZNF263	32	52
-ZIC3	32	46
-PLAG1	33	46
-ZNF263	33	53
-NR2C2	35	49
-PLAG1	35	48
-PLAG1	36	49
-E2F4	37	47
-THAP1	41	49
-Rarb(var.2)	42	58
-RARA::RXRA	42	58
-RARA(var.2)	42	58
-RREB1	46	65
-TBP	49	63
-HOXD13	49	58
-HOXA13	49	58
-HOXB13	49	58
+motif	start	end	peak_overlap
+NRL	2	12	in peak
+Mafb	2	13	in peak
+Gmeb1	5	21	in peak
+ATF7	6	19	in peak
+BATF3	6	19	in peak
+Creb5	7	18	in peak
+Crem	7	16	in peak
+JDP2(var.2)	7	18	in peak
+Crem	9	18	in peak
+CREB1	9	16	in peak
+ZBTB7B	17	28	in peak
+ZBTB7C	17	28	in peak
+GLI2	17	28	in peak
+ZIC3	21	35	in peak
+ZNF263	22	42	in peak
+Klf1	45	55	in peak
+Klf12	45	59	in peak
+Klf4	46	55	in peak
+KLF5	46	55	in peak
+RREB1	46	65	in peak
+SP3	46	56	in peak

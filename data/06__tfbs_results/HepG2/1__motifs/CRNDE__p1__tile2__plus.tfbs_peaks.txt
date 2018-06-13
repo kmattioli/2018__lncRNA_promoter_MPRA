@@ -1,1 +1,4 @@
-motif	start	end
+motif	start	end	peak_overlap
+Zfx	31	44	no peak
+TFAP2A	62	72	no peak
+TFAP2B(var.2)	62	72	no peak

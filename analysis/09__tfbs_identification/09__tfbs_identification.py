@@ -74,12 +74,13 @@ fimo_f = "../../misc/05__fimo/pool2.fimo.txt"
 index_f = "../../data/00__index/dels_oligo_pool.index.txt"
 
 
-# In[7]:
+# In[31]:
 
 
-peak_signal_cutoff = 0.5
+peak_signal_cutoff = 1.5
 peak_length_cutoff = 5
 del_buffer = 11
+seq_len = 94
 
 
 # ## 1. import deletion data and tf expr file
@@ -148,9 +149,19 @@ index_elem = index[["unique_id", "tile_name", "chr", "tile_start", "tile_end", "
 index_elem.head()
 
 
-# ## 2. filter dfs to only those that are sig active (wt_class)
+# ## 2. filter dfs to only those that are sig active (wt_class) and make loss score
 
 # In[15]:
+
+
+def loss_score(row):
+    if row["mean.log2FC"] < 0:
+        return -row["mean.log2FC"]
+    else:
+        return 0
+
+
+# In[16]:
 
 
 hepg2_data_filt = {}
@@ -159,28 +170,26 @@ for data, data_filt in zip([hepg2_data, k562_data], [hepg2_data_filt, k562_data_
     for key in data:
         df = data[key]
         if df.wt_class.iloc[0] == "sig active":
+            df["loss_score"] = df.apply(loss_score, axis=1)
             data_filt[key] = df
 
 
 # ## 3. find "peaks" in the deletion data
 
-# In[73]:
-
-
-peak_length_cutoff % 4
-
-
-# In[76]:
+# In[32]:
 
 
 def find_peaks(df, peak_signal_cutoff, peak_length_cutoff):
     peak_status = []
     effect_sizes = list(df["mean.log2FC"])
+    avg_sd = df["sd"].mean()
     count = 0
     in_peak = False
     overall_count = 1
+    scaled_peak_signal_cutoff = avg_sd * peak_signal_cutoff
+    print("sd: %s, scaled cutoff: %s" % (avg_sd, scaled_peak_signal_cutoff))
     for x in effect_sizes:
-        if x <= -peak_signal_cutoff:
+        if x <= -scaled_peak_signal_cutoff:
             count += 1
             if count >= peak_length_cutoff:
                 if in_peak == False:
@@ -203,7 +212,7 @@ def find_peaks(df, peak_signal_cutoff, peak_length_cutoff):
     return df
 
 
-# In[77]:
+# In[33]:
 
 
 hepg2_data_peaks = {}
@@ -215,6 +224,7 @@ for data_filt, data_peaks, cell in zip([hepg2_data_filt, k562_data_filt], [hepg2
         name = key.split(".")[0]
         strand = key.split(".")[2]
         gene_name = "%s__%s" % (name, strand)
+        print(gene_name)
         df = data_filt[key]
         df = find_peaks(df, peak_signal_cutoff, peak_length_cutoff)
         data_peaks[gene_name] = df
@@ -227,20 +237,21 @@ for data_filt, data_peaks, cell in zip([hepg2_data_filt, k562_data_filt], [hepg2
 
 # ## 4. intersect FIMO motifs w/ peaks
 
-# In[78]:
+# In[26]:
 
 
 fimo["fixed_name"] = fimo.apply(fix_fimo_names, name_dict=NAME_DICT, loc_dict=LOC_DICT, axis=1)
 fimo.head()
 
 
-# In[79]:
+# In[27]:
 
 
-hepg2_data_peaks["GAS5__p1__tile2__minus"].head()
+def getOverlap(a, b):
+    return max(a[0], b[0]) - min(a[1], b[1])
 
 
-# In[80]:
+# In[34]:
 
 
 hepg2_motif_peaks = {}
@@ -253,26 +264,76 @@ for data_peaks, data_motifs, cell in zip([hepg2_data_peaks, k562_data_peaks], [h
     for key in data_peaks:
         print(key)
         df = data_peaks[key]
-        fimo_sub = fimo[fimo["fixed_name"] == key]
-        motif_positions = zip(list(fimo_sub["start"]), list(fimo_sub["stop"]), list(fimo_sub["motif"]))
-        filtered_motifs = []
-        filtered_starts = []
-        filtered_ends = []
-        for start, end, motif in motif_positions:
-            for i in range(start, end):
-                try:
-                    peak_val = df[df["delpos"] == (i + del_buffer)]["peak"].iloc[0]
-                except:
-                    continue
-                if peak_val == "peak":
-                    filtered_motifs.append(motif)
-                    filtered_starts.append(start)
-                    filtered_ends.append(end)
+
+        # put del_df bps in terms of 1-94
+        df["delpos_fixed"] = list(range(1, 95))
+
+        fimo_sub = fimo[(fimo["fixed_name"] == key) & (~fimo["unique_id"].str.contains("DELETION"))
+                        & (~fimo["unique_id"].str.contains("SNP_INDIV"))]
+        fimo_sub = fimo_sub.sort_values(by="start")
+        #print(fimo_sub)
+        scores = list(df["mean.log2FC"])
+        yerrs = list(df["se"])
+        scaled_scores = list(df["loss_score"])
+        bases = list(df["seq"])
+        motif_positions = list(zip(list(fimo_sub["start"]), list(fimo_sub["stop"]), list(fimo_sub["motif"])))
+        print(list(fimo_sub["start"]))
+        print(list(fimo_sub["stop"]))
+
+        # get peak positions in tuples
+        prev_p = "no peak"
+        starts = []
+        ends = []
+        for i, p in zip(list(df["delpos_fixed"]), list(df["peak"])):
+            if p == "peak" and prev_p == "no peak":
+                starts.append(i-1)
+            elif p == "no peak" and prev_p == "peak":
+                ends.append(i-1)
+            elif i == 94 and prev_p == "peak":
+                ends.append(i)
+            prev_p = p
+        widths = list(zip(starts, ends))
+
+        motif_positions_neg = [(x-del_buffer, y-del_buffer, m) for x, y, m in motif_positions]
+        motif_positions_filt = [(x, y, m) for x, y, m in motif_positions_neg if x > 0 and y < seq_len]
+        motif_positions_fixed = [(x, y) for x, y, m in motif_positions_filt]
+        motif_names = [m for x, y, m in motif_positions_filt]
+
+
+        if key == "LINC_PINT__p2__tile1__minus":
+            plot_peaks_and_fimo((5.6, 2), seq_len, key, widths, scores, yerrs, scaled_scores, bases, 
+                                motif_positions_fixed, motif_names, "LINC_PINT_%s.pdf" % cell, ".", True)
+        elif key == "MEG3__p1__tile2__plus":
+            plot_peaks_and_fimo((5.6, 2), seq_len, key, widths, scores, yerrs, scaled_scores, bases, 
+                                motif_positions_fixed, motif_names, "MEG3_%s.pdf" % cell, ".", True)
+        elif key == "DLEU1__p1__tile2__plus":
+            plot_peaks_and_fimo((5.6, 2), seq_len, key, widths, scores, yerrs, scaled_scores, bases, 
+                                motif_positions_fixed, motif_names, "DLEU1_%s.pdf" % cell, ".", True)
+        else:
+            plot_peaks_and_fimo((5.6, 2), seq_len, key, widths, scores, yerrs, scaled_scores, bases, 
+                                motif_positions_fixed, motif_names, None, None, False)
+
+        motifs = []
+        starts = []
+        ends = []
+        in_peaks = []
+        for start, end, motif in motif_positions_filt:
+            motifs.append(motif)
+            starts.append(start)
+            ends.append(end)
+            added = False
+            for w in widths:
+                overlap = getOverlap(w, [start, end])
+                if overlap > 0:
+                    in_peaks.append("in peak")
+                    added = True
                     break
-        data_motifs[key] = {"motif": filtered_motifs, "start": filtered_starts, "end": filtered_ends}
+            if not added:
+                in_peaks.append("no peak")
+        data_motifs[key] = {"motif": motifs, "start": starts, "end": ends, "peak_overlap": in_peaks}
 
 
-# In[104]:
+# In[35]:
 
 
 hepg2_motif_dfs = {}
@@ -283,7 +344,7 @@ for data_motifs, dfs, cell in zip([hepg2_motif_peaks, k562_motif_peaks], [hepg2_
     for key in data_motifs:
         data = data_motifs[key]
         df = pd.DataFrame.from_dict(data)
-        df = df[["motif", "start", "end"]]
+        df = df[["motif", "start", "end", "peak_overlap"]]
         df = df.drop_duplicates()
         dfs[key] = df
         
@@ -296,9 +357,24 @@ for data_motifs, dfs, cell in zip([hepg2_motif_peaks, k562_motif_peaks], [hepg2_
 hepg2_motif_dfs["GAS5__p1__tile2__minus"].head()
 
 
-# ## 5. limit to TFs expressed in each cell line
+# In[36]:
 
-# In[82]:
+
+# find total # of tested motifs found to be in peaks
+for motif_dfs, cell in zip([hepg2_motif_dfs, k562_motif_dfs], ["HepG2", "K562"]):
+    print(cell)
+    tot_motifs = 0
+    tot_func_motifs = 0
+    for key in motif_dfs:
+        df = motif_dfs[key]
+        tot_motifs += len(df)
+        tot_func_motifs += len(df[df["peak_overlap"] == "in peak"])
+    print("tot motifs: %s, tot func: %s, perc: %s" % (tot_motifs, tot_func_motifs, tot_func_motifs/tot_motifs))
+
+
+# ## 5. limit to TFs expressed in each cell line & in peaks
+
+# In[37]:
 
 
 hepg2_motif_dfs_filt = {}
@@ -309,7 +385,7 @@ for motif_dfs, motif_dfs_filt, tfs in zip([hepg2_motif_dfs, k562_motif_dfs],
                                           [hepg2_tfs, k562_tfs]):
     for key in motif_dfs:
         df = motif_dfs[key]
-        sub = df[df["motif"].isin(tfs)]
+        sub = df[(df["motif"].isin(tfs)) & (df["peak_overlap"] == "in peak")]
         motif_dfs_filt[key] = sub
 
 hepg2_motif_dfs_filt["GAS5__p1__tile2__minus"].head()
@@ -318,7 +394,7 @@ hepg2_motif_dfs_filt["GAS5__p1__tile2__minus"].head()
 # ## 6. make heatmap with TFs mapped in each sequence
 # note: use only HepG2 since there are more seqs expressed in HepG2 and use results filtered by TFs expr in HepG2
 
-# In[83]:
+# In[38]:
 
 
 # first, put all gene data in dictionary of list of dataframes
@@ -360,7 +436,7 @@ for tile_data, gene_data in zip([hepg2_motif_dfs_filt, k562_motif_dfs_filt], [he
 list(hepg2_gene_data.keys())[0:5]
 
 
-# In[84]:
+# In[39]:
 
 
 hepg2_sig_data = {}
@@ -383,20 +459,20 @@ for sig_data, all_motifs, gene_data in zip([hepg2_sig_data, k562_sig_data], [hep
         sig_data[gene] = gene_motifs
 
 
-# In[85]:
+# In[40]:
 
 
 hepg2_all_motifs = list(set(hepg2_all_motifs))
 len(hepg2_all_motifs)
 
 
-# In[86]:
+# In[41]:
 
 
 hepg2_motif_idx_dict = {k:v for k, v in zip(hepg2_all_motifs, list(range(0, len(hepg2_all_motifs))))}
 
 
-# In[87]:
+# In[42]:
 
 
 hepg2_motif_array = np.zeros((len(hepg2_sig_data), len(hepg2_all_motifs)))
@@ -411,29 +487,29 @@ hepg2_mo_df = pd.DataFrame(hepg2_motif_array, index=list(hepg2_sig_data.keys()),
 hepg2_mo_df.head()
 
 
-# In[88]:
+# In[43]:
 
 
 cmap = sns.light_palette("firebrick", reverse=False, as_cmap=True)
 
 
-# In[89]:
+# In[44]:
 
 
 cg = sns.clustermap(hepg2_mo_df, annot=False, cmap=cmap, figsize=(2.25, 3))
 cg.savefig("Fig_4D.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[90]:
+# In[45]:
 
 
-cg = sns.clustermap(hepg2_mo_df, annot=False, cmap=cmap, figsize=(14, 5))
+cg = sns.clustermap(hepg2_mo_df, annot=False, cmap=cmap, figsize=(16, 5))
 cg.savefig("Fig_4D_big.pdf", bbox_inches="tight", dpi="figure")
 
 
 # ## 7. plot number of motifs found in seqs expressed in only one cell type vs. two
 
-# In[91]:
+# In[46]:
 
 
 expr_in_hepg2_not_k562 = [x for x in hepg2_gene_data.keys() if x not in k562_gene_data.keys()]
@@ -441,13 +517,13 @@ expr_in_both = [x for x in hepg2_gene_data.keys() if x in k562_gene_data.keys()]
 expr_in_hepg2_not_k562
 
 
-# In[92]:
+# In[47]:
 
 
 hepg2_sig_data.keys()
 
 
-# In[93]:
+# In[48]:
 
 
 results_dict = {}
@@ -478,7 +554,7 @@ results_df.columns = ["gene", "n_sig_motifs", "type"]
 results_df.head()
 
 
-# In[94]:
+# In[49]:
 
 
 fig = plt.figure(figsize=(2.5, 2))
@@ -507,7 +583,7 @@ fig.savefig("Fig_S15B.pdf", dpi="figure", bbox_inches="tight")
 
 # ## 8. plot correlation b/w number of motifs found and ref tile activity
 
-# In[95]:
+# In[50]:
 
 
 hepg2_dict = {}

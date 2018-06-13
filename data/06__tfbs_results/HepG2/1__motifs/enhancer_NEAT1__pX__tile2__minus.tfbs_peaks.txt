@@ -1,32 +1,16 @@
-motif	start	end
-Nr5a2	24	38
-HNF4G	25	39
-Zfx	25	38
-HNF4G	26	40
-Znf423	26	40
-RREB1	39	58
-SP1	39	49
-Klf1	40	50
-KLF5	40	49
-RREB1	40	59
-Klf4	40	49
-SP1	40	50
-ZNF263	42	62
-ZNF263	43	63
-RREB1	44	63
-EGR1	46	59
-EGR1	49	62
-EOMES	51	63
-TBX20	51	61
-TBX21	51	60
-KLF5	51	60
-TBX2	51	61
-E2F6	52	62
-MGA	52	59
-TBX5	52	59
-TBX1	52	59
-TBX15	52	59
-TBX4	52	59
-TBR1	52	61
-Klf1	61	71
-Klf12	61	75
+motif	start	end	peak_overlap
+HNF4G	15	29	in peak
+SP1	29	39	in peak
+Klf1	30	40	in peak
+KLF5	30	39	in peak
+Klf4	30	39	in peak
+ZNF263	32	52	no peak
+Klf1	51	61	in peak
+Klf12	51	65	in peak
+SP1	52	62	in peak
+SP2	52	66	in peak
+Klf4	52	61	in peak
+EGR3	63	77	in peak
+GLIS3	64	77	in peak
+EGR1	65	78	in peak
+EGR2	65	75	in peak

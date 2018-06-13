@@ -1,15 +1,24 @@
-motif	start	end
-Hes2	5	17
-Klf12	9	23
-ARNT::HIF1A	10	17
-HINFP	11	22
-SP2	15	29
-SPIC	16	29
-SPIB	19	25
-E2F7	22	35
-YY2	23	33
-E2F8	23	34
-ELF1	25	36
-ELF3	25	37
-ELF4	25	36
-EHF	25	36
+motif	start	end	peak_overlap
+ELF1	15	26	no peak
+ETV2	16	26	no peak
+ETS1	17	26	no peak
+FLI1	17	26	no peak
+ERG	17	26	no peak
+ETV3	17	26	no peak
+FEV	17	26	no peak
+ELK3	17	26	no peak
+ERF	17	26	no peak
+ETV1	17	26	no peak
+ETV4	17	26	no peak
+ETV5	17	26	no peak
+ETV6	17	26	no peak
+ELK4	17	27	no peak
+ELK1	17	26	no peak
+Gabpa	18	28	no peak
+STAT1::STAT2	19	33	no peak
+PLAG1	37	50	in peak
+E2F8	42	53	in peak
+ZNF740	44	53	in peak
+RREB1	46	65	in peak
+ZBTB33	71	85	in peak
+ZBTB33	74	88	in peak

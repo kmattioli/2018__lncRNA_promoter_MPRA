@@ -1,26 +1,19 @@
-motif	start	end
-ZNF263	4	24
-SP1	4	14
-ZNF263	5	25
-PLAG1	5	18
-Pparg::Rxra	5	19
-Klf4	5	14
-NR2C2	5	19
-KLF5	5	14
-SP2	9	23
-SP2	10	24
-EGR1	10	23
-ZNF263	10	30
-SP4	11	27
-Klf12	11	25
-Pparg::Rxra	12	26
-SP8	12	23
-NR2C2	12	26
-KLF14	12	25
-SP8	13	24
-PLAG1	13	26
-SP1	14	24
-SP3	14	24
-EGR4	14	29
-KLF16	14	24
-ZNF740	14	23
+motif	start	end	peak_overlap
+INSM1	5	16	no peak
+RREB1	5	24	no peak
+SP2	6	20	no peak
+SP4	7	23	no peak
+EGR1	7	20	no peak
+SP8	9	20	no peak
+SP1	10	20	no peak
+KLF16	10	20	no peak
+SP3	10	20	no peak
+Klf4	11	20	no peak
+INSM1	38	49	in peak
+EGR1	40	53	in peak
+NR2C2	42	56	in peak
+NFIX	71	79	in peak
+Nr2f6	71	84	in peak
+NFIA	71	80	in peak
+PLAG1	71	84	in peak
+Klf4	79	88	in peak

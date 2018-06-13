@@ -436,52 +436,58 @@ for cell, snps, dels in zip(["HepG2", "K562"], [hepg2_snps, k562_snps], [hepg2_d
     seqs_w_snps = snps["wt_id_new"].unique()
     
     for seq in seqs_w_snps:
-        if seq in ["MEG3__p1__tile2__plus", "DLEU1__p1__tile2__plus"]:
-            try:
-                del_df = dels[seq]
-            except KeyError:
-                print("deletions not tested")
-                print("")
-                continue
+        print(seq)
+        try:
+            del_df = dels[seq]
+        except KeyError:
+            print("deletions not tested")
+            print("")
+            continue
 
-            # put del_df bps in terms of 1-94
-            del_df["delpos_fixed"] = list(range(1, 95))
+        # put del_df bps in terms of 1-94
+        del_df["delpos_fixed"] = list(range(1, 95))
 
-            # print snp ids
-            snp_info = snps[(snps["wt_id_new"] == seq)][["SNP", "snp_pos"]]
+        # print snp ids
+        snp_info = snps[(snps["wt_id_new"] == seq)][["SNP", "snp_pos"]]
 
-            # merge dfs
-            snp_df = snps[(snps["wt_id_new"] == seq)][["wt_id_new", "combined_l2fc", "combined_sig", "snp_pos"]]
-            merged = del_df.merge(snp_df, left_on="delpos_fixed", right_on="snp_pos", how="left")
+        # merge dfs
+        snp_df = snps[(snps["wt_id_new"] == seq)][["wt_id_new", "combined_l2fc", "combined_sig", "snp_pos"]]
+        merged = del_df.merge(snp_df, left_on="delpos_fixed", right_on="snp_pos", how="left")
 
-            # get everything we need to plot
-            prev_p = "no peak"
-            starts = []
-            ends = []
-            for i, p in zip(merged["delpos_fixed"], merged["peak"]):
-                if p == "peak" and prev_p == "no peak":
-                    starts.append(i)
-                elif p == "no peak" and prev_p == "peak":
-                    ends.append(i-1)
-                prev_p = p
-            widths = list(zip(starts, ends))
+        # get everything we need to plot
+        prev_p = "no peak"
+        starts = []
+        ends = []
+        for i, p in zip(merged["delpos_fixed"], merged["peak"]):
+            if p == "peak" and prev_p == "no peak":
+                starts.append(i-1)
+            elif p == "no peak" and prev_p == "peak":
+                ends.append(i-1)
+            elif i == 94 and prev_p == "peak":
+                ends.append(i)
+            prev_p = p
+        widths = list(zip(starts, ends))
 
-            scores = list(merged["mean.log2FC"])
-            bases = list(merged["seq"])
-            yerrs = list(merged["se"])
-            scaled_scores = [1] * len(scores)
+        scores = list(merged["mean.log2FC"])
+        bases = list(merged["seq"])
+        yerrs = list(merged["se"])
+        scaled_scores = list(merged["loss_score"])
 
-            snp_vals = list(merged["combined_l2fc"].fillna(0))
-            snp_sigs = list(merged["combined_sig"].fillna("NA"))
-            
-            if "MEG3" in seq:
-                print(snp_info)
-                plot_peaks_and_snps((5.6, 2), seq_len, seq, widths, scores, yerrs, scaled_scores, 
-                                    snp_vals, snp_sigs, bases, "Fig_S17B_%s" % cell, ".")
-            if "DLEU" in seq:
-                print(snp_info)
-                plot_peaks_and_snps((5.6, 2), seq_len, seq, widths, scores, yerrs, scaled_scores, 
-                                    snp_vals, snp_sigs, bases, "Fig_4E_%s.pdf" % cell, ".")
+        snp_vals = list(merged["combined_l2fc"].fillna(0))
+        snp_sigs = list(merged["combined_sig"].fillna("NA"))
+
+        if "MEG3__p1__tile2__plus" in seq:
+            print(snp_info)
+            plot_peaks_and_snps((5.6, 2), seq_len, seq, widths, scores, yerrs, scaled_scores, 
+                                snp_vals, snp_sigs, bases, "Fig_S17B_%s" % cell, ".", True)
+        elif "DLEU1__p1__tile2__plus" in seq:
+            print(snp_info)
+            plot_peaks_and_snps((5.6, 2), seq_len, seq, widths, scores, yerrs, scaled_scores, 
+                                snp_vals, snp_sigs, bases, "Fig_4E_%s.pdf" % cell, ".", True)
+
+        else:
+            plot_peaks_and_snps((5.6, 2), seq_len, seq, widths, scores, yerrs, scaled_scores, 
+                                snp_vals, snp_sigs, bases, None, None, False)
 
 
 # In[ ]:

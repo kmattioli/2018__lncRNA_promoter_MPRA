@@ -1,17 +1,31 @@
-motif	start	end
-ZNF263	44	64
-ZNF263	45	65
-ZNF263	46	66
-EWSR1-FLI1	49	66
-Foxo1	54	64
-E2F7	58	71
-E2F7	59	72
-HSF2	61	73
-HSF1	61	73
-Hoxa11	69	80
-HOXD11	70	79
-HOXD12	70	80
-HOXC10	70	79
-HOXC12	70	80
-HOXC11	70	80
-HOXC13	70	80
+motif	start	end	peak_overlap
+Tcf21	7	20	no peak
+TGIF1	8	19	no peak
+Tcf12	8	18	no peak
+Myog	8	18	no peak
+TGIF2	8	19	no peak
+ZBTB18	8	20	no peak
+PKNOX2	8	19	no peak
+PKNOX1	8	19	no peak
+Tcf12	9	19	no peak
+MYF6	9	18	no peak
+Myod1	9	21	no peak
+MSC	9	18	no peak
+NHLH1	9	18	no peak
+ID4	9	18	no peak
+TFAP4	9	18	no peak
+Ascl2	9	18	no peak
+MEIS2	13	20	no peak
+MEIS3	13	20	no peak
+MEIS1	14	20	no peak
+NR2C2	24	38	no peak
+ZNF263	25	45	no peak
+ZNF263	31	51	no peak
+ZNF263	34	54	no peak
+E2F7	48	61	no peak
+NRF1	64	74	no peak
+NR2C2	79	93	no peak
+KLF16	81	91	no peak
+SP3	81	91	no peak
+SP8	81	92	no peak
+ZNF740	83	92	no peak

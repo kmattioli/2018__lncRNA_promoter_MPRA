@@ -1,67 +1,55 @@
-motif	start	end
-Gfi1	2	11
-RREB1	29	48
-RREB1	30	49
-EGR4	31	46
-RREB1	32	51
-GLIS2	32	45
-RREB1	34	53
-Klf1	35	45
-RREB1	35	54
-SP2	35	49
-SP2	36	50
-SP8	36	47
-ZNF740	36	45
-EWSR1-FLI1	36	53
-MZF1(var.2)	36	45
-EGR1	36	49
-MZF1(var.2)	37	46
-SP3	37	47
-KLF16	37	47
-PLAG1	37	50
-SP4	37	53
-EGR1	37	50
-ZNF740	37	46
-EGR4	38	53
-PLAG1	38	51
-ZNF740	38	47
-SP3	38	48
-SP8	38	49
-ZNF740	39	48
-KLF14	39	52
-SP3	39	49
-SP1	39	49
-SP8	39	50
-KLF16	39	49
-Klf4	40	49
-KLF16	40	50
-SP1	40	50
-ZNF740	40	49
-SP3	40	50
-KLF5	40	49
-KLF5	41	50
-Klf1	41	51
-RARA	41	58
-ZNF740	41	50
-Klf4	41	50
-ZNF740	42	51
-SP8	43	54
-IRF2	44	61
-IRF1	45	65
-NFKB1	45	57
-NFKB2	46	58
-REL	46	55
-NFKB1	46	58
-RELA	47	56
-REL	47	56
-Ddit3::Cebpa	47	58
-STAT1::STAT2	47	61
-Ddit3::Cebpa	48	59
-Hoxc9	48	60
-IRF7	49	62
-IRF8	49	62
-IRF9	49	63
-Gabpa	52	62
-Gabpa	53	63
-ELF3	53	65
-ELK4	53	63
+motif	start	end	peak_overlap
+HEY2	6	15	in peak
+ARNT::HIF1A	7	14	in peak
+ZIC3	18	32	in peak
+ZIC4	18	32	in peak
+ZIC1	19	32	in peak
+SP2	19	33	in peak
+GLIS3	19	32	in peak
+GLIS2	19	32	in peak
+EGR1	20	33	in peak
+EGR2	20	30	in peak
+SP3	23	33	in peak
+SP1	23	33	in peak
+KLF16	23	33	in peak
+ZNF740	23	32	in peak
+RREB1	24	43	in peak
+Klf4	24	33	in peak
+KLF5	24	33	in peak
+SP2	25	39	in peak
+MZF1(var.2)	26	35	in peak
+EGR1	26	39	in peak
+SP3	27	37	in peak
+ZNF740	27	36	in peak
+PLAG1	27	40	in peak
+SP8	28	39	in peak
+SP1	29	39	in peak
+KLF16	29	39	in peak
+SP3	29	39	in peak
+Klf4	30	39	in peak
+KLF5	30	39	in peak
+NFKB1	35	47	in peak
+REL	36	45	in peak
+Ddit3::Cebpa	37	48	in peak
+Gabpa	42	52	in peak
+ELF3	43	55	in peak
+ELK4	43	53	in peak
+ERG	44	53	in peak
+ETV4	44	53	in peak
+ELF1	44	55	in peak
+ETV1	44	53	in peak
+FEV	44	53	in peak
+ELK3	44	53	in peak
+FLI1	44	53	in peak
+ERF	44	53	in peak
+EHF	44	55	in peak
+ETV3	44	53	in peak
+ETS1	44	53	in peak
+SPDEF	44	54	in peak
+ETV6	44	53	in peak
+ELF5	44	54	in peak
+ELF4	44	55	in peak
+ELK1	44	53	in peak
+ETV5	44	53	in peak
+SP1	80	90	in peak
+EGR1	80	93	in peak

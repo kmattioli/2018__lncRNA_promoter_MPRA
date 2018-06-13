@@ -446,7 +446,7 @@ def paired_swarmplots_w_pval(n_rows, n_cols, figsize, snp_df, data_df, fontsize,
 # In[ ]:
 
 
-def plot_peaks_and_snps(figsize, seq_len, seq_name, widths, scores, yerrs, scaled_scores, snp_vals, snp_sigs, bases, plotname, figs_dir):
+def plot_peaks_and_snps(figsize, seq_len, seq_name, widths, scores, yerrs, scaled_scores, snp_vals, snp_sigs, bases, plotname, figs_dir, save):
     sns.set(style="ticks", font="Helvetica", context="paper", rc={"font.size":7,"axes.titlesize":7,
                                                               "axes.labelsize":7, 'axes.linewidth':0.5,
                                                               "legend.fontsize":6, "xtick.labelsize":6,
@@ -457,10 +457,10 @@ def plot_peaks_and_snps(figsize, seq_len, seq_name, widths, scores, yerrs, scale
     snp_pal = {"sig": "firebrick", "not sig": "darkgray", "NA__too_many_rep_NAs": "darkgray", "NA": "white"}
     
     fig = plt.figure(figsize=figsize)
-    gs = gridspec.GridSpec(3, 1, height_ratios=[5, 2, 1], hspace=0.1)
+    gs = gridspec.GridSpec(3, 1, height_ratios=[5, 1, 2], hspace=0.1)
     peak_ax = plt.subplot(gs[0])
-    snp_ax = plt.subplot(gs[1])
-    seq_ax = plt.subplot(gs[2])
+    snp_ax = plt.subplot(gs[2])
+    seq_ax = plt.subplot(gs[1])
     
     ### peaks figure ###
     # plot peak locations
@@ -528,6 +528,139 @@ def plot_peaks_and_snps(figsize, seq_len, seq_name, widths, scores, yerrs, scale
     
     #plt.tight_layout()
     plt.show()
-    fig.savefig("%s/%s" % (figs_dir, plotname), dpi="figure", bbox_inches="tight")
+    if save:
+        fig.savefig("%s/%s" % (figs_dir, plotname), dpi="figure", bbox_inches="tight")
+    plt.close()
+
+
+# In[ ]:
+
+
+def getOverlap(a, b):
+    return max(a[0], b[0]) - min(a[1], b[1])
+
+
+# In[ ]:
+
+
+def plot_peaks_and_fimo(figsize, seq_len, seq_name, widths, scores, yerrs, scaled_scores, bases, motif_pos, motif_names, plotname, figs_dir, save):
+     
+    fig = plt.figure(figsize=figsize)
+    gs = gridspec.GridSpec(3, 1, height_ratios=[5, 1, 2], hspace=0.1)
+    peak_ax = plt.subplot(gs[0])
+    seq_ax = plt.subplot(gs[1])
+    motif_ax = plt.subplot(gs[2])
+    
+    ### peaks figure ###
+    # plot peak locations
+    for w in widths:
+        peak_ax.axvline(x=w[0], color="gray", linestyle="solid", linewidth=0.5, zorder=1)
+        peak_ax.axvline(x=w[1], color="gray", linestyle="solid", linewidth=0.5, zorder=1)
+        peak_ax.axvspan(w[0], w[1], alpha=0.5, color="gainsboro", zorder=1)
+    
+    # plot deletion values
+    xs = list(range(0, seq_len))
+    peak_ax.bar(xs, scores, yerr=yerrs, color="lightgray", edgecolor="gray", linewidth=0.5, ecolor="gray", 
+                error_kw={"elinewidth": 0.75})
+    
+    # labels
+    peak_ax.set_xlim((-0.5, seq_len))
+    peak_ax.set_xlabel("")
+    peak_ax.set_ylabel("log2(del/WT)")
+    peak_ax.xaxis.set_visible(False)
+    peak_ax.set_title(seq_name)
+    
+    # plot motif locations
+    xs = list(range(0, seq_len))
+    prev_plotted = {}
+    
+    # iterate through things plotted at each prev_y value
+    # if any overlaps, move
+    for i, pos in enumerate(motif_pos):
+        #print("")
+        #print("i: %s, pos: %s" % (i, pos))
+        plotted = False
+        if i == 0:
+            #print("first motif, plotting at y=0")
+            motif_ax.plot([pos[0], pos[1]], [0, 0], color="darkgrey", linewidth=2, solid_capstyle="butt")
+            plotted = True
+            prev_plotted[0] = [pos]
+            continue
+        for prev_y in sorted(prev_plotted.keys(), reverse=True):
+            vals = prev_plotted[prev_y]
+            overlaps = []
+            for prev_pos in vals:
+                overlaps.append(getOverlap(prev_pos, pos))
+            if any(x < 0 for x in overlaps):
+                #print("motif overlaps w/ %s, continuing" % (prev_y))
+                continue
+            else:
+                if not plotted:
+                    #print("motif doesn't overlap anything at y=%s, plotting" % prev_y)
+                    motif_ax.plot([pos[0], pos[1]], [prev_y, prev_y], color="darkgrey", linewidth=2, 
+                                  solid_capstyle="butt")
+                    if prev_y not in prev_plotted:
+                        prev_plotted[prev_y] = [pos]
+                    else:
+                        new_vals = list(prev_plotted[prev_y])
+                        new_vals.extend([pos])
+                        prev_plotted[prev_y] = new_vals
+                    plotted = True
+        if not plotted:
+            prev_y -= 0.25
+            #print("motif overlaps at all prev_y, plotting at %s" % prev_y)
+            motif_ax.plot([pos[0], pos[1]], [prev_y, prev_y], color="darkgrey", linewidth=2, 
+                          solid_capstyle="butt")
+            if prev_y not in prev_plotted:
+                prev_plotted[prev_y] = [pos]
+            else:
+                new_vals = list(prev_plotted[prev_y])
+                new_vals.extend([pos])
+                prev_plotted[prev_y] = new_vals
+            plotted = True
+        #print(prev_plotted)
+        
+    min_y = np.min(list(prev_plotted.keys()))
+
+    # labels
+    motif_ax.set_xlim((-0.5, seq_len))
+    motif_ax.set_ylim((min_y - 0.25, 0.25))
+    motif_ax.set_xlabel("nucleotide number")
+    motif_ax.set_ylabel("")
+    motif_ax.xaxis.set_visible(False)
+    motif_ax.yaxis.set_visible(False)
+    motif_ax.axis("off")
+    
+    ### seq logo ###
+    mpl.rcParams["font.family"] = "Arial"
+    scaled_scores = scale_range(scaled_scores, 0.5, 2.0)
+    
+    font = FontProperties()
+    font.set_size(6)
+    font.set_weight("bold")
+    
+    seq_ax.set_xticks(range(1,len(scaled_scores)+1))
+    seq_ax.set_ylim((0, 2))
+    seq_ax.axis("off")
+    trans_offset = transforms.offset_copy(seq_ax.transData, 
+                                          fig=fig, 
+                                          x=1, 
+                                          y=0, 
+                                          units="dots")
+    
+    for i in range(0, len(scaled_scores)):
+        score = scaled_scores[i]
+        base = bases[i]
+        color = COLOR_DICT[base]
+        txt = seq_ax.text(i+0.25, 0, base, transform=trans_offset,fontsize=6, color=color, 
+                          ha="center", fontproperties=font)
+        txt.set_path_effects([Scale(1.0, score)])
+        fig.canvas.draw()
+        trans_offset = transforms.offset_copy(seq_ax.transData, fig=fig, x=1, y=0, units='points')
+    
+    #plt.tight_layout()
+    plt.show()
+    if save:
+        fig.savefig("%s/%s" % (figs_dir, plotname), dpi="figure", bbox_inches="tight")
     plt.close()
 

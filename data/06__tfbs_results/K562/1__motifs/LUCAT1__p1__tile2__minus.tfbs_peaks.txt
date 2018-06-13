@@ -1,11 +1,21 @@
-motif	start	end
-Nkx2-5(var.2)	6	16
-ZNF263	16	36
-MAF::NFE2	20	34
-MAFG	20	40
-MAF::NFE2	21	35
-JUN(var.2)	21	34
-MAFG	21	41
-JUN(var.2)	22	35
-Bach1::Mafk	23	37
-BATF::JUN	23	33
+motif	start	end	peak_overlap
+MAFG	10	30	no peak
+MAF::NFE2	10	24	no peak
+JUN(var.2)	11	24	no peak
+Bach1::Mafk	13	27	no peak
+JUNB	14	24	no peak
+Nfe2l2	14	28	no peak
+FOSL1	15	25	no peak
+JUND	15	25	no peak
+NFE2	15	25	no peak
+FOS	15	25	no peak
+JUNB	16	26	no peak
+JUN(var.2)	16	29	no peak
+JDP2	16	24	no peak
+FOSL2	16	26	no peak
+FOS::JUN	17	23	no peak
+BATF::JUN	17	27	no peak
+Myb	32	41	in peak
+FOXH1	66	76	in peak
+Dux	67	74	in peak
+Sox6	84	93	in peak

@@ -1,53 +1,16 @@
-motif	start	end
-EGR4	9	24
-EGR3	10	24
-EGR1	12	25
-EGR2	12	22
-EGR1	13	26
-Klf12	13	27
-KLF14	14	27
-HES7	15	26
-EGR4	16	31
-HEY2	16	25
-ARNT::HIF1A	17	24
-HINFP	18	29
-NRF1	18	28
-Bach1::Mafk	18	32
-Gmeb1	18	34
-GLI2	18	29
-EGR2	19	29
-Tcfl5	23	32
-JUND(var.2)	24	38
-Arntl	24	33
-JUN(var.2)	24	37
-Gmeb1	24	40
-Mitf	24	33
-JUND(var.2)	25	39
-Nfe2l2	25	39
-JUN	25	37
-XBP1	25	38
-Pax2	26	33
-Bach1::Mafk	26	40
-BATF3	26	39
-JUN	26	38
-ATF7	26	39
-CREB3	26	39
-TBP	50	64
-PPARG	57	76
-SMAD2::SMAD3::SMAD4	58	70
-TAL1::TCF3	68	79
-Tcf21	68	81
-BHLHE23	69	80
-MYF6	70	79
-NEUROG2	70	79
-Neurog1	70	79
-OLIG3	70	79
-BHLHE22	70	79
-NEUROD2	70	79
-TAL1::TCF3	70	81
-Atoh1	70	79
-Twist2	70	79
-OLIG1	70	79
-OLIG2	70	79
-Myb	71	80
-Bhlha15	71	78
+motif	start	end	peak_overlap
+JUND(var.2)	14	28	in peak
+JUN	15	27	in peak
+BATF3	16	29	in peak
+ATF7	16	29	in peak
+CREB3	16	29	in peak
+JDP2(var.2)	17	28	in peak
+Crem	17	26	in peak
+Creb5	17	28	in peak
+JUND(var.2)	17	31	in peak
+JUN	18	30	in peak
+MTF1	18	31	in peak
+Atf1	18	25	in peak
+CREB1	19	26	in peak
+Crem	19	28	in peak
+Atf3	21	28	in peak

@@ -1,50 +1,23 @@
-motif	start	end
-ZNF263	8	28
-EGR3	11	25
-ZNF263	11	31
-ZIC4	12	26
-ZIC3	12	26
-EGR1	12	25
-SP4	12	28
-EGR4	13	28
-EGR1	13	26
-EGR3	13	27
-Zfx	14	27
-EGR3	14	28
-Zfx	15	28
-EGR1	15	28
-EWSR1-FLI1	15	32
-SP8	15	26
-SP4	15	31
-EGR1	16	29
-NRF1	17	27
-KLF14	17	30
-Klf4	18	27
-KLF5	18	27
-SP2	18	32
-SP8	18	29
-SP3	18	28
-KLF16	18	28
-SP1	18	28
-EGR1	18	31
-CTCF	19	37
-EGR1	19	32
-CTCF	20	38
-SP1	21	31
-KLF5	21	30
-SP2	21	35
-SCRT2	25	37
-POU2F2	27	39
-MAFF	28	45
-Pou5f1::Sox2	30	44
-NRL	30	40
-Mafb	30	41
-MAFK	30	44
-MAFG	30	50
-Pou5f1::Sox2	31	45
-Nfe2l2	32	46
-Bach1::Mafk	33	47
-Nfe2l2	33	47
-Bach1::Mafk	34	48
-MAFF	35	52
-MAF::NFE2	36	50
+motif	start	end	peak_overlap
+EGR1	2	15	in peak
+EGR3	3	17	in peak
+Zfx	4	17	in peak
+EGR1	5	18	in peak
+EGR1	8	21	in peak
+CTCF	9	27	in peak
+Pou5f1::Sox2	20	34	no peak
+Nfe2l2	22	36	no peak
+Bach1::Mafk	23	37	no peak
+MAF::NFE2	26	40	no peak
+Myod1	38	50	in peak
+Tcf12	40	50	in peak
+Myog	40	50	in peak
+Myog	41	51	in peak
+Tcf12	41	51	in peak
+Myod1	41	53	in peak
+NHLH1	41	50	in peak
+TCF4	41	50	in peak
+TCF3	41	50	in peak
+Ascl2	41	50	in peak
+ELK4	73	83	in peak
+Gabpa	74	84	in peak
