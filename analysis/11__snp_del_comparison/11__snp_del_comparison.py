@@ -485,9 +485,9 @@ for cell, snps, dels in zip(["HepG2", "K562"], [hepg2_snps, k562_snps], [hepg2_d
             plot_peaks_and_snps((5.6, 2), seq_len, seq, widths, scores, yerrs, scaled_scores, 
                                 snp_vals, snp_sigs, bases, "Fig_4E_%s.pdf" % cell, ".", True)
 
-        else:
-            plot_peaks_and_snps((5.6, 2), seq_len, seq, widths, scores, yerrs, scaled_scores, 
-                                snp_vals, snp_sigs, bases, None, None, False)
+#         else:
+#             plot_peaks_and_snps((5.6, 2), seq_len, seq, widths, scores, yerrs, scaled_scores, 
+#                                 snp_vals, snp_sigs, bases, None, None, False)
 
 
 # In[ ]:

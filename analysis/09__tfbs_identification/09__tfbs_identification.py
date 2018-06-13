@@ -251,7 +251,7 @@ def getOverlap(a, b):
     return max(a[0], b[0]) - min(a[1], b[1])
 
 
-# In[34]:
+# In[55]:
 
 
 hepg2_motif_peaks = {}
@@ -324,13 +324,14 @@ for data_peaks, data_motifs, cell in zip([hepg2_data_peaks, k562_data_peaks], [h
             added = False
             for w in widths:
                 overlap = getOverlap(w, [start, end])
-                if overlap > 0:
+                if overlap < 0:
                     in_peaks.append("in peak")
                     added = True
                     break
             if not added:
                 in_peaks.append("no peak")
         data_motifs[key] = {"motif": motifs, "start": starts, "end": ends, "peak_overlap": in_peaks}
+        print({"motif": motifs, "start": starts, "end": ends, "peak_overlap": in_peaks})
 
 
 # In[35]:
@@ -603,7 +604,7 @@ for del_dict, motif_dict, d in zip([hepg2_data_peaks, k562_data_peaks],
         d[key] = [wt_activ, n_tot_sig]
 
 
-# In[96]:
+# In[51]:
 
 
 hepg2_activ = pd.DataFrame.from_dict(hepg2_dict, orient="index").reset_index()
@@ -613,13 +614,13 @@ k562_activ = pd.DataFrame.from_dict(k562_dict, orient="index").reset_index()
 k562_activ.columns = ["seq_name", "activ", "n_sig"]
 
 
-# In[97]:
+# In[52]:
 
 
 hepg2_activ.head()
 
 
-# In[98]:
+# In[53]:
 
 
 g = sns.jointplot(data=hepg2_activ, x="activ", y="n_sig", kind="reg", space=0, size=2.625, stat_func=spearmanr, 
@@ -629,7 +630,7 @@ g.set_axis_labels("reference activity", "# motifs")
 g.savefig("Fig_S15A_1.pdf", dpi="figure", bbox_inches="tight")
 
 
-# In[99]:
+# In[54]:
 
 
 g = sns.jointplot(data=k562_activ, x="activ", y="n_sig", kind="reg", space=0, size=2.625, stat_func=spearmanr, 
