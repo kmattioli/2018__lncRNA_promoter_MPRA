@@ -582,6 +582,12 @@ annotate_pval(ax, 0.2, 0.8, 40, 0, 39, pval, fontsize)
 fig.savefig("Fig_S15B.pdf", dpi="figure", bbox_inches="tight")
 
 
+# In[56]:
+
+
+pval
+
+
 # ## 8. plot correlation b/w number of motifs found and ref tile activity
 
 # In[50]:

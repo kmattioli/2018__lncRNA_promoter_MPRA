@@ -479,7 +479,7 @@ for cell, snps, dels in zip(["HepG2", "K562"], [hepg2_snps, k562_snps], [hepg2_d
         if "MEG3__p1__tile2__plus" in seq:
             print(snp_info)
             plot_peaks_and_snps((5.6, 2), seq_len, seq, widths, scores, yerrs, scaled_scores, 
-                                snp_vals, snp_sigs, bases, "Fig_S17B_%s" % cell, ".", True)
+                                snp_vals, snp_sigs, bases, "Fig_S17B_%s.pdf" % cell, ".", True)
         elif "DLEU1__p1__tile2__plus" in seq:
             print(snp_info)
             plot_peaks_and_snps((5.6, 2), seq_len, seq, widths, scores, yerrs, scaled_scores, 
