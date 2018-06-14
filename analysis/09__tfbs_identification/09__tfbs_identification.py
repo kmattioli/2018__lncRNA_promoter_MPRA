@@ -501,11 +501,11 @@ cg = sns.clustermap(hepg2_mo_df, annot=False, cmap=cmap, figsize=(2.25, 3))
 cg.savefig("Fig_4D.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[58]:
+# In[59]:
 
 
 cg = sns.clustermap(hepg2_mo_df.T, annot=False, cmap=cmap, figsize=(5, 12))
-cg.savefig("Fig_4D_big.pdf", bbox_inches="tight", dpi="figure")
+cg.savefig("Fig_4D_big_vert.pdf", bbox_inches="tight", dpi="figure")
 
 
 # ## 7. plot number of motifs found in seqs expressed in only one cell type vs. two
