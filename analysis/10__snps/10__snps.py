@@ -879,16 +879,15 @@ fig.savefig("Fig_S21_2.pdf", dpi="figure", bbox_inches="tight")
 
 # ## 14. make GWAS supplemental table
 
-# In[86]:
+# In[124]:
 
 
 tss_snps = pd.read_table("../../misc/07__gwas/tss.snp.ragger.output.txt", sep="\t")
 enh_snps = pd.read_table("../../misc/07__gwas/enh.snp.ragger.output.txt", sep="\t")
 all_snps = tss_snps.append(enh_snps)
-all_snps.head()
 
 
-# In[88]:
+# In[125]:
 
 
 n_snps_ld = all_snps.groupby(["SNP1 Name"])["Population"].agg("count").reset_index()
@@ -897,14 +896,13 @@ all_snps = all_snps.merge(n_snps_ld, on="SNP1 Name", how="left")
 all_snps.head()
 
 
-# In[85]:
+# In[126]:
 
 
 gwas = pd.read_table("../../misc/07__gwas/gwas.catalog.h19.ucsc.txt", sep="\t")
-gwas.head()
 
 
-# In[89]:
+# In[127]:
 
 
 tmp_snps = all_snps[["SNP1 Name", "SNP2 Name", "R-squared", "D'", "Distance", "n_snps_in_ld"]].drop_duplicates()
@@ -913,16 +911,21 @@ tmp = tmp_snps.merge(tmp_gwas, left_on="SNP1 Name", right_on="name", how="outer"
 tmp.head()
 
 
-# In[93]:
+# In[128]:
 
 
 tmp_mpra = supp_table_s7[["SNP", "unique_id", "HepG2_effect_size", "HepG2_sig_status", "K562_effect_size", "K562_sig_status", "delta_tfs", "sig_type"]].drop_duplicates()
 supp_table_s8 = tmp_mpra.merge(tmp, left_on="SNP", right_on="SNP2 Name")
-supp_table_s8 = supp_table_s8[supp_table_s8["sig_type"] != "not sig in both"]
 supp_table_s8.head()
 
 
-# In[95]:
+# In[129]:
+
+
+supp_table_s8 = supp_table_s8[(supp_table_s8["HepG2_sig_status"] == "sig") | (supp_table_s8["K562_sig_status"] == "sig")]
+
+
+# In[130]:
 
 
 supp_table_s8 = supp_table_s8[["unique_id", "SNP", "HepG2_effect_size", "K562_effect_size", "HepG2_sig_status",
@@ -934,13 +937,31 @@ supp_table_s8.columns = ["unique_id", "tested_SNP", "HepG2_effect_size", "K562_e
 supp_table_s8.head()
 
 
-# In[99]:
+# In[131]:
 
 
-supp_table_s8[supp_table_s8["tested_SNP"] == "rs4456788"]
+len(supp_table_s8)
 
 
-# In[100]:
+# In[132]:
+
+
+len(supp_table_s8[(supp_table_s8["HepG2_sig_status"] == "sig") & (supp_table_s8["K562_sig_status"] == "sig")])
+
+
+# In[133]:
+
+
+supp_table_s8.HepG2_sig_status.value_counts()
+
+
+# In[134]:
+
+
+supp_table_s8.K562_sig_status.value_counts()
+
+
+# In[135]:
 
 
 supp_table_s8.to_csv("../../data/07__snps/Supplemental_Table_S8.txt", sep="\t", index=False)
