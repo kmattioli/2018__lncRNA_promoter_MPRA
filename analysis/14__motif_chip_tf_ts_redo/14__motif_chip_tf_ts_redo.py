@@ -214,12 +214,6 @@ pool1_annot = pd.read_table(pool1_annot_f, sep="\t")
 pool1_annot.head()
 
 
-# In[28]:
-
-
-pool1_annot.sample(5)
-
-
 # ## 2. grab gene_ids for motif_names in chip/fimo 
 
 # In[23]:
