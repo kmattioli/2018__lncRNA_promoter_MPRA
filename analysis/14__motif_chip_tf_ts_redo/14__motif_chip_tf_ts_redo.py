@@ -508,20 +508,6 @@ tf_ts.sort_values(by="TF_tissue_spec_all").tail()
 
 # #### chip -- all promoters -- 3kb -- 3 cell-line CAGE
 
-# In[72]:
-
-
-# fig = plt.figure(figsize=(1.2, 1.2))
-# ax = sns.kdeplot(chip_grp_all["tf_ts"], chip_grp_all["tss_ts"], cmap=cmap, 
-#                  shade=True, shade_lowest=False)
-# ax.set_xlabel("mean(tissue-specificity of TFs w/ peak in TSS)")
-# ax.set_ylabel("tissue-specificity of TSS")
-
-# r, p = stats.spearmanr(chip_grp_all["tf_ts"], chip_grp_all["tss_ts"])
-# print("r: %s, spearman p: %s" % (r, p))
-# ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-
-
 # In[75]:
 
 
@@ -840,14 +826,145 @@ pool1_fimo_grp.columns = ["tss_id", "tss_ts", "tf_ts", "tf_count"]
 pool1_fimo_grp.sample(5)
 
 
-# In[117]:
+# In[118]:
 
 
 g = sns.jointplot(data=pool1_fimo_grp, x="tf_ts", y="tss_ts", kind="reg", size=2.5, color="gray", 
                   stat_func=spearmanr,
-                  xlim=(0, 1), ylim=(0,1), joint_kws=dict(scatter_kws={'alpha':0.1}))
+                  xlim=(0, 0.6), ylim=(0,0.6), joint_kws=dict(scatter_kws={'alpha':0.1}))
 g.set_axis_labels("mean(cell-type-specificity of TFs w/ peak in TSS)", "MPRA cell-type-specificity of TSS")
 g.savefig("MPRA_spec_fimo_pool1TSS_114bp_3CAGE_corr.pdf", dpi="figure", bbox_inches="tight")
+
+
+# ## summarize
+
+# In[123]:
+
+
+chip_all_3kb_allCAGE = {"length": "3kb", "seqs": "all", "CAGE": "all", "rho": 0.42}
+chip_all_114bp_allCAGE = {"length": "114bp", "seqs": "all", "CAGE": "all", "rho": 0.45}
+chip_all_3kb_3CAGE = {"length": "3kb", "seqs": "all", "CAGE": "three", "rho": 0.48}
+chip_all_114bp_3CAGE = {"length": "3kb", "seqs": "all", "CAGE": "all", "rho": 0.29}
+
+chip_pool1_3kb_allCAGE = {"length": "3kb", "seqs": "pool1", "CAGE": "all", "rho": 0.48}
+chip_pool1_114bp_allCAGE = {"length": "114bp", "seqs": "pool1", "CAGE": "all", "rho": 0.18}
+chip_pool1_3kb_3CAGE = {"length": "3kb", "seqs": "pool1", "CAGE": "three", "rho": 0.34}
+chip_pool1_114bp_3CAGE = {"length": "3kb", "seqs": "pool1", "CAGE": "all", "rho": 0.061}
+
+fimo_all_3kb_allCAGE = {"length": "3kb", "seqs": "all", "CAGE": "all", "rho": 0.28}
+fimo_all_114bp_allCAGE = {"length": "114bp", "seqs": "all", "CAGE": "all", "rho": 0.32}
+fimo_all_3kb_3CAGE = {"length": "3kb", "seqs": "all", "CAGE": "three", "rho": 0.22}
+fimo_all_114bp_3CAGE = {"length": "3kb", "seqs": "all", "CAGE": "all", "rho": 0.24}
+
+fimo_pool1_3kb_allCAGE = {"length": "3kb", "seqs": "pool1", "CAGE": "all", "rho": 0.23}
+fimo_pool1_114bp_allCAGE = {"length": "114bp", "seqs": "pool1", "CAGE": "all", "rho": 0.34}
+fimo_pool1_3kb_3CAGE = {"length": "3kb", "seqs": "pool1", "CAGE": "three", "rho": 0.1}
+fimo_pool1_114bp_3CAGE = {"length": "3kb", "seqs": "pool1", "CAGE": "all", "rho": 0.17}
+
+
+# In[131]:
+
+
+dist_diffs = {"ChIP_allseqs_allCAGE": [chip_all_3kb_allCAGE["rho"], chip_all_114bp_allCAGE["rho"]], 
+              "FIMO_allseqs_allCAGE": [fimo_all_3kb_allCAGE["rho"], fimo_all_114bp_allCAGE["rho"]],
+              "ChIP_allseqs_3CAGE": [chip_all_3kb_3CAGE["rho"], chip_all_114bp_3CAGE["rho"]],
+              "FIMO_allseqs_3CAGE": [fimo_all_3kb_3CAGE["rho"], fimo_all_114bp_3CAGE["rho"]],
+              "ChIP_pool1_allCAGE": [chip_pool1_3kb_allCAGE["rho"], chip_pool1_114bp_allCAGE["rho"]],
+              "FIMO_pool1_allCAGE": [fimo_pool1_3kb_allCAGE["rho"], fimo_pool1_114bp_allCAGE["rho"]],
+              "ChIP_pool1_3CAGE": [chip_pool1_3kb_3CAGE["rho"], chip_pool1_114bp_3CAGE["rho"]],
+              "FIMO_pool1_3CAGE": [fimo_pool1_3kb_3CAGE["rho"], fimo_pool1_114bp_3CAGE["rho"]]}
+
+
+# In[132]:
+
+
+dist_diffs = pd.DataFrame.from_dict(dist_diffs, orient="index")
+dist_diffs.columns = ["3kb", "114bp"]
+dist_diffs["diff"] = np.abs(dist_diffs["114bp"]-dist_diffs["3kb"])
+dist_diffs["delta_measurement"] = "distance (3kb to 114bp)"
+dist_diffs
+
+
+# In[133]:
+
+
+cage_diffs = {"ChIP_allseqs_3kb": [chip_all_3kb_allCAGE["rho"], chip_all_3kb_3CAGE["rho"]], 
+              "FIMO_allseqs_3kb": [fimo_all_3kb_allCAGE["rho"], fimo_all_3kb_3CAGE["rho"]],
+              "ChIP_allseqs_114bp": [chip_all_114bp_allCAGE["rho"], chip_all_114bp_3CAGE["rho"]],
+              "FIMO_allseqs_114bp": [fimo_all_114bp_allCAGE["rho"], fimo_all_114bp_3CAGE["rho"]],
+              "ChIP_pool1_3kb": [chip_pool1_3kb_allCAGE["rho"], chip_pool1_3kb_3CAGE["rho"]],
+              "FIMO_pool1_3kb": [fimo_pool1_3kb_allCAGE["rho"], fimo_pool1_3kb_3CAGE["rho"]],
+              "ChIP_pool1_114bp": [chip_pool1_114bp_allCAGE["rho"], chip_pool1_114bp_3CAGE["rho"]],
+              "FIMO_pool1_114bp": [fimo_pool1_114bp_allCAGE["rho"], fimo_pool1_114bp_3CAGE["rho"]]}
+
+
+# In[134]:
+
+
+cage_diffs = pd.DataFrame.from_dict(cage_diffs, orient="index")
+cage_diffs.columns = ["all CAGE", "3 CAGE"]
+cage_diffs["diff"] = np.abs(cage_diffs["all CAGE"]-cage_diffs["3 CAGE"])
+cage_diffs["delta_measurement"] = "# CAGE samples (all to 3)"
+cage_diffs
+
+
+# In[135]:
+
+
+seq_diffs = {"ChIP_3kb_allCAGE": [chip_all_3kb_allCAGE["rho"], chip_pool1_3kb_allCAGE["rho"]], 
+              "FIMO_3kb_allCAGE": [fimo_all_3kb_allCAGE["rho"], fimo_pool1_3kb_allCAGE["rho"]],
+              "ChIP_114bp_allCAGE": [chip_all_114bp_allCAGE["rho"], chip_pool1_114bp_allCAGE["rho"]],
+              "FIMO_114bp_allCAGE": [fimo_all_114bp_allCAGE["rho"], fimo_pool1_114bp_allCAGE["rho"]],
+              "ChIP_3kb_3CAGE": [chip_all_3kb_3CAGE["rho"], chip_pool1_3kb_3CAGE["rho"]],
+              "FIMO_3kb_3CAGE": [fimo_all_3kb_3CAGE["rho"], fimo_pool1_3kb_3CAGE["rho"]],
+              "ChIP_114bp_3CAGE": [chip_all_114bp_3CAGE["rho"], chip_pool1_114bp_3CAGE["rho"]],
+              "FIMO_114bp_3CAGE": [fimo_all_114bp_3CAGE["rho"], fimo_pool1_114bp_3CAGE["rho"]]}
+
+
+# In[136]:
+
+
+seq_diffs = pd.DataFrame.from_dict(seq_diffs, orient="index")
+seq_diffs.columns = ["all seqs", "Pool1 seqs"]
+seq_diffs["diff"] = np.abs(seq_diffs["all seqs"]-seq_diffs["Pool1 seqs"])
+seq_diffs["delta_measurement"] = "# seqs (all to Pool1 only)"
+seq_diffs
+
+
+# In[137]:
+
+
+type_diffs = {"allseqs_3kb_allCAGE": [chip_all_3kb_allCAGE["rho"], fimo_all_3kb_allCAGE["rho"]], 
+              "allseqs_114bp_allCAGE": [chip_all_114bp_allCAGE["rho"], fimo_all_114bp_allCAGE["rho"]],
+              "allseqs_3kb_3CAGE": [chip_all_3kb_3CAGE["rho"], fimo_all_3kb_3CAGE["rho"]],
+              "allseqs_114bp_3CAGE": [chip_all_114bp_3CAGE["rho"], fimo_all_114bp_3CAGE["rho"]],
+              "pool1_3kb_allCAGE": [chip_pool1_3kb_allCAGE["rho"], fimo_pool1_3kb_allCAGE["rho"]],
+              "pool1_114bp_allCAGE": [chip_pool1_114bp_allCAGE["rho"], fimo_pool1_114bp_allCAGE["rho"]],
+              "pool1_3kb_3CAGE": [chip_pool1_3kb_3CAGE["rho"], fimo_pool1_3kb_3CAGE["rho"]],
+              "pool1_114bp_3CAGE": [chip_pool1_114bp_3CAGE["rho"], fimo_pool1_114bp_3CAGE["rho"]]}
+
+
+# In[138]:
+
+
+type_diffs = pd.DataFrame.from_dict(type_diffs, orient="index")
+type_diffs.columns = ["ChIP", "FIMO"]
+type_diffs["diff"] = np.abs(type_diffs["ChIP"]-type_diffs["FIMO"])
+type_diffs["delta_measurement"] = "motif type (ChIP to FIMO)"
+type_diffs
+
+
+# In[139]:
+
+
+all_diffs = dist_diffs[["diff", "delta_measurement"]].append(cage_diffs[["diff", "delta_measurement"]]).append(seq_diffs[["diff", "delta_measurement"]].append(type_diffs[["diff", "delta_measurement"]]))
+all_diffs
+
+
+# In[140]:
+
+
+sns.boxplot(data=all_diffs, x="delta_measurement")
 
 
 # In[ ]:
