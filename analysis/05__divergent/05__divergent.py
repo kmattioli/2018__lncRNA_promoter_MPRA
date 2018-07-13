@@ -209,7 +209,7 @@ data.head()
 plt.figure(figsize=(2.5, 2.5))
 ax = sns.boxplot(data=data, x="type", y="log_mean", order=order, palette=palette,
                  flierprops=dict(marker='o', markersize=5))
-ax.set_xticklabels(["enhancers", "lincRNAs", "div. lncRNAs", "mRNAs", "div. mRNAs"], rotation=30)
+ax.set_xticklabels(["eRNAs", "lincRNAs", "div. lncRNAs", "mRNAs", "div. mRNAs"], rotation=30)
 mimic_r_boxplot(ax)
 ax.set_ylabel("log(mean(phyloP 100-way score))")
 ax.set_xlabel("")
@@ -481,6 +481,7 @@ plt.figure(figsize=(3, 2))
 ax = sns.countplot(data=sig_results, x="PromType2", color="lightgray", order=TSS_CLASS_ORDER)
 sns.countplot(data=sig_results[sig_results["sig_in_any"]], x="PromType2", palette=TSS_CLASS_PALETTE, 
               order=TSS_CLASS_ORDER, ax=ax)
+ax.set_xticklabels(["eRNAs", "lincRNAs", "div. lncRNAs", "mRNAs", "div. mRNAs"], rotation=30)
 
 counts = []
 tots = []

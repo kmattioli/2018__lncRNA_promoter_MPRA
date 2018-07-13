@@ -471,7 +471,7 @@ activ_counts = pd.melt(activ_counts, id_vars="PromType2")
 activ_counts.head()
 
 
-# In[42]:
+# In[44]:
 
 
 df = activ_counts[activ_counts["PromType2"] != "antisense"]
@@ -482,14 +482,14 @@ plt.figure(figsize=(3.56, 2.3))
 ax = sns.barplot(data=df, x="variable", y="value", hue="PromType2", ci=None, palette=TSS_CLASS_PALETTE)
 ax.set_xticklabels(["active in 1", "active in 2", "active in 3"], rotation=30)
 
-plt.legend(bbox_to_anchor=(1.1, 1))
+plt.legend(bbox_to_anchor=(1.35, 1))
 plt.ylim((0, 50))
 plt.ylabel("percent of sequences", size=fontsize)
 plt.xlabel("")
 plt.title("% of elements active in # of cell types")
 
 
-# In[43]:
+# In[45]:
 
 
 colors = []
@@ -498,7 +498,7 @@ for c in TSS_CLASS_ORDER:
 colors
 
 
-# In[44]:
+# In[46]:
 
 
 # better plot showing tissue sp
@@ -531,7 +531,7 @@ plt.savefig("Fig_2E.pdf", bbox_inches="tight", dpi="figure")
 
 # ## 7. kdeplot: compare to CAGE
 
-# In[45]:
+# In[47]:
 
 
 hepg2_activ = pool1_hepg2_df[["unique_id", "element", "better_type", "overall_mean", "PromType2"]]
@@ -547,7 +547,7 @@ all_activ = all_activ[(all_activ["PromType2"].isin(TSS_CLASS_ORDER)) &
 all_activ.sample(5)
 
 
-# In[46]:
+# In[48]:
 
 
 all_activ["combined_class"] = ""
@@ -556,14 +556,14 @@ all_activ.drop("combined_class", axis=1, inplace=True)
 all_activ.head()
 
 
-# In[47]:
+# In[49]:
 
 
 all_activ["oligo_reg"] = all_activ.unique_id.str.split("__", expand=True)[2]
 all_activ.sample(5)
 
 
-# In[48]:
+# In[50]:
 
 
 id_map = id_map[["oligo_reg", "K562_rep1", "K562_rep2", "K562_rep3", "HeLa_rep1", "HeLa_rep2", "HeLa_rep3", 
@@ -572,7 +572,7 @@ all_activ = all_activ.merge(id_map, on="oligo_reg")
 all_activ.sample(5)
 
 
-# In[49]:
+# In[51]:
 
 
 all_activ["K562_av"] = all_activ[["K562_rep1", "K562_rep2", "K562_rep3"]].mean(axis=1)
@@ -584,7 +584,7 @@ all_activ["HeLa_log_av"] = np.log(all_activ["HeLa_av"]+1)
 all_activ["HepG2_log_av"] = np.log(all_activ["HepG2_av"]+1)
 
 
-# In[50]:
+# In[52]:
 
 
 all_activ = all_activ[(~all_activ["unique_id"].str.contains("SNP_INDIV")) & 
@@ -593,7 +593,7 @@ all_activ = all_activ[(~all_activ["unique_id"].str.contains("SNP_INDIV")) &
 all_activ.sample(5)
 
 
-# In[51]:
+# In[53]:
 
 
 # first scale mpra ranges to be positive
@@ -602,7 +602,7 @@ all_activ["hela_scaled"] = scale_range(all_activ["HeLa"], 0, 100)
 all_activ["k562_scaled"] = scale_range(all_activ["K562"], 0, 100)
 
 
-# In[52]:
+# In[54]:
 
 
 cage_ts = calculate_tissue_specificity(all_activ[["HepG2_log_av", "K562_log_av", "HeLa_log_av"]])
@@ -615,13 +615,13 @@ all_activ["mpra_ts"] = mpra_ts
 all_activ.head()
 
 
-# In[53]:
+# In[55]:
 
 
 cmap = sns.light_palette("darkslategray", as_cmap=True)
 
 
-# In[54]:
+# In[56]:
 
 
 no_nan = all_activ[(~pd.isnull(all_activ["mpra_ts"])) & (~pd.isnull(all_activ["cage_ts"]))]
@@ -636,7 +636,7 @@ g.ax_joint.annotate("r = {:.2f}\np = {:.2e}".format(r, Decimal(p)), xy=(.1, .8),
 g.savefig("Fig_2D.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[55]:
+# In[57]:
 
 
 def cage_v_mpra_ts(row):
@@ -653,7 +653,7 @@ no_nan["ts_status"] = no_nan.apply(cage_v_mpra_ts, axis=1)
 no_nan.ts_status.value_counts()
 
 
-# In[56]:
+# In[58]:
 
 
 tot = 692+402+310+236
@@ -667,13 +667,13 @@ print("lower left: %s" % (lower_left/tot))
 print("lower right: %s" % (lower_right/tot))
 
 
-# In[57]:
+# In[59]:
 
 
 (692+402)/(692+402+310+236)
 
 
-# In[58]:
+# In[60]:
 
 
 no_nan = all_activ[(~pd.isnull(all_activ["mpra_activ"])) & (~pd.isnull(all_activ["cage_activ"]))]

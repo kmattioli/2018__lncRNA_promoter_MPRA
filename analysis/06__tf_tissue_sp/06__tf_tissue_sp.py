@@ -423,6 +423,56 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 fig.savefig("Fig_3C_5.pdf", bbox_inches="tight", dpi="figure")
 
 
+# ### check correlation b/w motif metrics and total # of motifs
+
+# In[44]:
+
+
+cmap = sns.light_palette("darkslategray", as_cmap=True)
+
+
+# In[46]:
+
+
+fig = plt.figure(figsize=(1.2, 1.2))
+ax = sns.kdeplot(mean_activ["log_num_motifs"], mean_activ["log_max_cov"], cmap=cmap, 
+                 shade=True, shade_lowest=False)
+ax.set_xlabel("log(total number of motifs)")
+ax.set_ylabel("log(maximum motif coverage)")
+
+r, p = stats.spearmanr(mean_activ["log_num_motifs"], mean_activ["log_max_cov"])
+print("r: %s, spearman p: %s" % (r, p))
+ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
+
+
+# In[47]:
+
+
+fig = plt.figure(figsize=(1.2, 1.2))
+ax = sns.kdeplot(mean_activ["log_num_motifs"], mean_activ["log_bp_cov"], cmap=cmap, 
+                 shade=True, shade_lowest=False)
+ax.set_xlabel("log(total number of motifs)")
+ax.set_ylabel("log(number of bp covered by motifs)")
+
+r, p = stats.spearmanr(mean_activ["log_num_motifs"], mean_activ["log_bp_cov"])
+print("r: %s, spearman p: %s" % (r, p))
+ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
+
+
+# In[48]:
+
+
+fig = plt.figure(figsize=(1.2, 1.2))
+ax = sns.kdeplot(mean_activ["log_max_cov"], mean_activ["log_bp_cov"], cmap=cmap, 
+                 shade=True, shade_lowest=False)
+ax.set_xlabel("log(maximum motif coverage)")
+ax.set_ylabel("log(number of bp covered by motifs)")
+
+r, p = stats.spearmanr(mean_activ["log_max_cov"], mean_activ["log_bp_cov"])
+print("r: %s, spearman p: %s" % (r, p))
+ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
+
+
 # ## 7. write files
 
 # In[44]:
@@ -449,4 +499,68 @@ out_dir = "../../data/04__coverage"
 get_ipython().system('mkdir -p $out_dir')
 final.to_csv("%s/motif_coverage.txt" % out_dir, sep="\t", index=False)
 tf_expr.to_csv("%s/tf_tissue_sp.txt" % out_dir, sep="\t", index=False)
+
+
+# ## re-do with new coverage/# motifs
+
+# In[49]:
+
+
+fimo.head()
+
+
+# In[50]:
+
+
+get_ipython().system('source new-modules.sh')
+get_ipython().system('module load bedtools2')
+get_ipython().system('bedtools --version')
+
+
+# In[52]:
+
+
+all_unique_ids = list(fimo["unique_id"].unique())
+len(all_unique_ids)
+
+
+# In[55]:
+
+
+cov_results = {}
+for i, unique_id in enumerate(all_unique_ids):
+    if i % 100 == 0:
+        print("i: %s" % i)
+    fimo_sub = fimo[fimo["unique_id"] == unique_id]
+    fimo_sub["chr"] = "chr1"
+    fimo_sub_bed = fimo_sub[["chr", "start", "end", "motif"]].sort_values(by="start")
+    n_total_motifs = len(fimo_sub)
+    n_unique_motifs = len(fimo_sub["motif"].unique())
+    fimo_sub_bed.to_csv("tmp.bed", sep="\t", index=False, header=False)
+    get_ipython().system('bedtools merge -i tmp.bed -c 4 -o count > tmp.merged.bed')
+    merged_sub = pd.read_table("tmp.merged.bed", sep="\t", header=None)
+    merged_sub.columns = ["chr", "start", "end", "count"]
+    max_cov = merged_sub["count"].max()
+    n_indiv_motifs = len(merged_sub)
+    cov_results[unique_id] = {"n_total_motifs": n_total_motifs, "n_unique_motifs": n_unique_motifs,
+                              "max_cov": max_cov, "n_indiv_motifs": n_indiv_motifs}
+
+
+# In[62]:
+
+
+cov_results_df = pd.DataFrame.from_dict(cov_results, orient="index")
+cov_results_df.head()
+
+
+# In[64]:
+
+
+sns.pairplot(cov_results_df)
+
+
+# In[ ]:
+
+
+
 

@@ -56,58 +56,50 @@ def get_tss_id(row):
 
 
 # ## variables
-
-# ### for all promoters (3kb)
+# ### tissue specificities
 
 # In[4]:
 
 
-chip_f = "chip_all.txt"
+tss_ts_f = "TSS.CAGE_grouped_exp.tissue_sp.txt"
+enh_ts_f = "Enh.CAGE_grouped_exp.tissue_sp.txt"
 
 
 # In[5]:
 
 
-fimo_f = "fimo_all_biotypes.txt"
+tf_ts_f = "TF_tissue_specificities.from_CAGE.txt"
 
+
+# ### for all promoters (3kb)
 
 # In[6]:
 
 
-tss_ts_f = "hg19.cage_peak_phase1and2combined_counts.osc.tissue_specificity.txt"
-enh_ts_f = "human_permissive_enhancers_phase_1_and_2_expression_count_matrix.tissue_specificity.txt"
+chip_f = "chip_all.txt"
 
 
 # In[7]:
 
 
-tss_ts_f = "hg19.cage_peak_phase1and2combined_counts.osc.tissue_specificity.txt"
-enh_ts_f = "human_permissive_enhancers_phase_1_and_2_expression_count_matrix.tissue_specificity.txt"
+fimo_f = "fimo_all_biotypes.txt"
 
 
 # In[8]:
 
 
 annot_f = "../../misc/00__tss_properties/TSS_FantomCat_all.TSSperENSG.txt"
-fimo_map_f = "../../misc/04__jaspar_id_map/2018_03_09_gencode_jaspar_curated.txt"
-chip_map_f = "ensembl_92_gene_id_to_name.txt"
-
-
-# In[9]:
-
-
-tf_ts_f = "gtex_tissue_specificity_tau.txt"
 
 
 # ### for all promoters (114bp)
 
-# In[10]:
+# In[9]:
 
 
 chip_114_f = "chip_all_114.txt"
 
 
-# In[11]:
+# In[10]:
 
 
 fimo_114_f = "../../misc/05__fimo/TFmotifs__intersect_114bpTSS.uniq.txt"
@@ -115,7 +107,7 @@ fimo_114_f = "../../misc/05__fimo/TFmotifs__intersect_114bpTSS.uniq.txt"
 
 # ### pool1 tss
 
-# In[12]:
+# In[11]:
 
 
 pool1_annot_f = "../../misc/00__tss_properties/TABLE_ALL_TSS_and_flipped.properties.PromType.txt"
@@ -123,7 +115,7 @@ pool1_annot_f = "../../misc/00__tss_properties/TABLE_ALL_TSS_and_flipped.propert
 
 # ## 1. import data
 
-# In[13]:
+# In[12]:
 
 
 fimo = pd.read_table(fimo_f, sep="\t")
@@ -131,14 +123,14 @@ fimo = fimo[fimo["shuffled"] != "shuffled"]
 fimo.head()
 
 
-# In[14]:
+# In[13]:
 
 
 chip = pd.read_table(chip_f, sep="\t")
 chip.head()
 
 
-# In[15]:
+# In[14]:
 
 
 annot = pd.read_table(annot_f, sep="\t")
@@ -146,35 +138,21 @@ promtype2 = annot[["gene_id", "PromType2"]].drop_duplicates()
 promtype2.head()
 
 
-# In[16]:
-
-
-fimo_map = pd.read_table(fimo_map_f, sep="\t")
-fimo_map.head()
-
-
-# In[17]:
-
-
-chip_map = pd.read_table(chip_map_f, sep="\t")
-chip_map.head()
-
-
-# In[18]:
+# In[15]:
 
 
 tf_ts = pd.read_table(tf_ts_f, sep="\t")
 tf_ts.head()
 
 
-# In[19]:
+# In[20]:
 
 
 tss_ts = pd.read_table(tss_ts_f, sep="\t")
 tss_ts.head()
 
 
-# In[20]:
+# In[17]:
 
 
 enh_ts = pd.read_table(enh_ts_f, sep="\t")
@@ -184,10 +162,22 @@ enh_ts.head()
 # In[21]:
 
 
-all_ts = tss_ts.append(enh_ts)
+tss_ts.drop("short_description", axis=1, inplace=True)
+tss_ts_cols = ["Id"]
+sample_cols = [x for x in tss_ts.columns if "Group_" in x or "tissue_sp_" in x]
+tss_ts_cols.extend(sample_cols)
+tss_ts.columns = tss_ts_cols
+tss_ts.head()
 
 
 # In[22]:
+
+
+all_ts = tss_ts.append(enh_ts)
+all_ts.sample(5)
+
+
+# In[23]:
 
 
 chip_114 = pd.read_table(chip_114_f, sep="\t", header=None)
@@ -197,7 +187,7 @@ chip_114["tss_id"] = chip_114.apply(get_tss_id, axis=1)
 chip_114.sample(5)
 
 
-# In[23]:
+# In[24]:
 
 
 fimo_114 = pd.read_table(fimo_114_f, sep="\t", header=None)
@@ -207,135 +197,30 @@ fimo_114["tss_id"] = fimo_114.apply(get_tss_id, axis=1)
 fimo_114.head()
 
 
-# In[24]:
+# In[25]:
 
 
 pool1_annot = pd.read_table(pool1_annot_f, sep="\t")
 pool1_annot.head()
 
 
-# ## 2. grab gene_ids for motif_names in chip/fimo 
-
-# In[23]:
-
-
-fimo_tfs = list(fimo["motif_id"].unique())
-len(fimo_tfs)
-
-
-# In[24]:
-
-
-chip_tfs = list(chip["motif_id"].unique())
-len(chip_tfs)
-
-
-# In[25]:
-
-
-manual_aliases = {"SIN3AK20": "SIN3A", "KAP1": "TRIM28", "SREBP1": "SREBF1", "ZZZ3": "AC118549.1", 
-                  "RPC155": "POLR3A", "RDBP": "NELFE", "FAM48A": "SUPT20H", "MZF1(VAR.2)": "MZF1",
-                  "RORA(VAR.2)": "RORA", "JUN(VAR.2)": "JUN", "JUND(VAR.2)": "JUND", "NKX2-5(VAR.2)": "NKX2-5",
-                  "JDP2(VAR.2)": "JDP2", "NR2F6(VAR.2)": "NR2F6", "RARA(VAR.2)": "RARA", "TFAP2A(VAR.2)": "TFAP2A",
-                  "TFAP2B(VAR.2)": "TFAP2B", "TFAP2B(VAR.3)": "TFAP2B", "TFAP2C(VAR.2)": "TFAP2C", 
-                  "SREBF2(VAR.2)": "SREBF2", "SREBF1(VAR.2)": "SREBF1", "RARB(VAR.2)": "RARB", 
-                  "RARG(VAR.2)": "RARG", "TFAP2A(VAR.3)": "TFAP2A", "TFAP2C(VAR.3)": "TFAP2C", "MIX-A": "MIXL1"}
-manual_gene_ids = {"HSF1": "ENSG00000185122", "HNF1B": "ENSG00000275410", "KLF13": "ENSG00000169926",
-                   "POU5F1": "ENSG00000204531", "SMARCB1": "ENSG00000099956", "RXRB": "ENSG00000204231"}
-
+# ## 2. merge fimo/chip with tss tissue-sp values
 
 # In[26]:
 
 
-def get_gene_id(motif_names, fimo_map, chip_map, manual_aliases, manual_gene_ids):
-    gene_id_map = {}
-    for motif in motif_names:
-        motif = motif.upper()
-        
-        if "::" in motif:
-            # fusion protein, continue
-            gene_id_map[motif] = np.nan
-            continue
-        
-        if motif in manual_gene_ids:
-            gene_id_map[motif] = manual_gene_ids[motif]
-            continue
-            
-        try:
-            fimo_id = fimo_map[fimo_map["motif_name"] == motif]["Gene ID"].iloc[0]
-        except:
-            fimo_id = "none"
-        try:
-            chip_id = chip_map[chip_map["Gene name"] == motif]["Gene stable ID"].iloc[0]
-        except:
-            chip_id = "none"
-        if fimo_id == "none" and chip_id == "none":
-            try:
-                alias = manual_aliases[motif]
-            except:
-                print("%s: no id, no alias" % motif)
-                gene_id_map[motif] = np.nan
-                continue
-            try:
-                real_id = chip_map[chip_map["Gene name"] == alias]["Gene stable ID"].iloc[0]
-            except:
-                print("%s: no id found for alias %s" % (motif, alias))
-                gene_id_map[motif] = np.nan
-        elif fimo_id != "none" and chip_id == "none":
-            #print("found fimo id")
-            gene_id_map[motif] = fimo_id
-        elif fimo_id == "none" and chip_id != "none":
-            #print("found chip id")
-            gene_id_map[motif] = chip_id
-        elif fimo_id != "none" and chip_id != "none":
-            if fimo_id == chip_id:
-                #print("found fimo/chip id that agrees")
-                gene_id_map[motif] = fimo_id
-            else:
-                #print("%s: found fimo/chip id that disagree: %s, %s\n" % (motif, fimo_id, chip_id))
-                real_id = manual_gene_ids[motif]
-                gene_id_map[motif] = real_id
-    return gene_id_map
+all_ts = all_ts[["Id", "tissue_sp_all", "tissue_sp_3"]]
+all_ts.columns = ["tss_id", "tissue_spec_all_cage", "tissue_spec_three_cage"]
+all_ts.sample(5)
 
 
 # In[27]:
 
 
-chip_id_map = get_gene_id(chip_tfs, fimo_map, chip_map, manual_aliases, manual_gene_ids)
-
-
-# In[28]:
-
-
-fimo_id_map = get_gene_id(fimo_tfs, fimo_map, chip_map, manual_aliases, manual_gene_ids)
-
-
-# In[29]:
-
-
-chip_id_map = pd.DataFrame.from_dict(chip_id_map, orient="index").reset_index()
-chip_id_map.columns = ["motif_name", "gene_id"]
-chip_id_map.head()
-
-
-# In[30]:
-
-
-fimo_id_map = pd.DataFrame.from_dict(fimo_id_map, orient="index").reset_index()
-fimo_id_map.columns = ["motif_name", "gene_id"]
-fimo_id_map.head()
-
-
-# ## 3. merge fimo/chip with tss tissue-sp values
-# why are some TSSs missing?
-
-# In[31]:
-
-
 len(fimo)
 
 
-# In[32]:
+# In[28]:
 
 
 fimo_ts = fimo.merge(all_ts, on="tss_id")
@@ -343,20 +228,20 @@ print(len(fimo_ts))
 fimo_ts.sample(5)
 
 
-# In[33]:
+# In[29]:
 
 
 missing_tss_ids_fimo = fimo[~fimo["tss_id"].isin(all_ts["tss_id"])]["tss_id"].unique()
 len(missing_tss_ids_fimo)
 
 
-# In[34]:
+# In[30]:
 
 
 len(chip)
 
 
-# In[35]:
+# In[31]:
 
 
 chip_ts = chip.merge(all_ts, on="tss_id")
@@ -364,14 +249,14 @@ print(len(chip_ts))
 chip_ts.sample(5)
 
 
-# In[36]:
+# In[32]:
 
 
 missing_tss_ids_chip = chip[~chip["tss_id"].isin(all_ts["tss_id"])]["tss_id"].unique()
 len(missing_tss_ids_chip)
 
 
-# In[37]:
+# In[33]:
 
 
 fimo_114_ts = fimo_114.merge(all_ts, on="tss_id")
@@ -379,7 +264,7 @@ print(len(fimo_114_ts))
 fimo_114_ts.sample(5)
 
 
-# In[38]:
+# In[34]:
 
 
 chip_114_ts = chip_114.merge(all_ts, on="tss_id")
@@ -387,45 +272,16 @@ print(len(chip_114_ts))
 chip_114_ts.sample(5)
 
 
-# ## 4. find tissue-sp per TF
-# #### use gtex for now
+# ## 3. map tissue spec per TF
 
-# In[39]:
+# In[36]:
 
 
-tf_ts["gene_id"] = tf_ts["GeneID"].str.split(".", expand=True)[0]
+tf_ts.columns = ["tf", "TF_tissue_spec_all", "TF_tissue_spec_three"]
 tf_ts.head()
 
 
-# In[40]:
-
-
-chip_id_map_ts = chip_id_map.merge(tf_ts, on="gene_id", how="left")
-chip_id_map_ts.sample(5)
-
-
-# In[41]:
-
-
-chip_id_map_ts[pd.isnull(chip_id_map_ts["tissue_spec"])]
-
-
-# In[42]:
-
-
-fimo_id_map_ts = fimo_id_map.merge(tf_ts, on="gene_id", how="left")
-fimo_id_map_ts.sample(5)
-
-
-# In[43]:
-
-
-fimo_id_map_ts[pd.isnull(fimo_id_map_ts["tissue_spec"])]
-
-
-# ## 5. merge fimo/chip with tf spec values
-
-# In[44]:
+# In[37]:
 
 
 chip_ts["motif_upper"] = chip_ts["motif_id"].str.upper()
@@ -433,15 +289,15 @@ chip_114_ts["motif_upper"] = chip_114_ts["motif_id"].str.upper()
 chip_ts.head()
 
 
-# In[45]:
+# In[38]:
 
 
-chip_ts = chip_ts.merge(chip_id_map_ts, left_on="motif_upper", right_on="motif_name", how="left")
-chip_114_ts = chip_114_ts.merge(chip_id_map_ts, left_on="motif_upper", right_on="motif_name", how="left")
+chip_ts = chip_ts.merge(tf_ts, left_on="motif_upper", right_on="tf", how="left")
+chip_114_ts = chip_114_ts.merge(tf_ts, left_on="motif_upper", right_on="tf", how="left")
 chip_ts.head()
 
 
-# In[46]:
+# In[39]:
 
 
 fimo_ts["motif_upper"] = fimo_ts["motif_id"].str.upper()
@@ -449,212 +305,549 @@ fimo_114_ts["motif_upper"] = fimo_114_ts["motif_id"].str.upper()
 fimo_ts.head()
 
 
-# In[47]:
+# In[40]:
 
 
-fimo_ts = fimo_ts.merge(fimo_id_map_ts, left_on="motif_upper", right_on="motif_name", how="left")
-fimo_114_ts = fimo_114_ts.merge(fimo_id_map_ts, left_on="motif_upper", right_on="motif_name", how="left")
+fimo_ts = fimo_ts.merge(tf_ts, left_on="motif_upper", right_on="tf", how="left")
+fimo_114_ts = fimo_114_ts.merge(tf_ts, left_on="motif_upper", right_on="tf", how="left")
 fimo_ts.head()
 
 
-# ## 6. find avg. tissue-spec for genes containing a given chip peak/motif
+# ## 4. find avg tissue-specifity of TFs within a given gene
+# ### for both chip and fimo, both all samples and 3 samples only
+
+# #### chip -- all promoters -- 3kb -- all CAGE
+
+# In[41]:
+
+
+chip_ts_sub = chip_ts[(~pd.isnull(chip_ts["tissue_spec_all_cage"])) & (~pd.isnull(chip_ts["TF_tissue_spec_all"]))]
+
+
+# In[42]:
+
+
+chip_grp_all = chip_ts_sub.groupby(["tss_id", "tissue_spec_all_cage"])["TF_tissue_spec_all"].agg(["mean", "count"]).reset_index()
+chip_grp_all.columns = ["tss_id", "tss_ts", "tf_ts", "tf_count"]
+chip_grp_all.head()
+
+
+# In[43]:
+
+
+len(chip_grp_all)
+
+
+# #### fimo -- all promoters -- 3kb -- all CAGE
+
+# In[44]:
+
+
+fimo_ts_sub = fimo_ts[(~pd.isnull(fimo_ts["tissue_spec_all_cage"])) & (~pd.isnull(fimo_ts["TF_tissue_spec_all"]))]
+
+
+# In[45]:
+
+
+fimo_grp_all = fimo_ts_sub.groupby(["tss_id", "tissue_spec_all_cage"])["TF_tissue_spec_all"].agg(["mean", "count"]).reset_index()
+fimo_grp_all.columns = ["tss_id", "tss_ts", "tf_ts", "tf_count"]
+fimo_grp_all.head()
+
+
+# In[46]:
+
+
+len(fimo_grp_all)
+
+
+# #### chip -- all promoters -- 114bp -- all CAGE
+
+# In[47]:
+
+
+chip_114_ts_sub = chip_114_ts[(~pd.isnull(chip_114_ts["tissue_spec_all_cage"])) & (~pd.isnull(chip_114_ts["TF_tissue_spec_all"]))]
+
 
 # In[48]:
 
 
-chip_grp = chip_ts.groupby(["motif_id", "tissue_spec_tau"])["tissue_spec_x"].agg(["mean", "count"]).reset_index()
-chip_grp.columns = ["motif_id", "tf_ts", "tss_ts", "tss_count"]
-chip_grp.head()
+chip_114_grp_all = chip_114_ts_sub.groupby(["tss_id", "tissue_spec_all_cage"])["TF_tissue_spec_all"].agg(["mean", "count"]).reset_index()
+chip_114_grp_all.columns = ["tss_id", "tss_ts", "tf_ts", "tf_count"]
+chip_114_grp_all.head()
 
 
 # In[49]:
 
 
-len(chip_grp)
+len(chip_114_grp_all)
 
+
+# #### fimo -- all promoters -- 114bp -- all CAGE
 
 # In[50]:
 
 
-fimo_grp = fimo_ts.groupby(["motif_id", "tissue_spec_tau"])["tissue_spec_x"].agg(["mean", "count"]).reset_index()
-fimo_grp.columns = ["motif_id", "tf_ts", "tss_ts", "tss_count"]
-fimo_grp.head()
+fimo_114_ts_sub = fimo_114_ts[(~pd.isnull(fimo_114_ts["tissue_spec_all_cage"])) & (~pd.isnull(fimo_114_ts["TF_tissue_spec_all"]))]
 
 
 # In[51]:
 
 
-len(fimo_grp)
+fimo_114_grp_all = fimo_114_ts_sub.groupby(["tss_id", "tissue_spec_all_cage"])["TF_tissue_spec_all"].agg(["mean", "count"]).reset_index()
+fimo_114_grp_all.columns = ["tss_id", "tss_ts", "tf_ts", "tf_count"]
+fimo_114_grp_all.head()
 
 
 # In[52]:
 
 
-chip_114_grp = chip_114_ts.groupby(["motif_id", "tissue_spec_tau"])["tissue_spec_x"].agg(["mean", "count"]).reset_index()
-chip_114_grp.columns = ["motif_id", "tf_ts", "tss_ts", "tss_count"]
-chip_114_grp.head()
+len(fimo_114_grp_all)
 
+
+# #### chip -- all promoters -- 3kb -- 3 cell-line CAGE
 
 # In[53]:
 
 
-len(chip_114_grp)
+chip_ts_sub = chip_ts[(~pd.isnull(chip_ts["tissue_spec_three_cage"])) & (~pd.isnull(chip_ts["TF_tissue_spec_three"]))]
 
 
 # In[54]:
 
 
-fimo_114_grp = fimo_114_ts.groupby(["motif_id", "tissue_spec_tau"])["tissue_spec_x"].agg(["mean", "count"]).reset_index()
-fimo_114_grp.columns = ["motif_id", "tf_ts", "tss_ts", "tss_count"]
-fimo_114_grp.head()
+chip_grp_3 = chip_ts_sub.groupby(["tss_id", "tissue_spec_three_cage"])["TF_tissue_spec_three"].agg(["mean", "count"]).reset_index()
+chip_grp_3.columns = ["tss_id", "tss_ts", "tf_ts", "tf_count"]
+chip_grp_3.head()
 
 
 # In[55]:
 
 
-len(fimo_114_grp)
+len(chip_grp_3)
 
 
-# ## 7. plot correlations
+# #### fimo -- all promoters -- 3kb -- 3 cell-line CAGE
 
 # In[56]:
 
 
-g = sns.jointplot(data=chip_grp, x="tf_ts", y="tss_ts", kind="reg", size=2.5, color="gray")
-g.set_axis_labels("tissue-specificity of TF", "mean(tissue-specificity of TSSs w/ peak)")
-g.savefig("chip_corr.pdf", dpi="figure", bbox_inches="tight")
+fimo_ts_sub = fimo_ts[(~pd.isnull(fimo_ts["tissue_spec_three_cage"])) & (~pd.isnull(fimo_ts["TF_tissue_spec_three"]))]
 
 
 # In[57]:
 
 
-g = sns.jointplot(data=chip_114_grp, x="tf_ts", y="tss_ts", kind="reg", size=2.5, color="gray")
-g.set_axis_labels("tissue-specificity of TF", "mean(tissue-specificity of TSSs w/ peak)")
-g.savefig("chip_corr_114.pdf", dpi="figure", bbox_inches="tight")
+fimo_grp_3 = fimo_ts_sub.groupby(["tss_id", "tissue_spec_three_cage"])["TF_tissue_spec_three"].agg(["mean", "count"]).reset_index()
+fimo_grp_3.columns = ["tss_id", "tss_ts", "tf_ts", "tf_count"]
+fimo_grp_3.head()
 
 
 # In[58]:
 
 
-g = sns.jointplot(data=fimo_grp, x="tf_ts", y="tss_ts", kind="reg", size=2.5, color="gray")
-g.set_axis_labels("tissue-specificity of TF", "mean(tissue-specificity of TSSs w/ motif)")
-g.savefig("motif_corr.pdf", dpi="figure", bbox_inches="tight")
+len(fimo_grp_3)
 
+
+# #### chip -- all promoters -- 114bp -- 3 cell-line CAGE
 
 # In[59]:
 
 
-g = sns.jointplot(data=fimo_114_grp, x="tf_ts", y="tss_ts", kind="reg", size=2.5, color="gray")
-g.set_axis_labels("tissue-specificity of TF", "mean(tissue-specificity of TSSs w/ motif)")
-g.savefig("motif_corr_114.pdf", dpi="figure", bbox_inches="tight")
+chip_114_ts_sub = chip_114_ts[(~pd.isnull(chip_114_ts["tissue_spec_three_cage"])) & (~pd.isnull(chip_114_ts["TF_tissue_spec_three"]))]
 
-
-# ## 8. do the reverse: find avg. tissue-specifity of TFs within a given gene
 
 # In[60]:
 
 
-chip_grp_rev = chip_ts.groupby(["tss_id", "tissue_spec_x"])["tissue_spec_tau"].agg(["mean", "count"]).reset_index()
-chip_grp_rev.columns = ["tss_id", "tss_ts", "tf_ts", "tf_count"]
-chip_grp_rev.head()
+chip_114_grp_3 = chip_114_ts_sub.groupby(["tss_id", "tissue_spec_three_cage"])["TF_tissue_spec_three"].agg(["mean", "count"]).reset_index()
+chip_114_grp_3.columns = ["tss_id", "tss_ts", "tf_ts", "tf_count"]
+chip_114_grp_3.head()
 
 
 # In[61]:
 
 
-len(chip_grp_rev)
+len(chip_114_grp_3)
 
+
+# #### fimo -- all promoters -- 114bp -- 3 cell-line CAGE
 
 # In[62]:
 
 
-fimo_grp_rev = fimo_ts.groupby(["tss_id", "tissue_spec_x"])["tissue_spec_tau"].agg(["mean", "count"]).reset_index()
-fimo_grp_rev.columns = ["tss_id", "tss_ts", "tf_ts", "tf_count"]
-fimo_grp_rev.head()
+fimo_114_ts_sub = fimo_114_ts[(~pd.isnull(fimo_114_ts["tissue_spec_three_cage"])) & (~pd.isnull(fimo_114_ts["TF_tissue_spec_three"]))]
 
 
 # In[63]:
 
 
-len(fimo_grp_rev)
+fimo_114_grp_3 = fimo_114_ts_sub.groupby(["tss_id", "tissue_spec_three_cage"])["TF_tissue_spec_three"].agg(["mean", "count"]).reset_index()
+fimo_114_grp_3.columns = ["tss_id", "tss_ts", "tf_ts", "tf_count"]
+fimo_114_grp_3.head()
 
 
 # In[64]:
 
 
-chip_114_grp_rev = chip_114_ts.groupby(["tss_id", "tissue_spec_x"])["tissue_spec_tau"].agg(["mean", "count"]).reset_index()
-chip_114_grp_rev.columns = ["tss_id", "tss_ts", "tf_ts", "tf_count"]
-chip_114_grp_rev.head()
+len(fimo_114_grp_3)
 
+
+# ## 5. plot the scatters
 
 # In[65]:
 
 
-len(chip_114_grp_rev)
+cmap = sns.light_palette("darkslategray", as_cmap=True)
 
 
 # In[66]:
 
 
-fimo_114_grp_rev = fimo_114_ts.groupby(["tss_id", "tissue_spec_x"])["tissue_spec_tau"].agg(["mean", "count"]).reset_index()
-fimo_114_grp_rev.columns = ["tss_id", "tss_ts", "tf_ts", "tf_count"]
-fimo_114_grp_rev.head()
+tf_ts.sort_values(by="TF_tissue_spec_all").tail()
 
 
-# In[67]:
-
-
-len(fimo_114_grp_rev)
-
-
-# ## 9. plot the reverse
-
-# In[68]:
-
-
-chip_grp_rev["log_tss_ts"] = np.log(chip_grp_rev["tss_ts"]+1)
-chip_grp_rev["log_tf_ts"] = np.log(chip_grp_rev["tf_ts"]+1)
-
-fimo_grp_rev["log_tss_ts"] = np.log(fimo_grp_rev["tss_ts"]+1)
-fimo_grp_rev["log_tf_ts"] = np.log(fimo_grp_rev["tf_ts"]+1)
-
-
-# In[69]:
-
-
-g = sns.jointplot(data=chip_grp_rev, x="tf_ts", y="tss_ts", kind="reg", size=2.5, color="gray", 
-                  stat_func=spearmanr,
-                  xlim=(0, 1.1), ylim=(0,1.1), joint_kws=dict(scatter_kws={'alpha':0.1}))
-g.set_axis_labels("mean(tissue-specificity of TFs w/ peak in TSS)", "tissue-specificity of TSS")
-g.savefig("chip_corr_rev.pdf", dpi="figure", bbox_inches="tight")
-
-
-# In[70]:
-
-
-g = sns.jointplot(data=chip_114_grp_rev, x="tf_ts", y="tss_ts", kind="reg", size=2.5, color="gray", 
-                  stat_func=spearmanr,
-                  xlim=(0, 1.1), ylim=(0,1.1), joint_kws=dict(scatter_kws={'alpha':0.1}))
-g.set_axis_labels("mean(tissue-specificity of TFs w/ peak in TSS)", "tissue-specificity of TSS")
-g.savefig("chip_corr_rev_114.pdf", dpi="figure", bbox_inches="tight")
-
-
-# In[71]:
-
-
-g = sns.jointplot(data=fimo_grp_rev, x="tf_ts", y="tss_ts", kind="reg", size=2.5, color="gray", stat_func=spearmanr,
-                  xlim=(0, 1.1), ylim=(0,1.1), joint_kws=dict(scatter_kws={'alpha':0.1}))
-g.set_axis_labels("mean(tissue-specificity of TFs w/ motif in TSS)", "tissue-specificity of TSS")
-g.savefig("fimo_corr_rev.pdf", dpi="figure", bbox_inches="tight")
-
+# #### chip -- all promoters -- 3kb -- 3 cell-line CAGE
 
 # In[72]:
 
 
-g = sns.jointplot(data=fimo_114_grp_rev, x="tf_ts", y="tss_ts", kind="reg", size=2.5, color="gray", stat_func=spearmanr,
-                  xlim=(0, 1.1), ylim=(0,1.1), joint_kws=dict(scatter_kws={'alpha':0.1}))
-g.set_axis_labels("mean(tissue-specificity of TFs w/ motif in TSS)", "tissue-specificity of TSS")
-g.savefig("fimo_corr_rev_114.pdf", dpi="figure", bbox_inches="tight")
+# fig = plt.figure(figsize=(1.2, 1.2))
+# ax = sns.kdeplot(chip_grp_all["tf_ts"], chip_grp_all["tss_ts"], cmap=cmap, 
+#                  shade=True, shade_lowest=False)
+# ax.set_xlabel("mean(tissue-specificity of TFs w/ peak in TSS)")
+# ax.set_ylabel("tissue-specificity of TSS")
+
+# r, p = stats.spearmanr(chip_grp_all["tf_ts"], chip_grp_all["tss_ts"])
+# print("r: %s, spearman p: %s" % (r, p))
+# ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
+
+
+# In[75]:
+
+
+g = sns.jointplot(data=chip_grp_3, x="tf_ts", y="tss_ts", kind="reg", size=2.5, color="gray", 
+                  stat_func=spearmanr,
+                  xlim=(0, 0.8), ylim=(0,0.8), joint_kws=dict(scatter_kws={'alpha':0.1}))
+g.set_axis_labels("mean(cell-type-specificity of TFs w/ peak in TSS)", "cell-type-specificity of TSS")
+g.savefig("chip_allTSS_3kb_3CAGE_corr.pdf", dpi="figure", bbox_inches="tight")
+
+
+# #### chip -- all promoters -- 3kb -- all CAGE
+
+# In[77]:
+
+
+g = sns.jointplot(data=chip_grp_all, x="tf_ts", y="tss_ts", kind="reg", size=2.5, color="gray", 
+                  stat_func=spearmanr,
+                  xlim=(0.5, 1.05), ylim=(0.5,1.05), joint_kws=dict(scatter_kws={'alpha':0.1}))
+g.set_axis_labels("mean(tissue-specificity of TFs w/ peak in TSS)", "tissue-specificity of TSS")
+g.savefig("chip_allTSS_3kb_allCAGE_corr.pdf", dpi="figure", bbox_inches="tight")
+
+
+# #### chip -- all promoters -- 114bp -- 3 cell-line CAGE
+
+# In[79]:
+
+
+g = sns.jointplot(data=chip_114_grp_3, x="tf_ts", y="tss_ts", kind="reg", size=2.5, color="gray", 
+                  stat_func=spearmanr,
+                  xlim=(0, 0.8), ylim=(0,0.8), joint_kws=dict(scatter_kws={'alpha':0.1}))
+g.set_axis_labels("mean(cell-type-specificity of TFs w/ peak in TSS)", "cell-type-specificity of TSS")
+g.savefig("chip_allTSS_114bp_3CAGE_corr.pdf", dpi="figure", bbox_inches="tight")
+
+
+# #### chip -- all promoters -- 114bp -- all CAGE
+
+# In[81]:
+
+
+g = sns.jointplot(data=chip_114_grp_all, x="tf_ts", y="tss_ts", kind="reg", size=2.5, color="gray", 
+                  stat_func=spearmanr,
+                  xlim=(0.5, 1.05), ylim=(0.5,1.05), joint_kws=dict(scatter_kws={'alpha':0.1}))
+g.set_axis_labels("mean(tissue-specificity of TFs w/ peak in TSS)", "tissue-specificity of TSS")
+g.savefig("chip_allTSS_114bp_allCAGE_corr.pdf", dpi="figure", bbox_inches="tight")
+
+
+# #### fimo -- all promoters -- 3kb -- 3 cell-line CAGE
+
+# In[72]:
+
+
+# fig = plt.figure(figsize=(1.2, 1.2))
+# ax = sns.kdeplot(chip_grp_all["tf_ts"], chip_grp_all["tss_ts"], cmap=cmap, 
+#                  shade=True, shade_lowest=False)
+# ax.set_xlabel("mean(tissue-specificity of TFs w/ peak in TSS)")
+# ax.set_ylabel("tissue-specificity of TSS")
+
+# r, p = stats.spearmanr(chip_grp_all["tf_ts"], chip_grp_all["tss_ts"])
+# print("r: %s, spearman p: %s" % (r, p))
+# ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
+
+
+# In[82]:
+
+
+g = sns.jointplot(data=fimo_grp_3, x="tf_ts", y="tss_ts", kind="reg", size=2.5, color="gray", 
+                  stat_func=spearmanr,
+                  xlim=(0, 0.8), ylim=(0,0.8), joint_kws=dict(scatter_kws={'alpha':0.1}))
+g.set_axis_labels("mean(cell-type-specificity of TFs w/ peak in TSS)", "cell-type-specificity of TSS")
+g.savefig("fimo_allTSS_3kb_3CAGE_corr.pdf", dpi="figure", bbox_inches="tight")
+
+
+# #### fimo -- all promoters -- 3kb -- all CAGE
+
+# In[83]:
+
+
+g = sns.jointplot(data=fimo_grp_all, x="tf_ts", y="tss_ts", kind="reg", size=2.5, color="gray", 
+                  stat_func=spearmanr,
+                  xlim=(0.5, 1.05), ylim=(0.5,1.05), joint_kws=dict(scatter_kws={'alpha':0.1}))
+g.set_axis_labels("mean(tissue-specificity of TFs w/ peak in TSS)", "tissue-specificity of TSS")
+g.savefig("fimo_allTSS_3kb_allCAGE_corr.pdf", dpi="figure", bbox_inches="tight")
+
+
+# #### fimo -- all promoters -- 114bp -- 3 cell-line CAGE
+
+# In[84]:
+
+
+g = sns.jointplot(data=fimo_114_grp_3, x="tf_ts", y="tss_ts", kind="reg", size=2.5, color="gray", 
+                  stat_func=spearmanr,
+                  xlim=(0, 0.8), ylim=(0,0.8), joint_kws=dict(scatter_kws={'alpha':0.1}))
+g.set_axis_labels("mean(cell-type-specificity of TFs w/ peak in TSS)", "cell-type-specificity of TSS")
+g.savefig("fimo_allTSS_114bp_3CAGE_corr.pdf", dpi="figure", bbox_inches="tight")
+
+
+# #### fimo -- all promoters -- 114bp -- all CAGE
+
+# In[85]:
+
+
+g = sns.jointplot(data=fimo_114_grp_all, x="tf_ts", y="tss_ts", kind="reg", size=2.5, color="gray", 
+                  stat_func=spearmanr,
+                  xlim=(0.5, 1.05), ylim=(0.5,1.05), joint_kws=dict(scatter_kws={'alpha':0.1}))
+g.set_axis_labels("mean(tissue-specificity of TFs w/ peak in TSS)", "tissue-specificity of TSS")
+g.savefig("fimo_allTSS_114bp_allCAGE_corr.pdf", dpi="figure", bbox_inches="tight")
+
+
+# ## 10. limit to pool1 tss only
+
+# In[86]:
+
+
+fimo_filt = fimo_ts[fimo_ts["tss_id"].isin(pool1_annot["TSS_id"])]
+fimo_filt.head()
+
+
+# In[87]:
+
+
+len(fimo_filt)
+
+
+# In[88]:
+
+
+fimo_114_filt = fimo_114_ts[fimo_114_ts["tss_id"].isin(pool1_annot["TSS_id"])]
+len(fimo_114_filt)
+
+
+# In[89]:
+
+
+chip_filt = chip_ts[chip_ts["tss_id"].isin(pool1_annot["TSS_id"])]
+len(chip_filt)
+
+
+# In[90]:
+
+
+chip_114_filt = chip_114_ts[chip_114_ts["tss_id"].isin(pool1_annot["TSS_id"])]
+len(chip_114_filt)
+
+
+# In[92]:
+
+
+fimo_filt_grp_all = fimo_filt.groupby(["tss_id", "tissue_spec_all_cage"])["TF_tissue_spec_all"].agg(["mean", "count"]).reset_index()
+fimo_filt_grp_all.columns = ["tss_id", "tss_ts", "tf_ts", "tf_count"]
+
+
+# In[93]:
+
+
+fimo_filt_grp_3 = fimo_filt.groupby(["tss_id", "tissue_spec_three_cage"])["TF_tissue_spec_three"].agg(["mean", "count"]).reset_index()
+fimo_filt_grp_3.columns = ["tss_id", "tss_ts", "tf_ts", "tf_count"]
+
+
+# In[94]:
+
+
+fimo_114_filt_grp_all = fimo_114_filt.groupby(["tss_id", "tissue_spec_all_cage"])["TF_tissue_spec_all"].agg(["mean", "count"]).reset_index()
+fimo_114_filt_grp_all.columns = ["tss_id", "tss_ts", "tf_ts", "tf_count"]
+
+
+# In[95]:
+
+
+fimo_114_filt_grp_3 = fimo_114_filt.groupby(["tss_id", "tissue_spec_three_cage"])["TF_tissue_spec_three"].agg(["mean", "count"]).reset_index()
+fimo_114_filt_grp_3.columns = ["tss_id", "tss_ts", "tf_ts", "tf_count"]
+
+
+# In[96]:
+
+
+chip_filt_grp_all = chip_filt.groupby(["tss_id", "tissue_spec_all_cage"])["TF_tissue_spec_all"].agg(["mean", "count"]).reset_index()
+chip_filt_grp_all.columns = ["tss_id", "tss_ts", "tf_ts", "tf_count"]
+
+
+# In[97]:
+
+
+chip_filt_grp_3 = chip_filt.groupby(["tss_id", "tissue_spec_three_cage"])["TF_tissue_spec_three"].agg(["mean", "count"]).reset_index()
+chip_filt_grp_3.columns = ["tss_id", "tss_ts", "tf_ts", "tf_count"]
+
+
+# In[98]:
+
+
+chip_114_filt_grp_all = chip_114_filt.groupby(["tss_id", "tissue_spec_all_cage"])["TF_tissue_spec_all"].agg(["mean", "count"]).reset_index()
+chip_114_filt_grp_all.columns = ["tss_id", "tss_ts", "tf_ts", "tf_count"]
+
+
+# In[99]:
+
+
+chip_114_filt_grp_3 = chip_114_filt.groupby(["tss_id", "tissue_spec_three_cage"])["TF_tissue_spec_three"].agg(["mean", "count"]).reset_index()
+chip_114_filt_grp_3.columns = ["tss_id", "tss_ts", "tf_ts", "tf_count"]
+
+
+# In[101]:
+
+
+g = sns.jointplot(data=chip_filt_grp_all, x="tf_ts", y="tss_ts", kind="reg", size=2.5, color="gray", 
+                  stat_func=spearmanr,
+                  xlim=(0.5, 1.1), ylim=(0.5,1.1), joint_kws=dict(scatter_kws={'alpha':0.1}))
+g.set_axis_labels("mean(tissue-specificity of TFs w/ peak in TSS)", "tissue-specificity of TSS")
+g.savefig("chip_pool1TSS_3kb_allCAGE_corr.pdf", dpi="figure", bbox_inches="tight")
+
+
+# In[103]:
+
+
+g = sns.jointplot(data=chip_filt_grp_3, x="tf_ts", y="tss_ts", kind="reg", size=2.5, color="gray", 
+                  stat_func=spearmanr,
+                  xlim=(0, 0.8), ylim=(0,0.8), joint_kws=dict(scatter_kws={'alpha':0.1}))
+g.set_axis_labels("mean(cell-type-specificity of TFs w/ peak in TSS)", "cell-type-specificity of TSS")
+g.savefig("chip_pool1TSS_3kb_3CAGE_corr.pdf", dpi="figure", bbox_inches="tight")
+
+
+# In[104]:
+
+
+g = sns.jointplot(data=chip_114_filt_grp_all, x="tf_ts", y="tss_ts", kind="reg", size=2.5, color="gray", 
+                  stat_func=spearmanr,
+                  xlim=(0.5, 1.1), ylim=(0.5,1.1), joint_kws=dict(scatter_kws={'alpha':0.1}))
+g.set_axis_labels("mean(tissue-specificity of TFs w/ peak in TSS)", "tissue-specificity of TSS")
+g.savefig("chip_pool1TSS_114bp_allCAGE_corr.pdf", dpi="figure", bbox_inches="tight")
+
+
+# In[105]:
+
+
+g = sns.jointplot(data=chip_114_filt_grp_3, x="tf_ts", y="tss_ts", kind="reg", size=2.5, color="gray", 
+                  stat_func=spearmanr,
+                  xlim=(0, 0.8), ylim=(0,0.8), joint_kws=dict(scatter_kws={'alpha':0.1}))
+g.set_axis_labels("mean(cell-type-specificity of TFs w/ peak in TSS)", "cell-type-specificity of TSS")
+g.savefig("chip_pool1TSS_114bp_3CAGE_corr.pdf", dpi="figure", bbox_inches="tight")
+
+
+# In[106]:
+
+
+g = sns.jointplot(data=fimo_filt_grp_all, x="tf_ts", y="tss_ts", kind="reg", size=2.5, color="gray", 
+                  stat_func=spearmanr,
+                  xlim=(0.5, 1.1), ylim=(0.5,1.1), joint_kws=dict(scatter_kws={'alpha':0.1}))
+g.set_axis_labels("mean(tissue-specificity of TFs w/ peak in TSS)", "tissue-specificity of TSS")
+g.savefig("fimo_pool1TSS_3kb_allCAGE_corr.pdf", dpi="figure", bbox_inches="tight")
+
+
+# In[107]:
+
+
+g = sns.jointplot(data=fimo_filt_grp_3, x="tf_ts", y="tss_ts", kind="reg", size=2.5, color="gray", 
+                  stat_func=spearmanr,
+                  xlim=(0, 0.8), ylim=(0,0.8), joint_kws=dict(scatter_kws={'alpha':0.1}))
+g.set_axis_labels("mean(cell-type-specificity of TFs w/ peak in TSS)", "cell-type-specificity of TSS")
+g.savefig("fimo_pool1TSS_3kb_3CAGE_corr.pdf", dpi="figure", bbox_inches="tight")
+
+
+# In[108]:
+
+
+g = sns.jointplot(data=fimo_114_filt_grp_all, x="tf_ts", y="tss_ts", kind="reg", size=2.5, color="gray", 
+                  stat_func=spearmanr,
+                  xlim=(0.5, 1.1), ylim=(0.5,1.1), joint_kws=dict(scatter_kws={'alpha':0.1}))
+g.set_axis_labels("mean(tissue-specificity of TFs w/ peak in TSS)", "tissue-specificity of TSS")
+g.savefig("fimo_pool1TSS_114bp_allCAGE_corr.pdf", dpi="figure", bbox_inches="tight")
+
+
+# In[109]:
+
+
+g = sns.jointplot(data=fimo_114_filt_grp_3, x="tf_ts", y="tss_ts", kind="reg", size=2.5, color="gray", 
+                  stat_func=spearmanr,
+                  xlim=(0, 0.8), ylim=(0,0.8), joint_kws=dict(scatter_kws={'alpha':0.1}))
+g.set_axis_labels("mean(cell-type-specificity of TFs w/ peak in TSS)", "cell-type-specificity of TSS")
+g.savefig("fimo_pool1TSS_114bp_3CAGE_corr.pdf", dpi="figure", bbox_inches="tight")
+
+
+# ## 11. re-do MPRA tissue-sp
+
+# In[110]:
+
+
+coverage = pd.read_table("../../data/04__coverage/motif_coverage.txt", sep="\t")
+coverage.head()
+
+
+# In[112]:
+
+
+pool1_fimo = pd.read_table("../../misc/05__fimo/pool1_fimo_map.txt", sep="\t")
+pool1_fimo.head()
+
+
+# In[113]:
+
+
+pool1_fimo = pool1_fimo.merge(tf_ts, left_on="#pattern name", right_on="tf", how="left")
+pool1_fimo.sample(5)
+
+
+# In[114]:
+
+
+pool1_fimo = pool1_fimo.merge(coverage, left_on="sequence name", right_on="unique_id", how="left")
+pool1_fimo.head()
+
+
+# In[116]:
+
+
+pool1_fimo_grp = pool1_fimo.groupby(["unique_id", "MPRA_tissue_sp"])["TF_tissue_spec_three"].agg(["mean", "count"]).reset_index()
+pool1_fimo_grp.columns = ["tss_id", "tss_ts", "tf_ts", "tf_count"]
+pool1_fimo_grp.sample(5)
+
+
+# In[117]:
+
+
+g = sns.jointplot(data=pool1_fimo_grp, x="tf_ts", y="tss_ts", kind="reg", size=2.5, color="gray", 
+                  stat_func=spearmanr,
+                  xlim=(0, 1), ylim=(0,1), joint_kws=dict(scatter_kws={'alpha':0.1}))
+g.set_axis_labels("mean(cell-type-specificity of TFs w/ peak in TSS)", "MPRA cell-type-specificity of TSS")
+g.savefig("MPRA_spec_fimo_pool1TSS_114bp_3CAGE_corr.pdf", dpi="figure", bbox_inches="tight")
 
 
 # In[ ]:

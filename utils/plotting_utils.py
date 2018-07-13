@@ -168,7 +168,7 @@ def neg_control_plot(df, order, palette, fontsize, cell_type, ax, figsize, ylabe
     else:
         sns.boxplot(data=df_sub, x="better_type", y="overall_mean", order=order, palette=palette, linewidth=1,
                     saturation=1, flierprops = dict(marker='o', markersize=5), ax=ax)
-    ax.set_xticklabels(["random", "scrambled", "reference"], rotation=30)
+    ax.set_xticklabels(["random", "scrambled", "core promoters"], rotation=30)
 
     mimic_r_boxplot(ax)
 
@@ -226,7 +226,7 @@ def promtype_plot(df, order, palette, fontsize, cell_type, ax, figsize, ylabel, 
     else:
         sns.boxplot(data=df, x="PromType2", y="overall_mean", order=order, palette=palette, linewidth=1,
                     saturation=1, flierprops = dict(marker='o', markersize=5), ax=ax)
-    ax.set_xticklabels(["enhancers", "lincRNAs", "div. lncRNAs", "mRNAs", "div. mRNAs"], rotation=30)
+    ax.set_xticklabels(["eRNAs", "lincRNAs", "div. lncRNAs", "mRNAs", "div. mRNAs"], rotation=30)
 
     mimic_r_boxplot(ax)
 
