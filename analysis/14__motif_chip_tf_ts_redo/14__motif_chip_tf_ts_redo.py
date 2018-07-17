@@ -961,10 +961,13 @@ all_diffs = dist_diffs[["diff", "delta_measurement"]].append(cage_diffs[["diff",
 all_diffs
 
 
-# In[140]:
+# In[142]:
 
 
-sns.boxplot(data=all_diffs, x="delta_measurement")
+sns.boxplot(data=all_diffs, x="delta_measurement", y="diff")
+plt.xlabel("")
+plt.ylabel("difference in Rho value")
+plt.savefig("rho_diffs.pdf", dpi="figure", bbox_inches="tight")
 
 
 # In[ ]:

@@ -102,7 +102,7 @@ dpc_vals = chip_cov[chip_cov["PromType2"] == "div_pc"]["log_bp_covered"]
 
 fig = plt.figure(figsize=(2.75, 2))
 ax = sns.kdeplot(data=enh_vals, cumulative=True, color=TSS_CLASS_PALETTE["Enhancer"], 
-                 label="enhancers")
+                 label="eRNAs")
 sns.kdeplot(data=linc_vals, cumulative=True, color=TSS_CLASS_PALETTE["intergenic"], 
             label="lincRNAs", ax=ax)
 sns.kdeplot(data=dlnc_vals, cumulative=True, color=TSS_CLASS_PALETTE["div_lnc"], 
@@ -127,7 +127,7 @@ dpc_vals = chip_cov[chip_cov["PromType2"] == "div_pc"]["log_max_cov"]
 
 fig = plt.figure(figsize=(2.5, 2))
 ax = sns.kdeplot(data=enh_vals, cumulative=True, color=TSS_CLASS_PALETTE["Enhancer"], 
-                 label="enhancers")
+                 label="eRNAs")
 sns.kdeplot(data=linc_vals, cumulative=True, color=TSS_CLASS_PALETTE["intergenic"], 
             label="lincRNAs", ax=ax)
 sns.kdeplot(data=dlnc_vals, cumulative=True, color=TSS_CLASS_PALETTE["div_lnc"], 
@@ -231,7 +231,7 @@ dpc_vals = cluster_cov[cluster_cov["PromType2"] == "div_pc"]["log_bp_covered"]
 
 fig = plt.figure(figsize=(2.75, 2))
 ax = sns.kdeplot(data=enh_vals, cumulative=True, color=TSS_CLASS_PALETTE["Enhancer"], 
-                 label="enhancers")
+                 label="eRNAs")
 sns.kdeplot(data=linc_vals, cumulative=True, color=TSS_CLASS_PALETTE["intergenic"], 
             label="lincRNAs", ax=ax)
 sns.kdeplot(data=dlnc_vals, cumulative=True, color=TSS_CLASS_PALETTE["div_lnc"], 
@@ -256,7 +256,7 @@ dpc_vals = cluster_cov[cluster_cov["PromType2"] == "div_pc"]["log_max_cov"]
 
 fig = plt.figure(figsize=(2.75, 2))
 ax = sns.kdeplot(data=enh_vals, cumulative=True, color=TSS_CLASS_PALETTE["Enhancer"], 
-                 label="enhancers")
+                 label="eRNAs")
 sns.kdeplot(data=linc_vals, cumulative=True, color=TSS_CLASS_PALETTE["intergenic"], 
             label="lincRNAs", ax=ax)
 sns.kdeplot(data=dlnc_vals, cumulative=True, color=TSS_CLASS_PALETTE["div_lnc"], 
