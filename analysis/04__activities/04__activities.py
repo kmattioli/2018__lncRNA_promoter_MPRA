@@ -14,7 +14,7 @@
 # - **Fig 2D**: KDE plot comparing CAGE cell type specificity and MPRA cell type specificity
 # - **Fig 2E**: barplot showing % of reference sequences active in 1 or all 3 cell types
 
-# In[95]:
+# In[1]:
 
 
 import warnings
@@ -42,7 +42,7 @@ from norm_utils import *
 get_ipython().magic('matplotlib inline')
 
 
-# In[96]:
+# In[2]:
 
 
 sns.set(**PAPER_PRESET)
@@ -51,7 +51,7 @@ fontsize = PAPER_FONTSIZE
 
 # ## variables
 
-# In[97]:
+# In[3]:
 
 
 activ_dir = "../../data/02__activs"
@@ -59,7 +59,7 @@ pval_dir = "../../data/03__pvals"
 index_dir = "../../data/00__index"
 
 
-# In[98]:
+# In[4]:
 
 
 pool1_hela_barc_activ_f = "POOL1__pMPRA1__HeLa__activities_per_barcode.txt"
@@ -75,7 +75,7 @@ pool1_hepg2_pvals_f = "POOL1__pMPRA1__HepG2__pvals.txt"
 pool1_k562_pvals_f = "POOL1__pMPRA1__K562__pvals.txt"
 
 
-# In[99]:
+# In[5]:
 
 
 pool1_nocmv_hela_barc_activ_f = "POOL1__pNoCMVMPRA1__HeLa__activities_per_barcode.txt"
@@ -91,7 +91,7 @@ pool1_nocmv_hepg2_pvals_f = "POOL1__pNoCMVMPRA1__HepG2__pvals.txt"
 pool1_nocmv_k562_pvals_f = "POOL1__pNoCMVMPRA1__K562__pvals.txt"
 
 
-# In[100]:
+# In[6]:
 
 
 pool2_hepg2_barc_activ_f = "POOL2__pMPRA1__HepG2__activities_per_barcode.txt"
@@ -104,14 +104,14 @@ pool2_hepg2_pvals_f = "POOL2__pMPRA1__HepG2__pvals.txt"
 pool2_k562_pvals_f = "POOL2__pMPRA1__K562__pvals.txt"
 
 
-# In[101]:
+# In[7]:
 
 
 pool1_index_f = "%s/tss_oligo_pool.index.txt" % index_dir
 pool2_index_f = "%s/dels_oligo_pool.index.txt" % index_dir
 
 
-# In[102]:
+# In[8]:
 
 
 annot_f = "../../misc/00__tss_properties/correspondance_seqID_PromType_unique.txt"
@@ -120,14 +120,14 @@ id_map_f = "../../misc/00__tss_properties/TABLE_ALL_TSS_and_flipped.properties.P
 
 # ## 1. import data
 
-# In[103]:
+# In[9]:
 
 
 pool1_index = pd.read_table(pool1_index_f, sep="\t")
 pool2_index = pd.read_table(pool2_index_f, sep="\t")
 
 
-# In[104]:
+# In[10]:
 
 
 pool1_index_elem = pool1_index[["element", "oligo_type", "unique_id", "dupe_info", "SNP"]]
@@ -137,14 +137,14 @@ pool1_index_elem = pool1_index_elem.drop_duplicates()
 pool2_index_elem = pool2_index_elem.drop_duplicates()
 
 
-# In[105]:
+# In[11]:
 
 
 annot = pd.read_table(annot_f, sep="\t")
 annot.head()
 
 
-# In[106]:
+# In[12]:
 
 
 id_map = pd.read_table(id_map_f, sep="\t")
@@ -153,7 +153,7 @@ id_map.head()
 
 # ### pool 1
 
-# In[107]:
+# In[13]:
 
 
 pool1_hela_elem_norm = pd.read_table("%s/%s" % (activ_dir, pool1_hela_elem_activ_f), sep="\t")
@@ -162,7 +162,7 @@ pool1_k562_elem_norm = pd.read_table("%s/%s" % (activ_dir, pool1_k562_elem_activ
 pool1_hepg2_elem_norm.head()
 
 
-# In[108]:
+# In[14]:
 
 
 pool1_hela_reps = [x for x in pool1_hela_elem_norm.columns if "rna_" in x]
@@ -171,7 +171,7 @@ pool1_k562_reps = [x for x in pool1_k562_elem_norm.columns if "rna_" in x]
 pool1_hepg2_reps
 
 
-# In[109]:
+# In[15]:
 
 
 pool1_hela_barc_norm = pd.read_table("%s/%s" % (activ_dir, pool1_hela_barc_activ_f), sep="\t")
@@ -180,7 +180,7 @@ pool1_k562_barc_norm = pd.read_table("%s/%s" % (activ_dir, pool1_k562_barc_activ
 pool1_hepg2_barc_norm.head()
 
 
-# In[110]:
+# In[16]:
 
 
 pool1_hela_pvals = pd.read_table("%s/%s" % (pval_dir, pool1_hela_pvals_f), sep="\t")
@@ -191,7 +191,7 @@ pool1_hepg2_pvals.head()
 
 # ### pool 2
 
-# In[111]:
+# In[17]:
 
 
 pool2_hepg2_elem_norm = pd.read_table("%s/%s" % (activ_dir, pool2_hepg2_elem_activ_f), sep="\t")
@@ -199,7 +199,7 @@ pool2_k562_elem_norm = pd.read_table("%s/%s" % (activ_dir, pool2_k562_elem_activ
 pool2_hepg2_elem_norm.head()
 
 
-# In[112]:
+# In[18]:
 
 
 pool2_hepg2_reps = [x for x in pool2_hepg2_elem_norm.columns if "rna_" in x]
@@ -207,7 +207,7 @@ pool2_k562_reps = [x for x in pool2_k562_elem_norm.columns if "rna_" in x]
 pool2_hepg2_reps
 
 
-# In[113]:
+# In[19]:
 
 
 pool2_hepg2_barc_norm = pd.read_table("%s/%s" % (activ_dir, pool2_hepg2_barc_activ_f), sep="\t")
@@ -215,7 +215,7 @@ pool2_k562_barc_norm = pd.read_table("%s/%s" % (activ_dir, pool2_k562_barc_activ
 pool2_hepg2_barc_norm.head()
 
 
-# In[114]:
+# In[20]:
 
 
 pool2_hepg2_pvals = pd.read_table("%s/%s" % (pval_dir, pool2_hepg2_pvals_f), sep="\t")
@@ -227,7 +227,7 @@ pool2_hepg2_pvals.head()
 
 # ### pool 1
 
-# In[115]:
+# In[21]:
 
 
 pool1_hela_elem_norm = pool1_hela_elem_norm.merge(pool1_index_elem, on=["unique_id", "element"], how="left")
@@ -235,7 +235,7 @@ pool1_hepg2_elem_norm = pool1_hepg2_elem_norm.merge(pool1_index_elem, on=["uniqu
 pool1_k562_elem_norm = pool1_k562_elem_norm.merge(pool1_index_elem, on=["unique_id", "element"], how="left")
 
 
-# In[116]:
+# In[22]:
 
 
 pool1_hela_barc_norm = pool1_hela_barc_norm.merge(pool1_index, left_on="barcode", right_on="barcode", how="left")
@@ -243,7 +243,7 @@ pool1_hepg2_barc_norm = pool1_hepg2_barc_norm.merge(pool1_index, left_on="barcod
 pool1_k562_barc_norm = pool1_k562_barc_norm.merge(pool1_index, left_on="barcode", right_on="barcode", how="left")
 
 
-# In[117]:
+# In[23]:
 
 
 pool1_hela_elem_norm["better_type"] = pool1_hela_elem_norm.apply(better_type, axis=1)
@@ -251,7 +251,7 @@ pool1_hepg2_elem_norm["better_type"] = pool1_hepg2_elem_norm.apply(better_type, 
 pool1_k562_elem_norm["better_type"] = pool1_k562_elem_norm.apply(better_type, axis=1)
 
 
-# In[118]:
+# In[24]:
 
 
 pool1_hela_elem_norm = pool1_hela_elem_norm.merge(pool1_hela_pvals.drop("oligo_type", axis=1), on=["unique_id", "element"], how="left")
@@ -262,28 +262,28 @@ pool1_hepg2_elem_norm.head()
 
 # ### pool 2
 
-# In[119]:
+# In[25]:
 
 
 pool2_hepg2_elem_norm = pool2_hepg2_elem_norm.merge(pool2_index_elem, on=["unique_id", "element"], how="left")
 pool2_k562_elem_norm = pool2_k562_elem_norm.merge(pool2_index_elem, on=["unique_id", "element"], how="left")
 
 
-# In[120]:
+# In[26]:
 
 
 pool2_hepg2_barc_norm = pool2_hepg2_barc_norm.merge(pool2_index, left_on="barcode", right_on="barcode", how="left")
 pool2_k562_barc_norm = pool2_k562_barc_norm.merge(pool2_index, left_on="barcode", right_on="barcode", how="left")
 
 
-# In[121]:
+# In[27]:
 
 
 pool2_hepg2_elem_norm["better_type"] = pool2_hepg2_elem_norm.apply(better_type, axis=1)
 pool2_k562_elem_norm["better_type"] = pool2_k562_elem_norm.apply(better_type, axis=1)
 
 
-# In[122]:
+# In[28]:
 
 
 pool2_hepg2_elem_norm = pool2_hepg2_elem_norm.merge(pool2_hepg2_pvals.drop("oligo_type", axis=1), on=["unique_id", "element"], how="left")
@@ -295,7 +295,7 @@ pool2_hepg2_elem_norm.head()
 
 # ### pool 1
 
-# In[123]:
+# In[29]:
 
 
 pool1_hela_elem_norm["overall_mean"] = pool1_hela_elem_norm[pool1_hela_reps].mean(axis=1)
@@ -307,7 +307,7 @@ pool1_hepg2_elem_norm["overall_median"] = pool1_hepg2_elem_norm[pool1_hepg2_reps
 pool1_k562_elem_norm["overall_median"] = pool1_k562_elem_norm[pool1_k562_reps].median(axis=1)
 
 
-# In[124]:
+# In[30]:
 
 
 for cell, df in zip(["HeLa", "HepG2", "K562"], [pool1_hela_elem_norm, pool1_hepg2_elem_norm, pool1_k562_elem_norm]):
@@ -322,7 +322,7 @@ for cell, df in zip(["HeLa", "HepG2", "K562"], [pool1_hela_elem_norm, pool1_hepg
 
 # ### pool 2
 
-# In[125]:
+# In[31]:
 
 
 pool2_hepg2_elem_norm["overall_mean"] = pool2_hepg2_elem_norm[pool2_hepg2_reps].mean(axis=1)
@@ -332,7 +332,7 @@ pool2_hepg2_elem_norm["overall_median"] = pool2_hepg2_elem_norm[pool2_hepg2_reps
 pool2_k562_elem_norm["overall_median"] = pool2_k562_elem_norm[pool2_k562_reps].median(axis=1)
 
 
-# In[126]:
+# In[32]:
 
 
 for cell, df in zip(["HepG2", "K562"], [pool2_hepg2_elem_norm, pool2_k562_elem_norm]):
@@ -347,7 +347,7 @@ for cell, df in zip(["HepG2", "K562"], [pool2_hepg2_elem_norm, pool2_k562_elem_n
 
 # ## 4. boxplots: neg ctrls vs reference
 
-# In[127]:
+# In[33]:
 
 
 order = ["RANDOM", "SCRAMBLED", "WILDTYPE"]
@@ -356,7 +356,7 @@ palette = {"RANDOM": "gray", "SCRAMBLED": "gray", "WILDTYPE": "black"}
 
 # ### pool 1
 
-# In[128]:
+# In[34]:
 
 
 f, axarr = plt.subplots(3, sharex=True, sharey=True, figsize=(1.78, 5))
@@ -372,7 +372,7 @@ f.savefig("Fig_2B_S8A.pdf", bbox_inches="tight", dpi="figure")
 
 # ### pool 2
 
-# In[129]:
+# In[35]:
 
 
 f, axarr = plt.subplots(2, sharex=True, sharey=True, figsize=(1.78, 3.2))
@@ -388,7 +388,7 @@ f.savefig("Fig_S12.pdf", bbox_inches="tight", dpi="figure")
 
 # the rest of the analysis only uses pool 1 (the TSS pool), as it looks at patterns in expression differences between TSS classes
 
-# In[130]:
+# In[36]:
 
 
 pool1_hepg2_df = pool1_hepg2_elem_norm.merge(annot, left_on="unique_id", right_on="seqID", how="left")
@@ -397,7 +397,7 @@ pool1_k562_df = pool1_k562_elem_norm.merge(annot, left_on="unique_id", right_on=
 pool1_hepg2_df.head()
 
 
-# In[131]:
+# In[37]:
 
 
 f, axarr = plt.subplots(3, sharex=True, sharey=True, figsize=(3.56, 5))
@@ -413,7 +413,7 @@ f.savefig("Fig_2C_S8B.pdf", bbox_inches="tight", dpi="figure")
 
 # ## 6. barplots: find % of sequences active across cell types
 
-# In[132]:
+# In[38]:
 
 
 pool1_hela_df["cell"] = "HeLa"
@@ -423,7 +423,7 @@ pool1_k562_df["cell"] = "K562"
 all_df = pool1_hela_df[["unique_id", "better_type", "cell", "PromType2", "combined_class", "overall_mean"]].append(pool1_hepg2_df[["unique_id", "better_type", "cell", "PromType2", "combined_class", "overall_mean"]]).append(pool1_k562_df[["unique_id", "better_type", "cell", "PromType2", "combined_class", "overall_mean"]])
 
 
-# In[133]:
+# In[39]:
 
 
 df = all_df[all_df["better_type"] == "WILDTYPE"]
@@ -434,7 +434,7 @@ activ_grp = activ_grp[(activ_grp["PromType2"].isin(TSS_CLASS_ORDER)) &
 activ_grp.sample(10)
 
 
-# In[134]:
+# In[40]:
 
 
 activ_grp["active_in_only_one"] = activ_grp.apply(active_in_only_one, axis=1)
@@ -443,7 +443,7 @@ activ_grp["active_in_only_three"] = activ_grp.apply(active_in_only_three, axis=1
 activ_grp.sample(5)
 
 
-# In[135]:
+# In[41]:
 
 
 activ_counts_1 = activ_grp.groupby(["PromType2", "active_in_only_one"])["unique_id"].agg("count").reset_index()
@@ -471,7 +471,7 @@ activ_counts = pd.melt(activ_counts, id_vars="PromType2")
 activ_counts.head()
 
 
-# In[136]:
+# In[42]:
 
 
 df = activ_counts[activ_counts["PromType2"] != "antisense"]
@@ -489,7 +489,7 @@ plt.xlabel("")
 plt.title("% of elements active in # of cell types")
 
 
-# In[137]:
+# In[43]:
 
 
 colors = []
@@ -498,7 +498,7 @@ for c in TSS_CLASS_ORDER:
 colors
 
 
-# In[138]:
+# In[44]:
 
 
 # better plot showing tissue sp
@@ -509,7 +509,7 @@ df.sort_values(by="PromType2")
 plt.figure(figsize=(3,2.3))
 ax = sns.barplot(data=df[df["variable"]!="active_in_only_two"], x="PromType2", y="value", 
                  ci=None, hue="variable", linewidth=1.5)
-ax.set_xticklabels(["enhancers", "lincRNAs", "div. lncRNAs", "mRNAs", "div. mRNAs"], rotation=30)
+ax.set_xticklabels(["eRNAs", "lincRNAs", "div. lncRNAs", "mRNAs", "div. mRNAs"], rotation=30)
 
 colors = colors*2
 for i, p in enumerate(ax.patches):
@@ -521,9 +521,9 @@ for i, p in enumerate(ax.patches):
         p.set_alpha(1)
         p.set_hatch("///")
 
-plt.legend(loc=1, title="", labels=["active in 1 cell type", "active in all 3 cell types"])
+#plt.legend(loc=1, title="", labels=["active in 1 cell type", "active in all 3 cell types"])
 plt.ylim((0, 50))
-plt.ylabel("percent of sequences", fontsize=fontsize)
+plt.ylabel("% of sequences that are active\nin 1 and 3 cell types", fontsize=fontsize)
 plt.xlabel("")
 plt.title("% of elements active")
 plt.savefig("Fig_2E.pdf", bbox_inches="tight", dpi="figure")
