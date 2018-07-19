@@ -561,20 +561,20 @@ paired_swarmplots_w_pval(1, 3, (4.5, 2), hepg2_pool1_gwas, hepg2_pool1_data, fon
 paired_swarmplots_w_pval(1, 3, (4.5, 1.5), hepg2_pool1_gwas, hepg2_pool1_data, fontsize, ".", "Fig_S22_1_short", True)
 
 
-# In[82]:
+# In[54]:
 
 
 hepg2_pool1_gwas.head()
 
 
-# In[54]:
+# In[55]:
 
 
 print("K562")
 paired_swarmplots_w_pval(1, 3, (4.5, 2), k562_pool1_gwas, k562_pool1_data, fontsize, ".", "Fig_S22_2_tall", True)
 
 
-# In[55]:
+# In[56]:
 
 
 paired_swarmplots_w_pval(1, 3, (4.5, 1.5), k562_pool1_gwas, k562_pool1_data, fontsize, ".", "Fig_S22_2_short", True)
@@ -582,13 +582,13 @@ paired_swarmplots_w_pval(1, 3, (4.5, 1.5), k562_pool1_gwas, k562_pool1_data, fon
 
 # ## 8. write files
 
-# In[56]:
+# In[57]:
 
 
 out_dir = "../../data/07__snps"
 
 
-# In[57]:
+# In[58]:
 
 
 hepg2_pool2_active_snp_data = hepg2_pool2_active_snp_data.merge(pool2_index_elem[["unique_id", "SNP"]], 
@@ -602,7 +602,7 @@ k562_pool2_repressive_snp_data = k562_pool2_repressive_snp_data.merge(pool2_inde
                                                                       on="unique_id", how="left")
 
 
-# In[58]:
+# In[59]:
 
 
 active_dfs = [k562_pool1_active_snp_data, k562_pool2_active_snp_data, hepg2_pool1_active_snp_data, hepg2_pool2_active_snp_data]
@@ -612,7 +612,7 @@ cells = ["K562", "K562", "HepG2", "HepG2"]
 pools = ["POOL1", "POOL2", "POOL1", "POOL2"]
 
 
-# In[59]:
+# In[60]:
 
 
 for active_df, repressive_df, reps, cell, pool in zip(active_dfs, repressive_dfs, all_reps, cells, pools):
@@ -652,7 +652,7 @@ for active_df, repressive_df, reps, cell, pool in zip(active_dfs, repressive_dfs
 
 # ## 9. create nicer table for supplement
 
-# In[60]:
+# In[61]:
 
 
 hepg2_supp = hepg2_pool1_active_snp_data[["SNP", "unique_id", "combined_wt_med", "combined_snp_med", "combined_l2fc",
@@ -664,7 +664,7 @@ print(len(hepg2_supp))
 hepg2_supp.sample(5)
 
 
-# In[61]:
+# In[62]:
 
 
 k562_supp = k562_pool1_active_snp_data[["SNP", "unique_id", "combined_wt_med", "combined_snp_med", "combined_l2fc",
@@ -676,7 +676,7 @@ print(len(k562_supp))
 k562_supp.sample(5)
 
 
-# In[62]:
+# In[63]:
 
 
 supp_table_s7 = hepg2_supp.merge(k562_supp, on=["SNP", "unique_id"]).drop_duplicates()
@@ -684,7 +684,7 @@ print(len(supp_table_s7))
 supp_table_s7.sample(5)
 
 
-# In[63]:
+# In[64]:
 
 
 supp_table_s7.to_csv("%s/Supplemental_Table_S7.txt" % out_dir, sep="\t", index=False)
@@ -692,7 +692,7 @@ supp_table_s7.to_csv("%s/Supplemental_Table_S7.txt" % out_dir, sep="\t", index=F
 
 # ## 10. correlate SNPs with fimo motif predictions
 
-# In[64]:
+# In[65]:
 
 
 def reverse_snp_map(snp_map):
@@ -707,27 +707,27 @@ def reverse_snp_map(snp_map):
     return rev_map
 
 
-# In[65]:
+# In[66]:
 
 
 hepg2_pool1_rev_map = reverse_snp_map(hepg2_pool1_snp_map)
 k562_pool1_rev_map = reverse_snp_map(k562_pool1_snp_map)
 
 
-# In[66]:
+# In[67]:
 
 
 fimo.set_index("seqID", inplace=True)
 fimo.head()
 
 
-# In[67]:
+# In[68]:
 
 
 fimo_dict = fimo.to_dict(orient="index")
 
 
-# In[68]:
+# In[69]:
 
 
 def get_snp_tfbs_delta(row, rev_map, fimo_map):
@@ -741,7 +741,7 @@ def get_snp_tfbs_delta(row, rev_map, fimo_map):
     return delta_tfs
 
 
-# In[69]:
+# In[70]:
 
 
 supp_table_s7["delta_tfs"] = supp_table_s7.apply(get_snp_tfbs_delta, rev_map=hepg2_pool1_rev_map, 
@@ -749,7 +749,7 @@ supp_table_s7["delta_tfs"] = supp_table_s7.apply(get_snp_tfbs_delta, rev_map=hep
 supp_table_s7.sample(5)
 
 
-# In[70]:
+# In[71]:
 
 
 df = supp_table_s7[supp_table_s7["HepG2_sig_status"] == "sig"]
@@ -759,7 +759,7 @@ g.set_axis_labels(r"$\Delta$ motifs (alt-ref)", "SNP effect size")
 g.savefig("Fig_5B.pdf", dpi="figure", bbox_inches="tight")
 
 
-# In[71]:
+# In[72]:
 
 
 df = supp_table_s7[supp_table_s7["K562_sig_status"] == "sig"]
@@ -771,7 +771,7 @@ g.savefig("Fig_S18.pdf", dpi="figure", bbox_inches="tight")
 
 # ## 11. correlate SNPs across cell types
 
-# In[72]:
+# In[73]:
 
 
 def both_type(row):
@@ -788,7 +788,7 @@ supp_table_s7["sig_type"] = supp_table_s7.apply(both_type, axis=1)
 supp_table_s7.sample(5)
 
 
-# In[73]:
+# In[74]:
 
 
 both_no_null = supp_table_s7[~pd.isnull(supp_table_s7["HepG2_sig_status"]) & ~pd.isnull(supp_table_s7["K562_sig_status"])]
@@ -800,7 +800,7 @@ g.set_axis_labels("HepG2 log2(alt/ref)", "K562 log2(alt/ref)")
 g.savefig("Fig_4C.pdf", dpi="figure", bbox_inches="tight")
 
 
-# In[74]:
+# In[75]:
 
 
 both_no_null.sig_type.value_counts()
@@ -808,14 +808,14 @@ both_no_null.sig_type.value_counts()
 
 # ## 12. compare results using all HepG2 reps vs. subset
 
-# In[75]:
+# In[76]:
 
 
 hepg2_all_sig = len(supp_table_s7[supp_table_s7["HepG2_sig_status"] == "sig"])
 hepg2_down_sig = len(supp_table_s7[supp_table_s7["HepG2_downsampled_sig_status"] == "sig"])
 
 
-# In[76]:
+# In[77]:
 
 
 rep_nums = {"HepG2 (Sampled Replicates: 4)": [4, hepg2_down_sig], "HepG2 (All Replicates: 12)": [12, hepg2_all_sig]}
@@ -824,7 +824,7 @@ rep_nums.columns = ["name", "reps", "snps"]
 rep_nums.head()
 
 
-# In[77]:
+# In[78]:
 
 
 fig = plt.figure(figsize=(2.2, 2.2))
@@ -837,40 +837,40 @@ fig.savefig("Fig_S20B.pdf", dpi="figure", bbox_inches="tight")
 
 # ## 13. compare effect sizes across biotypes
 
-# In[78]:
+# In[79]:
 
 
 supp_table_s7 = supp_table_s7.merge(annot, left_on="unique_id", right_on="seqID")
 supp_table_s7.head()
 
 
-# In[79]:
+# In[80]:
 
 
 supp_table_s7["HepG2_abs_effect_size"] = np.abs(supp_table_s7["HepG2_effect_size"])
 supp_table_s7["K562_abs_effect_size"] = np.abs(supp_table_s7["K562_effect_size"])
 
 
-# In[80]:
+# In[81]:
 
 
 fig = plt.figure(figsize=(3.5, 2.5))
 ax = sns.boxplot(data=supp_table_s7, x="PromType2", y="HepG2_abs_effect_size", 
                  flierprops = dict(marker='o', markersize=5), order=TSS_CLASS_ORDER, palette=TSS_CLASS_PALETTE)
-ax.set_xticklabels(["enhancers", "lincRNAs", "div. lncRNAs", "mRNAs", "div. mRNAs"], rotation=30)
+ax.set_xticklabels(["eRNAs", "lincRNAs", "div. lncRNAs", "mRNAs", "div. mRNAs"], rotation=30)
 mimic_r_boxplot(ax)
 plt.xlabel("")
 plt.ylabel("absolute value(HepG2 effect size)")
 fig.savefig("Fig_S21_1.pdf", dpi="figure", bbox_inches="tight")
 
 
-# In[81]:
+# In[82]:
 
 
 fig = plt.figure(figsize=(3.5, 2.5))
 ax = sns.boxplot(data=supp_table_s7, x="PromType2", y="K562_abs_effect_size", 
                  flierprops = dict(marker='o', markersize=5), order=TSS_CLASS_ORDER, palette=TSS_CLASS_PALETTE)
-ax.set_xticklabels(["enhancers", "lincRNAs", "div. lncRNAs", "mRNAs", "div. mRNAs"], rotation=30)
+ax.set_xticklabels(["eRNAs", "lincRNAs", "div. lncRNAs", "mRNAs", "div. mRNAs"], rotation=30)
 mimic_r_boxplot(ax)
 plt.xlabel("")
 plt.ylabel("absolute value(K562 effect size)")
@@ -879,7 +879,7 @@ fig.savefig("Fig_S21_2.pdf", dpi="figure", bbox_inches="tight")
 
 # ## 14. make GWAS supplemental table
 
-# In[124]:
+# In[83]:
 
 
 tss_snps = pd.read_table("../../misc/07__gwas/tss.snp.ragger.output.txt", sep="\t")
@@ -887,7 +887,7 @@ enh_snps = pd.read_table("../../misc/07__gwas/enh.snp.ragger.output.txt", sep="\
 all_snps = tss_snps.append(enh_snps)
 
 
-# In[125]:
+# In[84]:
 
 
 n_snps_ld = all_snps.groupby(["SNP1 Name"])["Population"].agg("count").reset_index()
@@ -896,13 +896,13 @@ all_snps = all_snps.merge(n_snps_ld, on="SNP1 Name", how="left")
 all_snps.head()
 
 
-# In[126]:
+# In[85]:
 
 
 gwas = pd.read_table("../../misc/07__gwas/gwas.catalog.h19.ucsc.txt", sep="\t")
 
 
-# In[127]:
+# In[86]:
 
 
 tmp_snps = all_snps[["SNP1 Name", "SNP2 Name", "R-squared", "D'", "Distance", "n_snps_in_ld"]].drop_duplicates()
@@ -911,7 +911,7 @@ tmp = tmp_snps.merge(tmp_gwas, left_on="SNP1 Name", right_on="name", how="outer"
 tmp.head()
 
 
-# In[128]:
+# In[87]:
 
 
 tmp_mpra = supp_table_s7[["SNP", "unique_id", "HepG2_effect_size", "HepG2_sig_status", "K562_effect_size", "K562_sig_status", "delta_tfs", "sig_type"]].drop_duplicates()
@@ -919,13 +919,13 @@ supp_table_s8 = tmp_mpra.merge(tmp, left_on="SNP", right_on="SNP2 Name")
 supp_table_s8.head()
 
 
-# In[129]:
+# In[88]:
 
 
 supp_table_s8 = supp_table_s8[(supp_table_s8["HepG2_sig_status"] == "sig") | (supp_table_s8["K562_sig_status"] == "sig")]
 
 
-# In[130]:
+# In[89]:
 
 
 supp_table_s8 = supp_table_s8[["unique_id", "SNP", "HepG2_effect_size", "K562_effect_size", "HepG2_sig_status",
@@ -937,31 +937,31 @@ supp_table_s8.columns = ["unique_id", "tested_SNP", "HepG2_effect_size", "K562_e
 supp_table_s8.head()
 
 
-# In[131]:
+# In[90]:
 
 
 len(supp_table_s8)
 
 
-# In[132]:
+# In[91]:
 
 
 len(supp_table_s8[(supp_table_s8["HepG2_sig_status"] == "sig") & (supp_table_s8["K562_sig_status"] == "sig")])
 
 
-# In[133]:
+# In[92]:
 
 
 supp_table_s8.HepG2_sig_status.value_counts()
 
 
-# In[134]:
+# In[93]:
 
 
 supp_table_s8.K562_sig_status.value_counts()
 
 
-# In[135]:
+# In[94]:
 
 
 supp_table_s8.to_csv("../../data/07__snps/Supplemental_Table_S8.txt", sep="\t", index=False)

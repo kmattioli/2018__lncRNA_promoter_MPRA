@@ -498,7 +498,7 @@ for c in TSS_CLASS_ORDER:
 colors
 
 
-# In[44]:
+# In[46]:
 
 
 # better plot showing tissue sp
@@ -521,11 +521,10 @@ for i, p in enumerate(ax.patches):
         p.set_alpha(1)
         p.set_hatch("///")
 
-#plt.legend(loc=1, title="", labels=["active in 1 cell type", "active in all 3 cell types"])
+ax.legend().set_visible(False)
 plt.ylim((0, 50))
 plt.ylabel("% of sequences that are active\nin 1 and 3 cell types", fontsize=fontsize)
 plt.xlabel("")
-plt.title("% of elements active")
 plt.savefig("Fig_2E.pdf", bbox_inches="tight", dpi="figure")
 
 

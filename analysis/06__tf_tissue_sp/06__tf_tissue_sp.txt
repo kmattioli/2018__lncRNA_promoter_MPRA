@@ -128,7 +128,7 @@ tissue_sp_fimo_chip.head()
 mean_activ_fimo = cage_v_mpra.merge(tissue_sp_fimo, on="unique_id")
 mean_activ_fimo.sample(5)
 
-mean_activ_fimo = mean_activ_fimo.merge(fimo_cov, left_on="unique_id", right_on="index")
+mean_activ_fimo = mean_activ_fimo.merge(fimo_cov, on="unique_id")
 mean_activ_fimo.sample(5)
 
 mean_activ_fimo_chip = cage_v_mpra.merge(tissue_sp_fimo_chip, on="unique_id")
@@ -503,7 +503,7 @@ mean_activ_fimo_chip.drop(["med_tf_tissue_sp", "log_med_tf_tissue_sp", "index"],
 
 out_dir = "../../data/04__coverage"
 !mkdir -p $out_dir
-mean_activ_fimo.to_csv("%s/FIMO.motif_coverage.txt" % out_dir, sep="\t", index=False)
-mean_activ_fimo_chip.to_csv("%s/FIMO_intersect_ChIP.motif_coverage.txt" % out_dir, sep="\t", index=False)
+mean_activ_fimo.to_csv("%s/FIMO.coverage.new.txt" % out_dir, sep="\t", index=False)
+mean_activ_fimo_chip.to_csv("%s/FIMO.ChIPIntersect.coverage.new.txt" % out_dir, sep="\t", index=False)
 
 

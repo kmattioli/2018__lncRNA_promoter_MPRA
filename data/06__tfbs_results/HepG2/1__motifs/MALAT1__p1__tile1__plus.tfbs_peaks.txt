@@ -3,5 +3,5 @@ MEF2C	8	22	in peak
 MEF2A	9	20	in peak
 MEF2B	9	20	in peak
 MEF2D	9	20	in peak
-Sox2	45	52	in peak
+Sox2	45	52	no peak
 EGR1	51	64	in peak

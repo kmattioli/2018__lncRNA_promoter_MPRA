@@ -74,7 +74,7 @@ fimo_f = "../../misc/05__fimo/pool2.fimo.txt"
 index_f = "../../data/00__index/dels_oligo_pool.index.txt"
 
 
-# In[31]:
+# In[7]:
 
 
 peak_signal_cutoff = 1.5
@@ -176,7 +176,7 @@ for data, data_filt in zip([hepg2_data, k562_data], [hepg2_data_filt, k562_data_
 
 # ## 3. find "peaks" in the deletion data
 
-# In[32]:
+# In[17]:
 
 
 def find_peaks(df, peak_signal_cutoff, peak_length_cutoff):
@@ -212,7 +212,7 @@ def find_peaks(df, peak_signal_cutoff, peak_length_cutoff):
     return df
 
 
-# In[33]:
+# In[18]:
 
 
 hepg2_data_peaks = {}
@@ -237,21 +237,21 @@ for data_filt, data_peaks, cell in zip([hepg2_data_filt, k562_data_filt], [hepg2
 
 # ## 4. intersect FIMO motifs w/ peaks
 
-# In[26]:
+# In[19]:
 
 
 fimo["fixed_name"] = fimo.apply(fix_fimo_names, name_dict=NAME_DICT, loc_dict=LOC_DICT, axis=1)
 fimo.head()
 
 
-# In[27]:
+# In[20]:
 
 
 def getOverlap(a, b):
     return max(a[0], b[0]) - min(a[1], b[1])
 
 
-# In[55]:
+# In[21]:
 
 
 hepg2_motif_peaks = {}
@@ -334,7 +334,7 @@ for data_peaks, data_motifs, cell in zip([hepg2_data_peaks, k562_data_peaks], [h
         print({"motif": motifs, "start": starts, "end": ends, "peak_overlap": in_peaks})
 
 
-# In[35]:
+# In[22]:
 
 
 hepg2_motif_dfs = {}
@@ -358,7 +358,7 @@ for data_motifs, dfs, cell in zip([hepg2_motif_peaks, k562_motif_peaks], [hepg2_
 hepg2_motif_dfs["GAS5__p1__tile2__minus"].head()
 
 
-# In[36]:
+# In[23]:
 
 
 # find total # of tested motifs found to be in peaks
@@ -375,7 +375,7 @@ for motif_dfs, cell in zip([hepg2_motif_dfs, k562_motif_dfs], ["HepG2", "K562"])
 
 # ## 5. limit to TFs expressed in each cell line & in peaks
 
-# In[37]:
+# In[24]:
 
 
 hepg2_motif_dfs_filt = {}
@@ -395,7 +395,7 @@ hepg2_motif_dfs_filt["GAS5__p1__tile2__minus"].head()
 # ## 6. make heatmap with TFs mapped in each sequence
 # note: use only HepG2 since there are more seqs expressed in HepG2 and use results filtered by TFs expr in HepG2
 
-# In[38]:
+# In[25]:
 
 
 # first, put all gene data in dictionary of list of dataframes
@@ -437,7 +437,7 @@ for tile_data, gene_data in zip([hepg2_motif_dfs_filt, k562_motif_dfs_filt], [he
 list(hepg2_gene_data.keys())[0:5]
 
 
-# In[39]:
+# In[26]:
 
 
 hepg2_sig_data = {}
@@ -460,20 +460,20 @@ for sig_data, all_motifs, gene_data in zip([hepg2_sig_data, k562_sig_data], [hep
         sig_data[gene] = gene_motifs
 
 
-# In[40]:
+# In[27]:
 
 
 hepg2_all_motifs = list(set(hepg2_all_motifs))
 len(hepg2_all_motifs)
 
 
-# In[41]:
+# In[28]:
 
 
 hepg2_motif_idx_dict = {k:v for k, v in zip(hepg2_all_motifs, list(range(0, len(hepg2_all_motifs))))}
 
 
-# In[42]:
+# In[29]:
 
 
 hepg2_motif_array = np.zeros((len(hepg2_sig_data), len(hepg2_all_motifs)))
@@ -488,20 +488,20 @@ hepg2_mo_df = pd.DataFrame(hepg2_motif_array, index=list(hepg2_sig_data.keys()),
 hepg2_mo_df.head()
 
 
-# In[43]:
+# In[30]:
 
 
 cmap = sns.light_palette("firebrick", reverse=False, as_cmap=True)
 
 
-# In[44]:
+# In[31]:
 
 
 cg = sns.clustermap(hepg2_mo_df, annot=False, cmap=cmap, figsize=(2.25, 3))
 cg.savefig("Fig_4D.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[59]:
+# In[32]:
 
 
 cg = sns.clustermap(hepg2_mo_df.T, annot=False, cmap=cmap, figsize=(5, 12))
@@ -510,7 +510,7 @@ cg.savefig("Fig_4D_big_vert.pdf", bbox_inches="tight", dpi="figure")
 
 # ## 7. plot number of motifs found in seqs expressed in only one cell type vs. two
 
-# In[46]:
+# In[41]:
 
 
 expr_in_hepg2_not_k562 = [x for x in hepg2_gene_data.keys() if x not in k562_gene_data.keys()]

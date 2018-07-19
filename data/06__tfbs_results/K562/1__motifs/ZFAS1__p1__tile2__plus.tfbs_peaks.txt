@@ -16,7 +16,7 @@ TBX1	16	23	in peak
 TBR1	16	25	in peak
 TBX15	16	23	in peak
 TBX4	16	23	in peak
-YY1	23	34	in peak
+YY1	23	34	no peak
 NFIL3	34	44	in peak
 TEF	35	46	in peak
 DBP	35	46	in peak

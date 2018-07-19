@@ -1,8 +1,8 @@
 motif	start	end	peak_overlap
-THAP1	14	22	no peak
-Gabpa	19	29	no peak
-ERG	21	30	no peak
-FLI1	21	30	no peak
-FEV	21	30	no peak
-ELF1	21	32	no peak
-STAT3	22	32	no peak
+THAP1	14	22	in peak
+Gabpa	19	29	in peak
+ERG	21	30	in peak
+FLI1	21	30	in peak
+FEV	21	30	in peak
+ELF1	21	32	in peak
+STAT3	22	32	in peak

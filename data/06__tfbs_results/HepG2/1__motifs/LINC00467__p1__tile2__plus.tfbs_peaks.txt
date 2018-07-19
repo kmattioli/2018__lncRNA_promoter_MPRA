@@ -5,7 +5,7 @@ E2F6	4	14	in peak
 KLF5	6	15	in peak
 SP2	6	20	in peak
 SP1	6	16	in peak
-PAX5	11	29	in peak
+PAX5	11	29	no peak
 Hes1	53	62	in peak
 Tcfl5	53	62	in peak
 NRF1	53	63	in peak

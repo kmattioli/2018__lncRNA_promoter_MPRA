@@ -2,8 +2,8 @@ motif	start	end	peak_overlap
 Crx	5	15	in peak
 HOXC13	25	35	in peak
 PPARG	35	54	in peak
-GRHL1	56	67	in peak
-TFCP2	57	66	in peak
+GRHL1	56	67	no peak
+TFCP2	57	66	no peak
 Stat6	62	76	in peak
 STAT3	63	73	in peak
 STAT1	63	73	in peak
