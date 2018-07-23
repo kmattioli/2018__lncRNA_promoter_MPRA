@@ -341,7 +341,7 @@ ax.set_xlabel("log(mean TF tissue specificity)")
 r, p = stats.spearmanr(no_nan["log_avg_tf_tissue_sp"], no_nan["mpra_activ"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_3.pdf", bbox_inches="tight", dpi="figure")
+fig.savefig("Fig_3C_3.pdf", bbox_inches="tight", dpi="figure")
 
 
 # In[40]:
@@ -363,7 +363,7 @@ ax.set_xlabel("log(mean TF tissue specificity)")
 r, p = stats.spearmanr(no_nan["log_avg_tf_tissue_sp"], no_nan["mpra_ts"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_6.pdf", bbox_inches="tight", dpi="figure")
+fig.savefig("Fig_3C_6.pdf", bbox_inches="tight", dpi="figure")
 
 
 # #### fimo intersected w/ chip
@@ -535,7 +535,7 @@ ax.set_xlabel("log(max overlapping motifs)")
 r, p = stats.spearmanr(no_nan["log_max_cov"], no_nan["mpra_activ"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_2.pdf", bbox_inches="tight", dpi="figure")
+fig.savefig("Fig_3C_2.pdf", bbox_inches="tight", dpi="figure")
 
 
 # In[57]:
@@ -557,7 +557,7 @@ ax.set_xlabel("log(max overlapping motifs)")
 r, p = stats.spearmanr(no_nan["log_max_cov"], no_nan["mpra_ts"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_5.pdf", bbox_inches="tight", dpi="figure")
+fig.savefig("Fig_3C_5.pdf", bbox_inches="tight", dpi="figure")
 
 
 # #### fimo intersected w/ chip
@@ -584,14 +584,14 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 #fig.savefig("Fig_3C_2.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[61]:
+# In[ ]:
 
 
 no_nan = mean_activ_fimo_chip[~pd.isnull(mean_activ_fimo_chip["log_max_cov"]) &
                               ~pd.isnull(mean_activ_fimo_chip["mpra_ts"])]
 
 
-# In[62]:
+# In[ ]:
 
 
 fig = plt.figure(figsize=(1.2, 1.2))
@@ -612,21 +612,21 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 
 # #### fimo only
 
-# In[63]:
+# In[ ]:
 
 
 #cmap = sns.light_palette("#8da0cb", as_cmap=True)
 cmap = sns.light_palette("darkslategray", as_cmap=True)
 
 
-# In[64]:
+# In[ ]:
 
 
 no_nan = mean_activ_fimo[~pd.isnull(mean_activ_fimo["log_avg_tf_tissue_sp"]) &
                          ~pd.isnull(mean_activ_fimo["cage_activ"])]
 
 
-# In[65]:
+# In[ ]:
 
 
 fig = plt.figure(figsize=(1.2, 1.2))
@@ -641,14 +641,14 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 #fig.savefig("Fig_3C_6.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[66]:
+# In[ ]:
 
 
 no_nan = mean_activ_fimo[~pd.isnull(mean_activ_fimo["log_avg_tf_tissue_sp"]) &
                          ~pd.isnull(mean_activ_fimo["cage_ts"])]
 
 
-# In[67]:
+# In[ ]:
 
 
 fig = plt.figure(figsize=(1.2, 1.2))
@@ -665,14 +665,14 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 
 # #### fimo intersected w/ chip
 
-# In[68]:
+# In[ ]:
 
 
 no_nan = mean_activ_fimo_chip[~pd.isnull(mean_activ_fimo_chip["log_avg_tf_tissue_sp"]) &
                               ~pd.isnull(mean_activ_fimo_chip["cage_activ"])]
 
 
-# In[69]:
+# In[ ]:
 
 
 fig = plt.figure(figsize=(1.2, 1.2))
@@ -687,14 +687,14 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 #fig.savefig("Fig_3C_6.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[70]:
+# In[ ]:
 
 
 no_nan = mean_activ_fimo_chip[~pd.isnull(mean_activ_fimo_chip["log_avg_tf_tissue_sp"]) &
                               ~pd.isnull(mean_activ_fimo_chip["cage_ts"])]
 
 
-# In[71]:
+# In[ ]:
 
 
 fig = plt.figure(figsize=(1.2, 1.2))
@@ -713,14 +713,14 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 
 # #### fimo only
 
-# In[72]:
+# In[ ]:
 
 
 no_nan = mean_activ_fimo[~pd.isnull(mean_activ_fimo["log_n_bp_cov"]) &
                          ~pd.isnull(mean_activ_fimo["cage_activ"])]
 
 
-# In[73]:
+# In[ ]:
 
 
 fig = plt.figure(figsize=(1.2, 1.2))
@@ -735,14 +735,14 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 #fig.savefig("Fig_3C_4.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[74]:
+# In[ ]:
 
 
 no_nan = mean_activ_fimo[~pd.isnull(mean_activ_fimo["log_n_bp_cov"]) &
                          ~pd.isnull(mean_activ_fimo["cage_ts"])]
 
 
-# In[75]:
+# In[ ]:
 
 
 fig = plt.figure(figsize=(1.2, 1.2))
@@ -759,14 +759,14 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 
 # #### fimo intersected w/ chip
 
-# In[76]:
+# In[ ]:
 
 
 no_nan = mean_activ_fimo_chip[~pd.isnull(mean_activ_fimo_chip["log_n_bp_cov"]) &
                               ~pd.isnull(mean_activ_fimo_chip["cage_activ"])]
 
 
-# In[77]:
+# In[ ]:
 
 
 fig = plt.figure(figsize=(1.2, 1.2))
@@ -781,14 +781,14 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 #fig.savefig("Fig_3C_4.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[78]:
+# In[ ]:
 
 
 no_nan = mean_activ_fimo_chip[~pd.isnull(mean_activ_fimo_chip["log_n_bp_cov"]) &
                               ~pd.isnull(mean_activ_fimo_chip["cage_ts"])]
 
 
-# In[79]:
+# In[ ]:
 
 
 fig = plt.figure(figsize=(1.2, 1.2))
@@ -807,20 +807,20 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 
 # #### fimo only
 
-# In[80]:
+# In[ ]:
 
 
 cmap = sns.light_palette("firebrick", as_cmap=True)
 
 
-# In[81]:
+# In[ ]:
 
 
 no_nan = mean_activ_fimo[~pd.isnull(mean_activ_fimo["log_max_cov"]) &
                          ~pd.isnull(mean_activ_fimo["cage_activ"])]
 
 
-# In[82]:
+# In[ ]:
 
 
 fig = plt.figure(figsize=(1.2, 1.2))
@@ -835,14 +835,14 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 #fig.savefig("Fig_3C_5.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[83]:
+# In[ ]:
 
 
 no_nan = mean_activ_fimo[~pd.isnull(mean_activ_fimo["log_max_cov"]) &
                          ~pd.isnull(mean_activ_fimo["cage_ts"])]
 
 
-# In[84]:
+# In[ ]:
 
 
 fig = plt.figure(figsize=(1.2, 1.2))
@@ -859,14 +859,14 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 
 # #### fimo intersected w/ chip
 
-# In[85]:
+# In[ ]:
 
 
 no_nan = mean_activ_fimo_chip[~pd.isnull(mean_activ_fimo_chip["log_max_cov"]) &
                               ~pd.isnull(mean_activ_fimo_chip["cage_activ"])]
 
 
-# In[86]:
+# In[ ]:
 
 
 fig = plt.figure(figsize=(1.2, 1.2))
@@ -881,14 +881,14 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 #fig.savefig("Fig_3C_5.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[87]:
+# In[ ]:
 
 
 no_nan = mean_activ_fimo_chip[~pd.isnull(mean_activ_fimo_chip["log_max_cov"]) &
                               ~pd.isnull(mean_activ_fimo_chip["cage_ts"])]
 
 
-# In[88]:
+# In[ ]:
 
 
 fig = plt.figure(figsize=(1.2, 1.2))
@@ -905,14 +905,14 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 
 # ### check correlation b/w CAGE and MPRA ts
 
-# In[89]:
+# In[ ]:
 
 
 no_nan = mean_activ_fimo[~pd.isnull(mean_activ_fimo["mpra_ts"]) &
                          ~pd.isnull(mean_activ_fimo["cage_ts"])]
 
 
-# In[90]:
+# In[ ]:
 
 
 fig = plt.figure(figsize=(1.2, 1.2))
@@ -929,19 +929,19 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 
 # ## 6. write files
 
-# In[92]:
+# In[ ]:
 
 
 mean_activ_fimo.drop(["med_tf_tissue_sp", "log_med_tf_tissue_sp"], axis=1, inplace=True)
 
 
-# In[93]:
+# In[ ]:
 
 
 mean_activ_fimo_chip.drop(["med_tf_tissue_sp", "log_med_tf_tissue_sp"], axis=1, inplace=True)
 
 
-# In[94]:
+# In[ ]:
 
 
 out_dir = "../../data/04__coverage"
