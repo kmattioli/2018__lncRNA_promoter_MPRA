@@ -242,6 +242,7 @@ sns.kdeplot(data=dpc_vals, cumulative=True, color=TSS_CLASS_PALETTE["div_pc"],
             label="div. mRNAs", ax=ax)
 ax.set_xlabel("log(# of bp covered, deduped by motif cluster)")
 ax.set_ylabel("cumulative density")
+plt.xlim((2,5))
 fig.savefig("Fig_S10B.pdf", bbox_inches="tight", dpi="figure")
 
 
