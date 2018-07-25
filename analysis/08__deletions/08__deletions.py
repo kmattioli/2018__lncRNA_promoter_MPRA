@@ -9,8 +9,8 @@
 # ------
 # 
 # figures in this notebook:
-# - **Fig 4B, S13A**: scatter plots showing the comparison between deletion effect sizes and motif disruptions
-# - **Fig 4C, S13B**: specific examples of deletion profiles across a sequence (HOTAIR and DLEU1) and how they compare to motif disruption profiles
+# - **Fig 3B, S9A**: scatter plots showing the comparison between deletion effect sizes and motif disruptions
+# - **Fig 3C, S9B**: specific examples of deletion profiles across a sequence (HOTAIR and DLEU1) and how they compare to motif disruption profiles
 
 # In[1]:
 
@@ -89,7 +89,7 @@ pool2_index_del_f = "%s/dels_oligo_pool.index.with_deletion_info.txt" % (index_d
 
 
 annot_f = "%s/tssid_all_biotypes.txt" % (index_dir)
-tfbs_f = "../../misc/05__fimo/pool2.noRandom.noScrambled.seqID.nMotifs.txt"
+tfbs_f = "../../misc/03__fimo/pool2_n_motifs_map.txt"
 
 
 # ## 1. import data
@@ -484,10 +484,10 @@ for dels_fixed, dels_df, cell in zip([hepg2_dels_fixed, k562_dels_fixed], [hepg2
         # plot
         if name == "HOTAIR__p1__tile2__minus" and cell == "HepG2":
             plot_peaks_and_tfbs((5.6, 2.5), 94, name, cell, scores, yerrs, 
-                                motif_vals, seq, "Fig_4C", True)
+                                motif_vals, seq, "Fig_3C", True)
         if name == "DLEU1__p1__tile1__plus" and cell == "HepG2":
             plot_peaks_and_tfbs((5.6, 2.5), 94, name, cell, scores, yerrs, 
-                                motif_vals, seq, "Fig_S13B", True)
+                                motif_vals, seq, "Fig_S9B", True)
         
     if cell == "HepG2":
         hepg2_all_dels_tfs = dels_df.copy()
@@ -517,7 +517,7 @@ g = sns.jointplot(data=sig_only, x="delta_tfs", y="mean.log2FC", kind="reg", spa
                   marginal_kws={"hist": False}, color="darkgrey", scatter_kws={"s": 25})
 print("HepG2")
 g.set_axis_labels(r"$\Delta$ motifs (del-ref)", "deletion effect size")
-g.savefig("Fig_4B.pdf", bbox_inches="tight", dpi="figure")
+g.savefig("Fig_3B.pdf", bbox_inches="tight", dpi="figure")
 
 
 # In[46]:
@@ -540,5 +540,5 @@ g = sns.jointplot(data=sig_only, x="delta_tfs", y="mean.log2FC", kind="reg", spa
                   marginal_kws={"hist": False}, color="darkgrey", scatter_kws={"s": 25})
 print("K562")
 g.set_axis_labels(r"$\Delta$ motifs (del-ref)", "deletion effect size")
-g.savefig("Fig_S13A.pdf", bbox_inches="tight", dpi="figure")
+g.savefig("Fig_S9A.pdf", bbox_inches="tight", dpi="figure")
 

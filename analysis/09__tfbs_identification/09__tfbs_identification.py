@@ -4,13 +4,13 @@
 # # 09__tbs_identification
 # # finding functional TFBSs based on deletion data
 # 
-# in this notebook, i ..
+# in this notebook, i find "peaks" in the deletion data, defined as any stretch of >= 5 nucleotides with effect sizes of <= -1.5 * the average standard deviation of the deletion effect sizes in that tile. (scaling by the standard deviation ensures that extremely noisy tiles will have higher thresholds for peak calling). then, i intersect the mapped FIMO motifs with these peaks, and consider "functional" motifs to be those that overlap a peak by at least 1 nucleotide. i also limit the motifs to only those that are expressed in the given cell type. i make a heatmap of all of the predicted "functional" TF motifs across all of the lncRNAs we examined, and i examine patterns between tile specificity and the number of functional motifs in the tile.
 # 
 # ------
 # 
 # figures in this notebook:
-# - **Fig 4E, top**: barplot of deletion effect sizes and sequence logo plotted proportionally to the loss scores of lncRNA DLEU1 promoter. all of these plots are made by the MIND algorithm and stored in the data/06__mind_results folder
-# - **Fig 4D**: heatmap showing all of the significant TFBSs predicted by MIND in HepG2
+# - **Fig 3E**: barplot of deletion effect sizes and sequence logo plotted proportionally to the loss scores of lncRNA DLEU1 promoter (DLEU1_HepG2). 
+# - **Fig 3D, S10**: heatmap showing all of the functional TFBSs
 
 # In[1]:
 
@@ -59,13 +59,13 @@ out_dir = "../../data/06__tfbs_results"
 
 
 # file w/ tfs and their expression
-tf_expr_f = "../../misc/03__rna_seq_expr/tf_tissue_sp.txt"
+tf_expr_f = "../../data/04__coverage/TF_tissue_specificities.from_CAGE.txt"
 
 
 # In[5]:
 
 
-fimo_f = "../../misc/05__fimo/pool2.fimo.txt"
+fimo_f = "../../misc/03__fimo/pool2_fimo_map.txt"
 
 
 # In[6]:
@@ -137,8 +137,8 @@ fimo.head()
 
 
 # filter to tfs that are expr in the 2 cell lines
-hepg2_tfs = tf_expr[tf_expr["HepG2"] > 1]["motif_name"]
-k562_tfs = tf_expr[tf_expr["K562"] > 1]["motif_name"]
+hepg2_tfs = tf_expr[tf_expr["HepG2_exp"] > 0.1]["tf"]
+k562_tfs = tf_expr[tf_expr["K562_exp"] > 0.1]["tf"]
 
 
 # In[14]:
@@ -300,10 +300,7 @@ for data_peaks, data_motifs, cell in zip([hepg2_data_peaks, k562_data_peaks], [h
         motif_names = [m for x, y, m in motif_positions_filt]
 
 
-        if key == "LINC_PINT__p2__tile1__minus":
-            plot_peaks_and_fimo((5.6, 2), seq_len, key, widths, scores, yerrs, scaled_scores, bases, 
-                                motif_positions_fixed, motif_names, "LINC_PINT_%s.pdf" % cell, ".", True)
-        elif key == "MEG3__p1__tile2__plus":
+        if key == "MEG3__p1__tile2__plus":
             plot_peaks_and_fimo((5.6, 2), seq_len, key, widths, scores, yerrs, scaled_scores, bases, 
                                 motif_positions_fixed, motif_names, "MEG3_%s.pdf" % cell, ".", True)
         elif key == "DLEU1__p1__tile2__plus":
@@ -498,19 +495,19 @@ cmap = sns.light_palette("firebrick", reverse=False, as_cmap=True)
 
 
 cg = sns.clustermap(hepg2_mo_df, annot=False, cmap=cmap, figsize=(2.25, 3))
-cg.savefig("Fig_4D.pdf", bbox_inches="tight", dpi="figure")
+cg.savefig("Fig_3D.pdf", bbox_inches="tight", dpi="figure")
 
 
 # In[32]:
 
 
 cg = sns.clustermap(hepg2_mo_df.T, annot=False, cmap=cmap, figsize=(5, 12))
-cg.savefig("Fig_4D_big_vert.pdf", bbox_inches="tight", dpi="figure")
+cg.savefig("Fig_S10.pdf", bbox_inches="tight", dpi="figure")
 
 
 # ## 7. plot number of motifs found in seqs expressed in only one cell type vs. two
 
-# In[41]:
+# In[33]:
 
 
 expr_in_hepg2_not_k562 = [x for x in hepg2_gene_data.keys() if x not in k562_gene_data.keys()]
@@ -518,13 +515,13 @@ expr_in_both = [x for x in hepg2_gene_data.keys() if x in k562_gene_data.keys()]
 expr_in_hepg2_not_k562
 
 
-# In[47]:
+# In[34]:
 
 
 hepg2_sig_data.keys()
 
 
-# In[48]:
+# In[35]:
 
 
 results_dict = {}
@@ -555,7 +552,7 @@ results_df.columns = ["gene", "n_sig_motifs", "type"]
 results_df.head()
 
 
-# In[49]:
+# In[36]:
 
 
 fig = plt.figure(figsize=(2.5, 2))
@@ -579,10 +576,10 @@ u, pval = stats.mannwhitneyu(one_dist, both_dist, alternative="less", use_contin
 # statistical annotation
 annotate_pval(ax, 0.2, 0.8, 40, 0, 39, pval, fontsize)
 
-fig.savefig("Fig_S15B.pdf", dpi="figure", bbox_inches="tight")
+fig.savefig("Fig_S11.pdf", dpi="figure", bbox_inches="tight")
 
 
-# In[56]:
+# In[37]:
 
 
 pval
@@ -590,7 +587,7 @@ pval
 
 # ## 8. plot correlation b/w number of motifs found and ref tile activity
 
-# In[50]:
+# In[38]:
 
 
 hepg2_dict = {}
@@ -610,7 +607,7 @@ for del_dict, motif_dict, d in zip([hepg2_data_peaks, k562_data_peaks],
         d[key] = [wt_activ, n_tot_sig]
 
 
-# In[51]:
+# In[39]:
 
 
 hepg2_activ = pd.DataFrame.from_dict(hepg2_dict, orient="index").reset_index()
@@ -620,30 +617,28 @@ k562_activ = pd.DataFrame.from_dict(k562_dict, orient="index").reset_index()
 k562_activ.columns = ["seq_name", "activ", "n_sig"]
 
 
-# In[52]:
+# In[40]:
 
 
 hepg2_activ.head()
 
 
-# In[53]:
+# In[41]:
 
 
 g = sns.jointplot(data=hepg2_activ, x="activ", y="n_sig", kind="reg", space=0, size=2.625, stat_func=spearmanr, 
                   marginal_kws={"hist": True, "kde": False, "bins": 10}, color="darkgrey", scatter_kws={"s": 25},
                   xlim=(-1, 6), ylim=(-10, 60))
 g.set_axis_labels("reference activity", "# motifs")
-g.savefig("Fig_S15A_1.pdf", dpi="figure", bbox_inches="tight")
 
 
-# In[54]:
+# In[42]:
 
 
 g = sns.jointplot(data=k562_activ, x="activ", y="n_sig", kind="reg", space=0, size=2.625, stat_func=spearmanr, 
                   marginal_kws={"hist": True, "kde": False, "bins": 10}, color="darkgrey", scatter_kws={"s": 25},
                   xlim=(-1, 6), ylim=(-10, 60))
 g.set_axis_labels("reference activity", "# motifs")
-g.savefig("Fig_S15A_2.pdf", dpi="figure", bbox_inches="tight")
 
 
 # In[ ]:

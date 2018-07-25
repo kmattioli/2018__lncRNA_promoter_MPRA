@@ -17,7 +17,7 @@
 # ------
 # 
 # figures in this notebook:
-# - **Fig S7B**: heatmap of element activity correlation between replicates
+# - **Fig S3B**: heatmap of element activity correlation between replicates
 
 # In[1]:
 
@@ -454,7 +454,7 @@ cmap = sns.cubehelix_palette(as_cmap=True)
 cg = sns.clustermap(pool1_all_no_neg_corr, figsize=(7.2,7.2), cmap=cmap, annot=False)
 _ = plt.setp(cg.ax_heatmap.yaxis.get_majorticklabels(), rotation=0)
 plt.suptitle("pearson correlation of replicates\nquantile-normalized activities per element (no neg controls)")
-cg.savefig("Fig_S7B.pdf", dpi="figure", transparent=True, bbox_inches="tight")
+cg.savefig("Fig_S3B.pdf", dpi="figure", transparent=True, bbox_inches="tight")
 
 
 # ### pool 2 (deletion pool)

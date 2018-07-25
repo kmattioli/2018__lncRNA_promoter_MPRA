@@ -11,7 +11,7 @@
 # ------
 # 
 # figures in this notebook:
-# - **Fig S7A**: heatmap of barcode count correlation between replicates
+# - **Fig S3A**: heatmap of barcode count correlation between replicates
 
 # In[1]:
 
@@ -669,5 +669,5 @@ cmap = sns.cubehelix_palette(as_cmap=True)
 cg = sns.clustermap(all_pool1_corr, figsize=(7.2,7.2), cmap=cmap, annot=False)
 _ = plt.setp(cg.ax_heatmap.yaxis.get_majorticklabels(), rotation=0)
 plt.suptitle("pearson correlation of replicates\nall barcodes at counts > 5")
-cg.savefig("Fig_S7A.pdf", dpi="figure", transparent=True, bbox_inches="tight")
+cg.savefig("Fig_S3A.pdf", dpi="figure", transparent=True, bbox_inches="tight")
 

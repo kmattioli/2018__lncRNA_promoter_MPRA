@@ -4,13 +4,13 @@
 # # 11__snp_del_comparison
 # # comparing SNP effect sizes to deletion effect sizes
 # 
-# in this notebook, i compare SNP effect sizes (log2(alt/ref)) to deletion effect sizes (log2(del/ref)) and also determine how often a regulatory SNP overlaps "peaks" found by MIND
+# in this notebook, i compare SNP effect sizes (log2(alt/ref)) to deletion effect sizes (log2(del/ref)) and also plot deletions and SNPs side-by-side across sequences
 # 
 # ------
 # 
 # figures in this notebook:
-# - **Fig S17A**: scatter plot b/w SNP and del effect sizes in HepG2 and K562
-# - **Fig 4E and S17B**: bar plot of del effect sizes with SNP plot below for DLEU1 and MEG3
+# - **Fig S12A**: scatter plot b/w SNP and del effect sizes in HepG2 and K562
+# - **Fig S12B**: bar plot of del effect sizes with SNP plot below for MEG3
 
 # In[1]:
 
@@ -411,7 +411,7 @@ g = sns.jointplot(data=hepg2_snp_del_nonan, x="snp_val", y="del_val", kind="reg"
                   stat_func=spearmanr, 
                   marginal_kws={"hist": False}, color="darkgrey", scatter_kws={"s": 25})
 g.set_axis_labels("SNP effect size", "deletion effect size")
-g.savefig("Fig_S17A_HepG2.pdf", dpi="figure", bbox_inches="tight")
+g.savefig("Fig_S12A_HepG2.pdf", dpi="figure", bbox_inches="tight")
 
 
 # In[40]:
@@ -421,7 +421,7 @@ g = sns.jointplot(data=k562_snp_del_nonan, x="snp_val", y="del_val", kind="reg",
                   stat_func=spearmanr, 
                   marginal_kws={"hist": False}, color="darkgrey", scatter_kws={"s": 25})
 g.set_axis_labels("SNP effect size", "deletion effect size")
-g.savefig("Fig_S17A_K562.pdf", dpi="figure", bbox_inches="tight")
+g.savefig("Fig_S12A_K562.pdf", dpi="figure", bbox_inches="tight")
 
 
 # ## 9. plot overlap of SNPs & deletions
@@ -479,11 +479,7 @@ for cell, snps, dels in zip(["HepG2", "K562"], [hepg2_snps, k562_snps], [hepg2_d
         if "MEG3__p1__tile2__plus" in seq:
             print(snp_info)
             plot_peaks_and_snps((5.6, 2), seq_len, seq, widths, scores, yerrs, scaled_scores, 
-                                snp_vals, snp_sigs, bases, "Fig_S17B_%s.pdf" % cell, ".", True)
-        elif "DLEU1__p1__tile2__plus" in seq:
-            print(snp_info)
-            plot_peaks_and_snps((5.6, 2), seq_len, seq, widths, scores, yerrs, scaled_scores, 
-                                snp_vals, snp_sigs, bases, "Fig_4E_%s.pdf" % cell, ".", True)
+                                snp_vals, snp_sigs, bases, "Fig_S12B_%s.pdf" % cell, ".", True)
 
 #         else:
 #             plot_peaks_and_snps((5.6, 2), seq_len, seq, widths, scores, yerrs, scaled_scores, 

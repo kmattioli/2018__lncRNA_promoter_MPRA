@@ -9,10 +9,10 @@
 # ------
 # 
 # figures in this notebook:
-# - **Fig 2B, Fig S8A, Fig S12**: boxplots comparing reference sequences to negative controls
-# - **Fig 2C, Fig S8B**: boxplots comparing activities between biotypes
-# - **Fig 2D**: KDE plot comparing CAGE cell type specificity and MPRA cell type specificity
-# - **Fig 2E**: barplot showing % of reference sequences active in 1 or all 3 cell types
+# - **Fig 1C, Fig S4A, Fig S8**: boxplots comparing reference sequences to negative controls
+# - **Fig 1D, Fig S4B**: boxplots comparing activities between biotypes
+# - **Fig 1E**: KDE plot comparing CAGE cell type specificity and MPRA cell type specificity
+# - **Fig 1F**: barplot showing % of reference sequences active in 1 or all 3 cell types
 
 # In[1]:
 
@@ -114,8 +114,8 @@ pool2_index_f = "%s/dels_oligo_pool.index.txt" % index_dir
 # In[8]:
 
 
-annot_f = "../../misc/00__tss_properties/correspondance_seqID_PromType_unique.txt"
-id_map_f = "../../misc/00__tss_properties/TABLE_ALL_TSS_and_flipped.properties.PromType.txt"
+annot_f = "../../misc/00__tss_properties/mpra_id_to_biotype_map.txt"
+id_map_f = "../../misc/00__tss_properties/mpra_tss_detailed_info.txt"
 
 
 # ## 1. import data
@@ -367,7 +367,7 @@ neg_control_plot(pool1_hepg2_elem_norm, order, palette, fontsize, "HepG2", axarr
 neg_control_plot(pool1_k562_elem_norm, order, palette, fontsize, "K562", axarr[2], None, "K562 MPRA activity", 
                  True, False, False, None)
 plt.tight_layout()
-f.savefig("Fig_2B_S8A.pdf", bbox_inches="tight", dpi="figure")
+f.savefig("Fig_1C_S4A.pdf", bbox_inches="tight", dpi="figure")
 
 
 # ### pool 2
@@ -381,7 +381,7 @@ neg_control_plot(pool2_hepg2_elem_norm, order, palette, fontsize, "HepG2", axarr
 neg_control_plot(pool2_k562_elem_norm, order, palette, fontsize, "K562", axarr[1], None, "K562 MPRA activity", 
                  True, False, False, None)
 plt.tight_layout()
-f.savefig("Fig_S12.pdf", bbox_inches="tight", dpi="figure")
+f.savefig("Fig_S8.pdf", bbox_inches="tight", dpi="figure")
 
 
 # ## 5. boxplots: across TSS classes
@@ -408,7 +408,7 @@ promtype_plot(pool1_hepg2_df, TSS_CLASS_ORDER, TSS_CLASS_PALETTE, fontsize, "Hep
 promtype_plot(pool1_k562_df, TSS_CLASS_ORDER, TSS_CLASS_PALETTE, fontsize, "K562", axarr[2], None, 
               "K562 MPRA activity", True, False, False, None)
 plt.tight_layout()
-f.savefig("Fig_2C_S8B.pdf", bbox_inches="tight", dpi="figure")
+f.savefig("Fig_1D_S4B.pdf", bbox_inches="tight", dpi="figure")
 
 
 # ## 6. barplots: find % of sequences active across cell types
@@ -498,7 +498,7 @@ for c in TSS_CLASS_ORDER:
 colors
 
 
-# In[46]:
+# In[44]:
 
 
 # better plot showing tissue sp
@@ -525,12 +525,12 @@ ax.legend().set_visible(False)
 plt.ylim((0, 50))
 plt.ylabel("% of sequences that are active\nin 1 and 3 cell types", fontsize=fontsize)
 plt.xlabel("")
-plt.savefig("Fig_2E.pdf", bbox_inches="tight", dpi="figure")
+plt.savefig("Fig_1F.pdf", bbox_inches="tight", dpi="figure")
 
 
 # ## 7. kdeplot: compare to CAGE
 
-# In[139]:
+# In[45]:
 
 
 hepg2_activ = pool1_hepg2_df[["unique_id", "element", "better_type", "overall_mean", "PromType2"]]
@@ -546,7 +546,7 @@ all_activ = all_activ[(all_activ["PromType2"].isin(TSS_CLASS_ORDER)) &
 all_activ.sample(5)
 
 
-# In[140]:
+# In[46]:
 
 
 all_activ["combined_class"] = ""
@@ -555,14 +555,14 @@ all_activ.drop("combined_class", axis=1, inplace=True)
 all_activ.head()
 
 
-# In[141]:
+# In[47]:
 
 
 all_activ["oligo_reg"] = all_activ.unique_id.str.split("__", expand=True)[2]
 all_activ.sample(5)
 
 
-# In[142]:
+# In[48]:
 
 
 id_map = id_map[["oligo_reg", "K562_rep1", "K562_rep2", "K562_rep3", "HeLa_rep1", "HeLa_rep2", "HeLa_rep3", 
@@ -571,7 +571,7 @@ all_activ = all_activ.merge(id_map, on="oligo_reg")
 all_activ.sample(5)
 
 
-# In[143]:
+# In[49]:
 
 
 all_activ["K562_av"] = all_activ[["K562_rep1", "K562_rep2", "K562_rep3"]].mean(axis=1)
@@ -583,7 +583,7 @@ all_activ["HeLa_log_av"] = np.log(all_activ["HeLa_av"]+1)
 all_activ["HepG2_log_av"] = np.log(all_activ["HepG2_av"]+1)
 
 
-# In[144]:
+# In[50]:
 
 
 all_activ = all_activ[(~all_activ["unique_id"].str.contains("SNP_INDIV")) & 
@@ -592,7 +592,7 @@ all_activ = all_activ[(~all_activ["unique_id"].str.contains("SNP_INDIV")) &
 all_activ.sample(5)
 
 
-# In[145]:
+# In[51]:
 
 
 # first scale mpra ranges to be positive
@@ -601,7 +601,7 @@ all_activ["hela_scaled"] = scale_range(all_activ["HeLa"], 0, 100)
 all_activ["k562_scaled"] = scale_range(all_activ["K562"], 0, 100)
 
 
-# In[146]:
+# In[52]:
 
 
 cage_ts = calculate_tissue_specificity(all_activ[["HepG2_log_av", "K562_log_av", "HeLa_log_av"]])
@@ -614,13 +614,13 @@ all_activ["mpra_ts"] = mpra_ts
 all_activ.head()
 
 
-# In[147]:
+# In[53]:
 
 
 cmap = sns.light_palette("darkslategray", as_cmap=True)
 
 
-# In[148]:
+# In[54]:
 
 
 no_nan = all_activ[(~pd.isnull(all_activ["mpra_ts"])) & (~pd.isnull(all_activ["cage_ts"]))]
@@ -632,10 +632,10 @@ g.set_axis_labels("CAGE cell-type specificity", "MPRA cell-type specificity")
 r, p = stats.spearmanr(no_nan["cage_ts"], no_nan["mpra_ts"])
 g.ax_joint.annotate("r = {:.2f}\np = {:.2e}".format(r, Decimal(p)), xy=(.1, .8), xycoords=ax.transAxes, 
                     fontsize=5)
-g.savefig("Fig_2D.pdf", bbox_inches="tight", dpi="figure")
+g.savefig("Fig_1E.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[149]:
+# In[55]:
 
 
 def cage_v_mpra_ts(row):
@@ -652,7 +652,7 @@ no_nan["ts_status"] = no_nan.apply(cage_v_mpra_ts, axis=1)
 no_nan.ts_status.value_counts()
 
 
-# In[150]:
+# In[56]:
 
 
 tot = 692+402+310+236
@@ -666,13 +666,13 @@ print("lower left: %s" % (lower_left/tot))
 print("lower right: %s" % (lower_right/tot))
 
 
-# In[151]:
+# In[57]:
 
 
 (692+402)/(692+402+310+236)
 
 
-# In[152]:
+# In[58]:
 
 
 no_nan = all_activ[(~pd.isnull(all_activ["mpra_activ"])) & (~pd.isnull(all_activ["cage_activ"]))]
@@ -684,93 +684,10 @@ g.ax_joint.annotate("r = {:.2f}\np = {:.2e}".format(r, Decimal(p)), xy=(.1, .8),
                     fontsize=5)
 
 
-# In[155]:
+# In[59]:
 
 
 # write file with tissue-specificities for later use
 final = all_activ[["unique_id", "PromType2", "cage_activ", "cage_ts", "mpra_activ", "mpra_ts"]]
 final.to_csv("../../data/02__activs/POOL1__pMPRA1__CAGE_vs_MPRA_activs.txt", sep="\t", index=False)
-
-
-# ### find counts of tiles that are only on in HepG2 in MPRA AND CAGE, etc.
-
-# In[84]:
-
-
-hepg2 = all_activ[~pd.isnull(all_activ["HepG2"])]
-sns.distplot(hepg2[hepg2["combined_class_HepG2"] == "sig active"]["HepG2"], bins=100, label="sig active", 
-             color="green")
-sns.distplot(hepg2[hepg2["combined_class_HepG2"] != "sig active"]["HepG2"], bins=100, label="not sig active", 
-             color="gray")
-plt.legend()
-plt.ylim((0, 1))
-
-
-# In[92]:
-
-
-cage_hepg2_only = all_activ[(all_activ["HepG2_av"] > 0) & (all_activ["K562_av"] == 0) & (all_activ["HeLa_av"] == 0)]
-print("# tiles that are on in HepG2 only by CAGE: %s" % len(cage_hepg2_only))
-
-cage_mpra_hepg2_only = cage_hepg2_only[(cage_hepg2_only["combined_class_HepG2"] == "sig active") &
-                                       (cage_hepg2_only["combined_class_HeLa"] != "sig active") &
-                                       (cage_hepg2_only["combined_class_K562"] != "sig active")]
-print("of those tiles, ones that are active in HepG2 only by MPRA: %s" % (len(cage_mpra_hepg2_only)))
-print("%% agreement: %s" % ((len(cage_mpra_hepg2_only)/len(cage_hepg2_only))))
-
-
-# In[86]:
-
-
-hela = all_activ[~pd.isnull(all_activ["HeLa"])]
-sns.distplot(hela[hela["combined_class_HeLa"] == "sig active"]["HeLa"], bins=100, label="sig active", 
-             color="green")
-sns.distplot(hela[hela["combined_class_HeLa"] != "sig active"]["HeLa"], bins=100, label="not sig active", 
-             color="gray")
-plt.legend()
-plt.ylim((0, 0.8))
-
-
-# In[93]:
-
-
-cage_hela_only = all_activ[(all_activ["HeLa_av"] > 0) & (all_activ["HepG2_av"] == 0) & (all_activ["K562_av"] == 0)]
-print("# tiles that are on in HeLa only by CAGE: %s" % len(cage_hela_only))
-
-cage_mpra_hela_only = cage_hela_only[(cage_hela_only["combined_class_HeLa"] == "sig active") &
-                                     (cage_hela_only["combined_class_HepG2"] != "sig active") &
-                                     (cage_hela_only["combined_class_K562"] != "sig active")]
-print("of those tiles, ones that are active in HeLa only by MPRA: %s" % (len(cage_mpra_hela_only)))
-print("%% agreement: %s" % ((len(cage_mpra_hela_only)/len(cage_hela_only))))
-
-
-# In[88]:
-
-
-k562 = all_activ[~pd.isnull(all_activ["K562"])]
-sns.distplot(k562[k562["combined_class_K562"] == "sig active"]["K562"], bins=100, label="sig active", 
-             color="green")
-sns.distplot(k562[k562["combined_class_K562"] != "sig active"]["K562"], bins=100, label="not sig active", 
-             color="gray")
-plt.legend()
-plt.ylim((0, 0.5))
-
-
-# In[94]:
-
-
-cage_k562_only = all_activ[(all_activ["K562_av"] > 0) & (all_activ["HepG2_av"] == 0) & (all_activ["HeLa_av"] == 0)]
-print("# tiles that are on in K562 only by CAGE: %s" % len(cage_k562_only))
-
-cage_mpra_k562_only = cage_k562_only[(cage_k562_only["combined_class_K562"] == "sig active") &
-                                     (cage_k562_only["combined_class_HepG2"] != "sig active") &
-                                     (cage_k562_only["combined_class_HeLa"] != "sig active")]
-print("of those tiles, ones that are active in K562 only by MPRA: %s" % (len(cage_mpra_k562_only)))
-print("%% agreement: %s" % ((len(cage_mpra_k562_only)/len(cage_k562_only))))
-
-
-# In[ ]:
-
-
-
 

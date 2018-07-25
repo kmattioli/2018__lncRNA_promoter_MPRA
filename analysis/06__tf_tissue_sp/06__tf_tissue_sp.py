@@ -11,7 +11,7 @@
 # ------
 # 
 # figures in this notebook:
-# - **Fig 3C**: KDE plot of correlations of MPRA activity & specificity with each of the 3 metrics
+# - **Fig 2C**: KDE plot of correlations of MPRA activity & specificity with each of the 3 metrics
 
 # In[1]:
 
@@ -69,8 +69,8 @@ k562_activ_f = "../../data/02__activs/POOL1__pMPRA1__K562__activities_per_elemen
 # In[5]:
 
 
-fimo_f = "../../misc/05__fimo/pool1_fimo_map.txt"
-fimo_chip_f = "../../misc/05__fimo/pool1_fimo_map.chip_intersected.txt"
+fimo_f = "../../misc/03__fimo/pool1_fimo_map.txt"
+fimo_chip_f = "../../misc/03__fimo/pool1_fimo_map.chip_intersected.txt"
 
 
 # In[6]:
@@ -341,7 +341,7 @@ ax.set_xlabel("log(mean TF tissue specificity)")
 r, p = stats.spearmanr(no_nan["log_avg_tf_tissue_sp"], no_nan["mpra_activ"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-fig.savefig("Fig_3C_3.pdf", bbox_inches="tight", dpi="figure")
+fig.savefig("Fig_2C_3.pdf", bbox_inches="tight", dpi="figure")
 
 
 # In[40]:
@@ -363,7 +363,7 @@ ax.set_xlabel("log(mean TF tissue specificity)")
 r, p = stats.spearmanr(no_nan["log_avg_tf_tissue_sp"], no_nan["mpra_ts"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-fig.savefig("Fig_3C_6.pdf", bbox_inches="tight", dpi="figure")
+fig.savefig("Fig_2C_6.pdf", bbox_inches="tight", dpi="figure")
 
 
 # #### fimo intersected w/ chip
@@ -387,7 +387,6 @@ ax.set_xlabel("log(mean TF tissue specificity)")
 r, p = stats.spearmanr(no_nan["log_avg_tf_tissue_sp"], no_nan["mpra_activ"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_3.pdf", bbox_inches="tight", dpi="figure")
 
 
 # In[44]:
@@ -409,7 +408,6 @@ ax.set_xlabel("log(mean TF tissue specificity)")
 r, p = stats.spearmanr(no_nan["log_avg_tf_tissue_sp"], no_nan["mpra_ts"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_6.pdf", bbox_inches="tight", dpi="figure")
 
 
 # ## number of bp covered
@@ -435,7 +433,7 @@ ax.set_xlabel("log(number of bp covered by motif)")
 r, p = stats.spearmanr(no_nan["log_n_bp_cov"], no_nan["mpra_activ"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-fig.savefig("Fig_3C_1.pdf", bbox_inches="tight", dpi="figure")
+fig.savefig("Fig_2C_1.pdf", bbox_inches="tight", dpi="figure")
 
 
 # In[48]:
@@ -457,7 +455,7 @@ ax.set_xlabel("log(number of bp covered by motif)")
 r, p = stats.spearmanr(no_nan["log_n_bp_cov"], no_nan["mpra_ts"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-fig.savefig("Fig_3C_4.pdf", bbox_inches="tight", dpi="figure")
+fig.savefig("Fig_2C_4.pdf", bbox_inches="tight", dpi="figure")
 
 
 # #### fimo intersected w/ chip
@@ -481,7 +479,6 @@ ax.set_xlabel("log(number of bp covered by motif)")
 r, p = stats.spearmanr(no_nan["log_n_bp_cov"], no_nan["mpra_activ"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_1.pdf", bbox_inches="tight", dpi="figure")
 
 
 # In[52]:
@@ -503,10 +500,9 @@ ax.set_xlabel("log(number of bp covered by motif)")
 r, p = stats.spearmanr(no_nan["log_n_bp_cov"], no_nan["mpra_ts"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_4.pdf", bbox_inches="tight", dpi="figure")
 
 
-# ## mean overlapping coverage
+# ## max overlapping coverage
 
 # #### fimo only
 
@@ -535,7 +531,7 @@ ax.set_xlabel("log(max overlapping motifs)")
 r, p = stats.spearmanr(no_nan["log_max_cov"], no_nan["mpra_activ"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-fig.savefig("Fig_3C_2.pdf", bbox_inches="tight", dpi="figure")
+fig.savefig("Fig_2C_2.pdf", bbox_inches="tight", dpi="figure")
 
 
 # In[57]:
@@ -557,7 +553,7 @@ ax.set_xlabel("log(max overlapping motifs)")
 r, p = stats.spearmanr(no_nan["log_max_cov"], no_nan["mpra_ts"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-fig.savefig("Fig_3C_5.pdf", bbox_inches="tight", dpi="figure")
+fig.savefig("Fig_2C_5.pdf", bbox_inches="tight", dpi="figure")
 
 
 # #### fimo intersected w/ chip
@@ -581,7 +577,6 @@ ax.set_xlabel("log(max overlapping motifs)")
 r, p = stats.spearmanr(no_nan["log_max_cov"], no_nan["mpra_activ"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_2.pdf", bbox_inches="tight", dpi="figure")
 
 
 # In[61]:
@@ -603,7 +598,6 @@ ax.set_xlabel("log(max overlapping motifs)")
 r, p = stats.spearmanr(no_nan["log_max_cov"], no_nan["mpra_ts"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_5.pdf", bbox_inches="tight", dpi="figure")
 
 
 # ## 5. plot correlations w/ CAGE data
@@ -638,7 +632,6 @@ ax.set_xlabel("log(mean TF tissue specificity)")
 r, p = stats.spearmanr(no_nan["log_avg_tf_tissue_sp"], no_nan["cage_activ"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_6.pdf", bbox_inches="tight", dpi="figure")
 
 
 # In[66]:
@@ -660,7 +653,6 @@ ax.set_xlabel("log(mean TF tissue specificity)")
 r, p = stats.spearmanr(no_nan["log_avg_tf_tissue_sp"], no_nan["cage_ts"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_6.pdf", bbox_inches="tight", dpi="figure")
 
 
 # #### fimo intersected w/ chip
@@ -684,7 +676,6 @@ ax.set_xlabel("log(mean TF tissue specificity)")
 r, p = stats.spearmanr(no_nan["log_avg_tf_tissue_sp"], no_nan["cage_activ"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_6.pdf", bbox_inches="tight", dpi="figure")
 
 
 # In[70]:
@@ -706,7 +697,6 @@ ax.set_xlabel("log(mean TF tissue specificity)")
 r, p = stats.spearmanr(no_nan["log_avg_tf_tissue_sp"], no_nan["cage_ts"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_6.pdf", bbox_inches="tight", dpi="figure")
 
 
 # ## # bp covered
@@ -732,7 +722,6 @@ ax.set_xlabel("log(number of bp covered by motif)")
 r, p = stats.spearmanr(no_nan["log_n_bp_cov"], no_nan["cage_activ"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_4.pdf", bbox_inches="tight", dpi="figure")
 
 
 # In[74]:
@@ -754,7 +743,6 @@ ax.set_xlabel("log(number of bp covered by motif)")
 r, p = stats.spearmanr(no_nan["log_n_bp_cov"], no_nan["cage_ts"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_4.pdf", bbox_inches="tight", dpi="figure")
 
 
 # #### fimo intersected w/ chip
@@ -778,7 +766,6 @@ ax.set_xlabel("log(number of bp covered by motif)")
 r, p = stats.spearmanr(no_nan["log_n_bp_cov"], no_nan["cage_activ"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_4.pdf", bbox_inches="tight", dpi="figure")
 
 
 # In[78]:
@@ -800,10 +787,9 @@ ax.set_xlabel("log(number of bp covered by motif)")
 r, p = stats.spearmanr(no_nan["log_n_bp_cov"], no_nan["cage_ts"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_4.pdf", bbox_inches="tight", dpi="figure")
 
 
-# ## mean overlapping motifs
+# ## max overlapping motifs
 
 # #### fimo only
 
@@ -832,7 +818,6 @@ ax.set_xlabel("log(max overlapping motifs)")
 r, p = stats.spearmanr(no_nan["log_max_cov"], no_nan["cage_activ"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_5.pdf", bbox_inches="tight", dpi="figure")
 
 
 # In[83]:
@@ -854,7 +839,6 @@ ax.set_xlabel("log(max overlapping motifs)")
 r, p = stats.spearmanr(no_nan["log_max_cov"], no_nan["cage_ts"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_5.pdf", bbox_inches="tight", dpi="figure")
 
 
 # #### fimo intersected w/ chip
@@ -878,7 +862,6 @@ ax.set_xlabel("log(max overlapping motifs)")
 r, p = stats.spearmanr(no_nan["log_max_cov"], no_nan["cage_activ"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_5.pdf", bbox_inches="tight", dpi="figure")
 
 
 # In[87]:
@@ -900,48 +883,23 @@ ax.set_xlabel("log(max overlapping motifs)")
 r, p = stats.spearmanr(no_nan["log_max_cov"], no_nan["cage_ts"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_5.pdf", bbox_inches="tight", dpi="figure")
-
-
-# ### check correlation b/w CAGE and MPRA ts
-
-# In[89]:
-
-
-no_nan = mean_activ_fimo[~pd.isnull(mean_activ_fimo["mpra_ts"]) &
-                         ~pd.isnull(mean_activ_fimo["cage_ts"])]
-
-
-# In[90]:
-
-
-fig = plt.figure(figsize=(1.2, 1.2))
-ax = sns.kdeplot(no_nan["mpra_ts"], no_nan["cage_ts"], cmap=cmap, 
-                 shade=True, shade_lowest=False)
-ax.set_ylabel("tissue specificity in CAGE")
-ax.set_xlabel("tissue specificity in MPRA")
-
-r, p = stats.spearmanr(no_nan["mpra_ts"], no_nan["cage_ts"])
-print("r: %s, spearman p: %s" % (r, p))
-ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_5.pdf", bbox_inches="tight", dpi="figure")
 
 
 # ## 6. write files
 
-# In[91]:
+# In[89]:
 
 
 mean_activ_fimo.drop(["med_tf_tissue_sp", "log_med_tf_tissue_sp"], axis=1, inplace=True)
 
 
-# In[92]:
+# In[90]:
 
 
 mean_activ_fimo_chip.drop(["med_tf_tissue_sp", "log_med_tf_tissue_sp"], axis=1, inplace=True)
 
 
-# In[93]:
+# In[91]:
 
 
 out_dir = "../../data/04__coverage"

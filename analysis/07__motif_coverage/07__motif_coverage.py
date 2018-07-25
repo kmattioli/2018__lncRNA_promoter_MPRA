@@ -9,8 +9,8 @@
 # ------
 # 
 # figures in this notebook:
-# - **Fig 3D and 3E**: cumulative density plots of # bp covered and max motif coverage across biotypes
-# - **Fig S10**: heatmap of clustered motifs, and more cumulative density plots (after clustering)
+# - **Fig 2D and 2E**: cumulative density plots of # bp covered and max motif coverage across biotypes
+# - **Fig S7**: heatmap of clustered motifs, and more cumulative density plots (after clustering)
 
 # In[1]:
 
@@ -62,8 +62,8 @@ mosbat_file = "../../misc/02__mosbat/results.from_mosbat.txt"
 # In[4]:
 
 
-chip_cov_f = "../../misc/05__fimo/All.TSS.114bp.Motifs.Intersect.Chip.ALL.txt"
-cluster_cov_f = "../../misc/05__fimo/All.TSS.114bp.Cluster.ALL.txt"
+chip_cov_f = "../../misc/03__fimo/All.TSS.114bp.Motifs.Intersect.Chip.ALL.txt"
+cluster_cov_f = "../../misc/03__fimo/All.TSS.114bp.Cluster.ALL.txt"
 
 
 # ## 1. import data
@@ -113,7 +113,7 @@ sns.kdeplot(data=dpc_vals, cumulative=True, color=TSS_CLASS_PALETTE["div_pc"],
             label="div. mRNAs", ax=ax)
 ax.set_xlabel("log(# of bp covered)")
 ax.set_ylabel("cumulative density")
-fig.savefig("Fig_3D.pdf", bbox_inches="tight", dpi="figure")
+fig.savefig("Fig_2D.pdf", bbox_inches="tight", dpi="figure")
 
 
 # In[9]:
@@ -138,7 +138,7 @@ sns.kdeplot(data=dpc_vals, cumulative=True, color=TSS_CLASS_PALETTE["div_pc"],
             label="div. mRNAs", ax=ax)
 ax.set_xlabel("log(max coverage)")
 ax.set_ylabel("cumulative density")
-fig.savefig("Fig_3E.pdf", bbox_inches="tight", dpi="figure")
+fig.savefig("Fig_2E.pdf", bbox_inches="tight", dpi="figure")
 
 
 # ## 2. cluster the motifs using MoSBAT output
@@ -207,7 +207,7 @@ cmap = sns.cubehelix_palette(8, start=.5, light=1, dark=0.25, hue=0.9, rot=-0.75
 cg = sns.clustermap(corr, method="average", row_linkage=row_linkage, robust=True,
                     col_linkage=col_linkage, cmap=cmap, figsize=(5, 5), row_colors=row_colors,
                     linewidths=0, rasterized=True)
-cg.savefig("Fig_S10A.pdf", bbox_inches="tight", dpi="figure")
+cg.savefig("Fig_S7A.pdf", bbox_inches="tight", dpi="figure")
 
 
 # ## 4. re-plot # bp covered and max coverage per biotype *after* clustering
@@ -242,8 +242,8 @@ sns.kdeplot(data=dpc_vals, cumulative=True, color=TSS_CLASS_PALETTE["div_pc"],
             label="div. mRNAs", ax=ax)
 ax.set_xlabel("log(# of bp covered, deduped by motif cluster)")
 ax.set_ylabel("cumulative density")
-plt.xlim((2,5))
-fig.savefig("Fig_S10B.pdf", bbox_inches="tight", dpi="figure")
+plt.xlim((2.5,5))
+fig.savefig("Fig_S7B.pdf", bbox_inches="tight", dpi="figure")
 
 
 # In[21]:
@@ -268,7 +268,8 @@ sns.kdeplot(data=dpc_vals, cumulative=True, color=TSS_CLASS_PALETTE["div_pc"],
             label="div. mRNAs", ax=ax)
 ax.set_xlabel("log(max coverage, deduped by motif cluster)")
 ax.set_ylabel("cumulative density")
-fig.savefig("Fig_S10C.pdf", bbox_inches="tight", dpi="figure")
+plt.xlim((0, 2.75))
+fig.savefig("Fig_S7C.pdf", bbox_inches="tight", dpi="figure")
 
 
 # In[ ]:

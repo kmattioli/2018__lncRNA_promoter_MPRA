@@ -12,8 +12,7 @@
 # 
 # ------
 # 
-# figures in this notebook:
-# - **Fig SX**: none
+# no figures in this notebook
 
 # In[1]:
 

@@ -8,8 +8,7 @@
 # 
 # ------
 # 
-# figures in this notebook:
-# - **Fig S10**: bar plot showing sequences with directionality preferences within biotypes
+# no figures in this notebook
 
 # In[1]:
 
@@ -108,7 +107,7 @@ k562_activ_f = "../../data/02__activs/POOL1__pMPRA1__K562__activities_per_barcod
 # In[9]:
 
 
-annot_f = "../../misc/00__tss_properties/correspondance_seqID_PromType_unique.txt"
+annot_f = "../../misc/00__tss_properties/mpra_id_to_biotype_map.txt"
 
 
 # # conservation
@@ -502,7 +501,6 @@ for i in range(len(counts)):
 plt.xlabel("")
 plt.ylim((0, 130))
 plt.title("count of seqs that are sig. diff. (padj < 0.05)\nin either HepG2, HeLa, or K562")
-plt.savefig("Fig_S9.pdf", bbox_inches="tight", dpi="figure")
 
 
 # ## 9. remove tmp files
@@ -511,6 +509,7 @@ plt.savefig("Fig_S9.pdf", bbox_inches="tight", dpi="figure")
 
 
 get_ipython().system('rm tmp/*.txt')
+get_ipython().system('rmdir tmp')
 
 
 # In[ ]:
