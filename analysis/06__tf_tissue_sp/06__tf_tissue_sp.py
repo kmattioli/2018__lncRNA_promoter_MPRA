@@ -165,6 +165,179 @@ cage_v_mpra = pd.read_table(cage_v_mpra_f, sep="\t")
 cage_v_mpra.head()
 
 
+# In[32]:
+
+
+no_nan = cage_v_mpra[~pd.isnull(cage_v_mpra["cage_ts"])]
+fig = plt.figure(figsize=(2.4, 1.2))
+sns.kdeplot(no_nan["cage_ts"], legend=False, color="gray")
+plt.xlim((0, 1))
+plt.xlabel("tissue specificity")
+plt.ylabel("density")
+plt.ylim((0, 3))
+fig.savefig("TS_dist.for_talk.pdf", dpi="figure", bbox_inches="tight")
+
+
+# In[56]:
+
+
+fig = plt.figure(figsize=(2.4, 1.2))
+sns.distplot(no_nan["cage_ts"], kde=False, bins=8, color="gray",
+             hist_kws={"histtype": "step", "linewidth": 1, "alpha": 1, "color": "gray"})
+plt.xlim((0, 0.7))
+plt.xlabel("tissue specificity")
+plt.ylabel("count of sequences")
+#plt.ylim((0, 3))
+fig.savefig("TS_hist.for_talk.pdf", dpi="figure", bbox_inches="tight")
+
+
+# In[61]:
+
+
+mRNAs = no_nan[no_nan["PromType2"] == "protein_coding"]
+fig = plt.figure(figsize=(2.4, 1.2))
+#sns.kdeplot(no_nan["cage_ts"], legend=False, color="gray")
+sns.kdeplot(mRNAs["cage_ts"], legend=False, shade=True, color=TSS_CLASS_PALETTE["protein_coding"])
+plt.xlim((0, 1))
+plt.xlabel("tissue specificity")
+plt.ylabel("density")
+plt.ylim((0, 3))
+fig.savefig("TS_dist.mRNAs.for_talk.pdf", dpi="figure", bbox_inches="tight")
+
+
+# In[57]:
+
+
+fig = plt.figure(figsize=(2.4, 1.2))
+sns.distplot(no_nan["cage_ts"], kde=False, bins=8, color="gray",
+             hist_kws={"histtype": "step", "linewidth": 1, "alpha": 1, "color": "gray"},
+             label="all sequences")
+sns.distplot(mRNAs["cage_ts"], kde=False, bins=8, color=TSS_CLASS_PALETTE["protein_coding"], label="mRNAs")
+plt.xlim((0, 0.7))
+plt.xlabel("tissue specificity")
+plt.ylabel("count of sequences")
+plt.legend(loc=2)
+fig.savefig("TS_hist.mRNAs.for_talk.pdf", dpi="figure", bbox_inches="tight")
+
+
+# In[62]:
+
+
+lincRNAs = no_nan[no_nan["PromType2"] == "intergenic"]
+fig = plt.figure(figsize=(2.4, 1.2))
+#sns.kdeplot(no_nan["cage_ts"], legend=False, color="gray")
+sns.kdeplot(lincRNAs["cage_ts"], legend=False, shade=True, color=TSS_CLASS_PALETTE["intergenic"])
+plt.xlim((0, 1))
+plt.xlabel("tissue specificity")
+plt.ylabel("density")
+plt.ylim((0, 3))
+fig.savefig("TS_dist.lincRNAs.for_talk.pdf", dpi="figure", bbox_inches="tight")
+
+
+# In[58]:
+
+
+fig = plt.figure(figsize=(2.4, 1.2))
+sns.distplot(no_nan["cage_ts"], kde=False, bins=8, color="gray",
+             hist_kws={"histtype": "step", "linewidth": 1, "alpha": 1, "color": "gray"},
+             label="all sequences")
+sns.distplot(lincRNAs["cage_ts"], kde=False, bins=8, color=TSS_CLASS_PALETTE["intergenic"], label="lincRNAs")
+plt.xlim((0, 0.7))
+plt.xlabel("tissue specificity")
+plt.ylabel("count of sequences")
+plt.legend(loc=2)
+fig.savefig("TS_hist.lincRNAs.for_talk.pdf", dpi="figure", bbox_inches="tight")
+
+
+# In[63]:
+
+
+fig = plt.figure(figsize=(2.4, 1.2))
+#sns.kdeplot(no_nan["cage_ts"], legend=False, color="gray")
+sns.kdeplot(mRNAs["cage_ts"], legend=False, shade=True, color=TSS_CLASS_PALETTE["protein_coding"])
+sns.kdeplot(lincRNAs["cage_ts"], legend=False, shade=True, color=TSS_CLASS_PALETTE["intergenic"])
+plt.xlim((0, 1))
+plt.xlabel("tissue specificity")
+plt.ylabel("density")
+plt.ylim((0, 3))
+fig.savefig("TS_dist.both.for_talk.pdf", dpi="figure", bbox_inches="tight")
+
+
+# In[60]:
+
+
+fig = plt.figure(figsize=(2.4, 1.2))
+sns.distplot(no_nan["cage_ts"], kde=False, bins=8, color="gray",
+             hist_kws={"histtype": "step", "linewidth": 1, "alpha": 1, "color": "gray"},
+             label="all sequences")
+sns.distplot(mRNAs["cage_ts"], kde=False, bins=8, color=TSS_CLASS_PALETTE["protein_coding"], label="mRNAs")
+sns.distplot(lincRNAs["cage_ts"], kde=False, bins=8, color=TSS_CLASS_PALETTE["intergenic"], label="lincRNAs")
+plt.xlim((0, 0.7))
+plt.xlabel("tissue specificity")
+plt.ylabel("count of sequences")
+plt.legend(loc=2)
+fig.savefig("TS_hist.both.for_talk.pdf", dpi="figure", bbox_inches="tight")
+
+
+# In[69]:
+
+
+fig = plt.figure(figsize=(3, 2))
+ax = sns.boxplot(data=cage_v_mpra, x="PromType2", y="mpra_ts", order=TSS_CLASS_ORDER, palette=TSS_CLASS_PALETTE,
+                 flierprops = dict(marker='o', markersize=5))
+mimic_r_boxplot(ax)
+plt.ylabel("MPRA cell-type specificity")
+plt.xlabel("")
+ax.set_xticklabels(["eRNAs", "lincRNAs", "div. lncRNAs", "mRNAs", "div. mRNAs"], rotation=30)
+fig.savefig("TS_boxplot.all_biotypes.pdf", dpi="figure", bbox_inches="tight")
+
+
+# In[82]:
+
+
+fig = plt.figure(figsize=(2, 2))
+sub_order = ["intergenic", "protein_coding"]
+sub_palette = {"intergenic": TSS_CLASS_PALETTE["intergenic"], "protein_coding": TSS_CLASS_PALETTE["protein_coding"]}
+ax = sns.boxplot(data=cage_v_mpra, x="PromType2", y="mpra_ts", order=sub_order, palette=sub_palette,
+                 flierprops = dict(marker='o', markersize=5))
+mimic_r_boxplot(ax)
+plt.ylabel("MPRA cell-type specificity")
+plt.xlabel("")
+ax.set_xticklabels(["lincRNAs", "mRNAs"], rotation=30)
+
+# u, pval = stats.mannwhitneyu(lincRNAs["mpra_ts"], mRNAs["mpra_ts"], alternative="less", use_continuity=False)
+# annotate_pval(ax, 0, 1, 0.7, 0, 0.7, pval, fontsize)
+# plt.ylim((0, 0.8))
+
+fig.savefig("TS_boxplot.both_biotypes.pdf", dpi="figure", bbox_inches="tight")
+
+
+# In[76]:
+
+
+fig = plt.figure(figsize=(2, 2))
+ax = sns.boxplot(data=cage_v_mpra, x="PromType2", y="cage_ts", order=sub_order, palette=sub_palette,
+                 flierprops = dict(marker='o', markersize=5))
+mimic_r_boxplot(ax)
+plt.ylabel("tissue specificity")
+plt.xlabel("")
+ax.set_xticklabels(["lincRNAs", "mRNAs"], rotation=30)
+fig.savefig("TS_boxplot.cage_both_biotypes.pdf", dpi="figure", bbox_inches="tight")
+
+
+# In[71]:
+
+
+fig = plt.figure(figsize=(2.4, 1.2))
+sns.kdeplot(mRNAs["mpra_ts"], legend=False, shade=True, color=TSS_CLASS_PALETTE["protein_coding"])
+sns.kdeplot(lincRNAs["mpra_ts"], legend=False, shade=True, color=TSS_CLASS_PALETTE["intergenic"])
+plt.xlim((0, 0.8))
+plt.xlabel("MPRA cell-type specificity")
+plt.ylabel("density")
+plt.ylim((0, 5))
+fig.savefig("TS_dist_mpra.both.for_talk.pdf", dpi="figure", bbox_inches="tight")
+
+
 # ## 2. find avg specificity per tile
 
 # In[18]:

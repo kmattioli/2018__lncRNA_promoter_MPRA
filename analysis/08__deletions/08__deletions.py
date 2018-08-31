@@ -460,7 +460,7 @@ for dels_dict, fixed_dict in zip([hepg2_dels_clean, k562_dels_clean], [hepg2_del
 hepg2_dels_fixed["ZFAS1__p1__tile2__plus"].head()
 
 
-# In[43]:
+# In[51]:
 
 
 hepg2_all_dels_tfs = pd.DataFrame()
@@ -488,6 +488,9 @@ for dels_fixed, dels_df, cell in zip([hepg2_dels_fixed, k562_dels_fixed], [hepg2
         if name == "DLEU1__p1__tile1__plus" and cell == "HepG2":
             plot_peaks_and_tfbs((5.6, 2.5), 94, name, cell, scores, yerrs, 
                                 motif_vals, seq, "Fig_S9B", True)
+        if name == "ZFAS1__p1__tile2__plus" and cell == "HepG2":
+            plot_peaks_and_tfbs((5.6, 2.5), 94, name, cell, scores, yerrs, 
+                                motif_vals, seq, "ZFAS_tile2.for_talk.pdf", True)
         
     if cell == "HepG2":
         hepg2_all_dels_tfs = dels_df.copy()

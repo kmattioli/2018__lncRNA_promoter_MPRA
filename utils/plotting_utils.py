@@ -168,7 +168,6 @@ def neg_control_plot(df, order, palette, fontsize, cell_type, ax, figsize, ylabe
     else:
         sns.boxplot(data=df_sub, x="better_type", y="overall_mean", order=order, palette=palette, linewidth=1,
                     saturation=1, flierprops = dict(marker='o', markersize=5), ax=ax)
-    ax.set_xticklabels(["random", "scrambled", "core promoters"], rotation=30)
 
     mimic_r_boxplot(ax)
 
@@ -199,8 +198,13 @@ def neg_control_plot(df, order, palette, fontsize, cell_type, ax, figsize, ylabe
         text_y_2 = np.max(wt_dist)+0.55
     
     # statistical annotation
-    annotate_pval(ax, 0, 2, y_1, 0, text_y_1, rand_pval, fontsize)
-    annotate_pval(ax, 1, 2, y_2, 0, text_y_2, scram_pval, fontsize)
+    if len(order) == 3:
+        annotate_pval(ax, 0, 2, y_1, 0, text_y_1, rand_pval, fontsize)
+        annotate_pval(ax, 1, 2, y_2, 0, text_y_2, scram_pval, fontsize)
+        ax.set_xticklabels(["random", "scrambled", "core promoters"], rotation=30)
+    elif len(order) == 2:
+        annotate_pval(ax, 0, 1, y_1, 0, text_y_1, rand_pval, fontsize)
+        ax.set_xticklabels(["random seqs", "core promoters"], rotation=30)
     
     ax.set_ylabel(ylabel)
     ax.set_xlabel("")

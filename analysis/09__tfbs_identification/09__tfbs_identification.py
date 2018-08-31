@@ -251,7 +251,7 @@ def getOverlap(a, b):
     return max(a[0], b[0]) - min(a[1], b[1])
 
 
-# In[21]:
+# In[43]:
 
 
 hepg2_motif_peaks = {}
@@ -306,6 +306,11 @@ for data_peaks, data_motifs, cell in zip([hepg2_data_peaks, k562_data_peaks], [h
         elif key == "DLEU1__p1__tile2__plus":
             plot_peaks_and_fimo((5.6, 2), seq_len, key, widths, scores, yerrs, scaled_scores, bases, 
                                 motif_positions_fixed, motif_names, "DLEU1_%s.pdf" % cell, ".", True)
+            plot_peaks_and_fimo((5.6, 2), seq_len, key, [], scores, yerrs, scaled_scores, bases, 
+                                motif_positions_fixed, motif_names, "DLEU1_%s.for_talk.pdf" % cell, ".", True)
+        elif key == "ZFAS1__p1__tile2__plus":
+            plot_peaks_and_fimo((5.6, 2), seq_len, key, [], scores, yerrs, scaled_scores, bases, 
+                                motif_positions_fixed, motif_names, "ZFAS1_%s.for_talk.pdf" % cell, ".", True)
         else:
             plot_peaks_and_fimo((5.6, 2), seq_len, key, widths, scores, yerrs, scaled_scores, bases, 
                                 motif_positions_fixed, motif_names, None, None, False)

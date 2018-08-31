@@ -370,6 +370,23 @@ plt.tight_layout()
 f.savefig("Fig_1C_S4A.pdf", bbox_inches="tight", dpi="figure")
 
 
+# In[35]:
+
+
+talk_order = ["RANDOM", "WILDTYPE"]
+talk_palette = {"RANDOM": "gray", "WILDTYPE": "black"}
+
+f, axarr = plt.subplots(nrows=1, ncols=3, sharex=True, sharey=True, figsize=(4.7, 1.5))
+neg_control_plot(pool1_hela_elem_norm, talk_order, talk_palette, fontsize, "HeLa", axarr[0], None, "HeLa MPRA activity", 
+                 True, False, False, None)
+neg_control_plot(pool1_hepg2_elem_norm, talk_order, talk_palette, fontsize, "HepG2", axarr[1], None, "HepG2 MPRA activity", 
+                 True, False, False, None)
+neg_control_plot(pool1_k562_elem_norm, talk_order, talk_palette, fontsize, "K562", axarr[2], None, "K562 MPRA activity", 
+                 True, False, False, None)
+plt.tight_layout()
+#f.savefig("Fig_1C_S4A.pdf", bbox_inches="tight", dpi="figure")
+
+
 # ### pool 2
 
 # In[35]:
