@@ -212,7 +212,7 @@ ax = sns.kdeplot(data=linc_vals, cumulative=True, color=TSS_CLASS_PALETTE["inter
                  label="lincRNAs")
 sns.kdeplot(data=pc_vals, cumulative=True, color=TSS_CLASS_PALETTE["protein_coding"], 
             label="mRNAs", ax=ax)
-ax.set_xlabel("log(# of bp covered)")
+ax.set_xlabel("log(max # overlapping motifs)")
 ax.set_ylabel("cumulative density")
 ax.set_xlim((0.2, 4.8))
 ax.set_ylim((0, 1.02))
@@ -331,7 +331,7 @@ ax = sns.kdeplot(data=linc_vals, cumulative=True, color=TSS_CLASS_PALETTE["inter
                  label="lincRNAs")
 sns.kdeplot(data=pc_vals, cumulative=True, color=TSS_CLASS_PALETTE["protein_coding"], 
             label="mRNAs", ax=ax)
-ax.set_xlabel("log(# of bp covered)")
+ax.set_xlabel("log(max # overlapping motifs)")
 ax.set_ylabel("cumulative density")
 #ax.set_xlim((0.2, 4.8))
 #ax.set_ylim((0, 1.02))
@@ -522,7 +522,7 @@ ax = sns.kdeplot(data=linc_vals, cumulative=True, color=TSS_CLASS_PALETTE["inter
                  label="lincRNAs")
 sns.kdeplot(data=pc_vals, cumulative=True, color=TSS_CLASS_PALETTE["protein_coding"], 
             label="mRNAs", ax=ax)
-ax.set_xlabel("log(# of bp covered)")
+ax.set_xlabel("log(max # overlapping motifs)")
 ax.set_ylabel("cumulative density")
 ax.set_xlim((0, 2.75))
 #ax.set_ylim((0, 1.02))
