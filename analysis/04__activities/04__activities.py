@@ -653,9 +653,10 @@ g.ax_joint.annotate("r = {:.2f}\np = {:.2e}".format(r, Decimal(p)), xy=(.1, .8),
 g.savefig("Fig_1E.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[62]:
+# In[65]:
 
 
+no_nan = all_activ[(~pd.isnull(all_activ["mpra_ts"])) & (~pd.isnull(all_activ["cage_ts"]))]
 g = sns.jointplot(data=no_nan, x="cage_ts", y="mpra_ts", kind="kde", shade_lowest=False, size=2.3, space=0,
                   stat_func=None, cmap=cmap, color="darkslategrey")
 g.set_axis_labels("endogenous cell-type specificity", "MPRA cell-type specificity")

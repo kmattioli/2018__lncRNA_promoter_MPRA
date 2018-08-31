@@ -460,7 +460,7 @@ for dels_dict, fixed_dict in zip([hepg2_dels_clean, k562_dels_clean], [hepg2_del
 hepg2_dels_fixed["ZFAS1__p1__tile2__plus"].head()
 
 
-# In[51]:
+# In[43]:
 
 
 hepg2_all_dels_tfs = pd.DataFrame()
@@ -510,6 +510,12 @@ hepg2_all_dels_tfs["delta_tfs_log"] = np.log(hepg2_all_dels_tfs["delta_tfs"]+1)
 no_nans = hepg2_all_dels_tfs[~pd.isnull(hepg2_all_dels_tfs["mean.log2FC"])]
 sig_only = hepg2_all_dels_tfs[hepg2_all_dels_tfs["sig"] == "sig"]
 len(sig_only)
+
+
+# In[45]:
+
+
+sig_only.head()
 
 
 # In[45]:
