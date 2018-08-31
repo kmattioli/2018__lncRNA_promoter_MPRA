@@ -59,7 +59,7 @@ fontsize = PAPER_FONTSIZE
 mosbat_file = "../../misc/02__mosbat/results.from_mosbat.txt"
 
 
-# In[10]:
+# In[4]:
 
 
 motif_cov_f = "../../misc/03__fimo/All.TSS.114bp.Motifs.txt"
@@ -70,13 +70,13 @@ cluster_cov_f = "../../misc/03__fimo/All.TSS.114bp.Cluster.ALL.txt"
 
 # ## 1. import data
 
-# In[6]:
+# In[5]:
 
 
 corr = pd.read_table(mosbat_file, sep="\t")
 
 
-# In[14]:
+# In[6]:
 
 
 motif_cov = pd.read_table(motif_cov_f, sep="\t")
@@ -86,7 +86,7 @@ motif_cov = motif_cov.merge(motif_max, on="seqID")
 motif_cov.head()
 
 
-# In[9]:
+# In[7]:
 
 
 chip_cov = pd.read_table(chip_cov_f, sep="\t")
@@ -94,7 +94,7 @@ cluster_cov = pd.read_table(cluster_cov_f, sep="\t")
 chip_cov.head()
 
 
-# In[17]:
+# In[8]:
 
 
 motif_cov = motif_cov.merge(chip_cov[["seqID", "PromType2"]], on="seqID")
@@ -105,14 +105,14 @@ motif_cov.head()
 
 # ### all motifs
 
-# In[44]:
+# In[9]:
 
 
 motif_cov["log_bp_covered"] = np.log(motif_cov["numBPcovered"]+1)
 motif_cov["log_max_cov"] = np.log(motif_cov["MaxCov"]+1)
 
 
-# In[46]:
+# In[10]:
 
 
 enh_vals = motif_cov[motif_cov["PromType2"] == "Enhancer"]["log_bp_covered"]
@@ -136,7 +136,7 @@ ax.set_xlabel("log(# of bp covered)")
 ax.set_ylabel("cumulative density")
 
 
-# In[47]:
+# In[11]:
 
 
 fig = plt.figure(figsize=(2.4, 1.2))
@@ -151,10 +151,10 @@ ax.set_ylim((0, 2))
 fig.savefig("num_bp_cov.kde.for_talk.pdf", dpi="figure", bbox_inches="tight")
 
 
-# In[48]:
+# In[12]:
 
 
-fig = plt.figure(figsize=(1.5, 1.2))
+fig = plt.figure(figsize=(2, 1.7))
 ax = sns.kdeplot(data=linc_vals, cumulative=True, color=TSS_CLASS_PALETTE["intergenic"], 
                  label="lincRNAs")
 sns.kdeplot(data=pc_vals, cumulative=True, color=TSS_CLASS_PALETTE["protein_coding"], 
@@ -166,7 +166,7 @@ ax.set_ylim((0, 1.02))
 fig.savefig("num_bp_cov.cdf.for_talk.pdf", dpi="figure", bbox_inches="tight")
 
 
-# In[49]:
+# In[13]:
 
 
 enh_vals = motif_cov[motif_cov["PromType2"] == "Enhancer"]["log_max_cov"]
@@ -190,7 +190,7 @@ ax.set_xlabel("log(max coverage)")
 ax.set_ylabel("cumulative density")
 
 
-# In[50]:
+# In[14]:
 
 
 fig = plt.figure(figsize=(2.4, 1.2))
@@ -204,10 +204,10 @@ ax.set_ylim((0, 0.7))
 fig.savefig("max_cov.kde.for_talk.pdf", dpi="figure", bbox_inches="tight")
 
 
-# In[53]:
+# In[15]:
 
 
-fig = plt.figure(figsize=(1.5, 1.2))
+fig = plt.figure(figsize=(2, 1.7))
 ax = sns.kdeplot(data=linc_vals, cumulative=True, color=TSS_CLASS_PALETTE["intergenic"], 
                  label="lincRNAs")
 sns.kdeplot(data=pc_vals, cumulative=True, color=TSS_CLASS_PALETTE["protein_coding"], 
@@ -222,14 +222,14 @@ fig.savefig("max_cov.cdf.for_talk.pdf", dpi="figure", bbox_inches="tight")
 
 # ### ChIP-validated motifs
 
-# In[54]:
+# In[16]:
 
 
 chip_cov["log_bp_covered"] = np.log(chip_cov["numBPcovered"]+1)
 chip_cov["log_max_cov"] = np.log(chip_cov["MaxCov"]+1)
 
 
-# In[55]:
+# In[17]:
 
 
 enh_vals = chip_cov[chip_cov["PromType2"] == "Enhancer"]["log_bp_covered"]
@@ -254,7 +254,7 @@ ax.set_ylabel("cumulative density")
 fig.savefig("Fig_2D.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[57]:
+# In[18]:
 
 
 fig = plt.figure(figsize=(2.4, 1.2))
@@ -269,10 +269,10 @@ ax.set_ylabel("density")
 fig.savefig("num_bp_cov_chip.kde.for_talk.pdf", dpi="figure", bbox_inches="tight")
 
 
-# In[58]:
+# In[19]:
 
 
-fig = plt.figure(figsize=(1.5, 1.2))
+fig = plt.figure(figsize=(2, 1.7))
 ax = sns.kdeplot(data=linc_vals, cumulative=True, color=TSS_CLASS_PALETTE["intergenic"], 
                  label="lincRNAs")
 sns.kdeplot(data=pc_vals, cumulative=True, color=TSS_CLASS_PALETTE["protein_coding"], 
@@ -284,7 +284,7 @@ ax.set_ylim((0, 1.02))
 fig.savefig("num_bp_cov_chip.cdf.for_talk.pdf", dpi="figure", bbox_inches="tight")
 
 
-# In[60]:
+# In[20]:
 
 
 enh_vals = chip_cov[chip_cov["PromType2"] == "Enhancer"]["log_max_cov"]
@@ -309,7 +309,7 @@ ax.set_ylabel("cumulative density")
 fig.savefig("Fig_2E.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[61]:
+# In[21]:
 
 
 fig = plt.figure(figsize=(2.4, 1.2))
@@ -323,10 +323,10 @@ ax.set_ylabel("density")
 fig.savefig("max_cov_chip.kde.for_talk.pdf", dpi="figure", bbox_inches="tight")
 
 
-# In[63]:
+# In[22]:
 
 
-fig = plt.figure(figsize=(1.5, 1.2))
+fig = plt.figure(figsize=(2, 1.7))
 ax = sns.kdeplot(data=linc_vals, cumulative=True, color=TSS_CLASS_PALETTE["intergenic"], 
                  label="lincRNAs")
 sns.kdeplot(data=pc_vals, cumulative=True, color=TSS_CLASS_PALETTE["protein_coding"], 
@@ -341,7 +341,7 @@ fig.savefig("max_cov_chip.cdf.for_talk.pdf", dpi="figure", bbox_inches="tight")
 
 # ## 2. cluster the motifs using MoSBAT output
 
-# In[64]:
+# In[23]:
 
 
 corr.set_index(corr["Motif"], inplace=True)
@@ -349,32 +349,32 @@ corr.drop("Motif", axis=1, inplace=True)
 corr.head()
 
 
-# In[65]:
+# In[24]:
 
 
 row_linkage = hierarchy.linkage(distance.pdist(corr, 'correlation'), method="average")
 col_linkage = hierarchy.linkage(distance.pdist(corr.T, 'correlation'), method="average")
 
 
-# In[66]:
+# In[25]:
 
 
 dists = plot_dendrogram(row_linkage, 0.4, "correlation")
 
 
-# In[67]:
+# In[26]:
 
 
 clusters = hierarchy.fcluster(row_linkage, 0.1, criterion="distance")
 
 
-# In[68]:
+# In[27]:
 
 
 print("n clusters: %s" % np.max(clusters))
 
 
-# In[69]:
+# In[28]:
 
 
 cluster_map = pd.DataFrame.from_dict(dict(zip(list(corr.index), clusters)), orient="index")
@@ -384,7 +384,7 @@ cluster_map.head()
 
 # ## 3. plot clustered motif heatmap
 
-# In[70]:
+# In[29]:
 
 
 colors = sns.husl_palette(np.max(clusters), s=0.75)
@@ -393,13 +393,13 @@ lut = dict(zip(range(np.min(clusters), np.max(clusters)+1), colors))
 row_colors = cluster_map["cluster"].map(lut)
 
 
-# In[71]:
+# In[30]:
 
 
 cmap = sns.cubehelix_palette(8, start=.5, light=1, dark=0.25, hue=0.9, rot=-0.75, as_cmap=True)
 
 
-# In[72]:
+# In[31]:
 
 
 cg = sns.clustermap(corr, method="average", row_linkage=row_linkage, robust=True,
@@ -411,14 +411,14 @@ cg.savefig("Fig_S7A.pdf", bbox_inches="tight", dpi="figure")
 # ## 4. re-plot # bp covered and max coverage per biotype *after* clustering
 # note that i sent the cluster results to marta, who re-ran her coverage scripts using them, and i re-upload them in this notebook (so in real life there is a break between the above part and the following part of this notebook)
 
-# In[73]:
+# In[32]:
 
 
 cluster_cov["log_bp_covered"] = np.log(cluster_cov["numBPcovered"]+1)
 cluster_cov["log_max_cov"] = np.log(cluster_cov["MaxCov"]+1)
 
 
-# In[74]:
+# In[33]:
 
 
 enh_vals = cluster_cov[cluster_cov["PromType2"] == "Enhancer"]["log_bp_covered"]
@@ -444,7 +444,7 @@ plt.xlim((2.5,5))
 fig.savefig("Fig_S7B.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[79]:
+# In[34]:
 
 
 fig = plt.figure(figsize=(2.4, 1.2))
@@ -459,22 +459,22 @@ ax.set_ylim((0, 1.5))
 fig.savefig("num_bp_cov_cluster.kde.for_talk.pdf", dpi="figure", bbox_inches="tight")
 
 
-# In[82]:
+# In[35]:
 
 
-fig = plt.figure(figsize=(1.5, 1.2))
+fig = plt.figure(figsize=(2, 1.7))
 ax = sns.kdeplot(data=linc_vals, cumulative=True, color=TSS_CLASS_PALETTE["intergenic"], 
                  label="lincRNAs")
 sns.kdeplot(data=pc_vals, cumulative=True, color=TSS_CLASS_PALETTE["protein_coding"], 
             label="mRNAs", ax=ax)
 ax.set_xlabel("log(# of bp covered)")
 ax.set_ylabel("cumulative density")
-ax.set_xlim((1, 5))
+ax.set_xlim((2.5, 5))
 ax.set_ylim((0, 1.02))
 fig.savefig("num_bp_cov_cluster.cdf.for_talk.pdf", dpi="figure", bbox_inches="tight")
 
 
-# In[83]:
+# In[36]:
 
 
 enh_vals = cluster_cov[cluster_cov["PromType2"] == "Enhancer"]["log_max_cov"]
@@ -500,7 +500,7 @@ plt.xlim((0, 2.75))
 fig.savefig("Fig_S7C.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[84]:
+# In[37]:
 
 
 fig = plt.figure(figsize=(2.4, 1.2))
@@ -514,17 +514,17 @@ ax.set_ylabel("density")
 fig.savefig("max_cov_cluster.kde.for_talk.pdf", dpi="figure", bbox_inches="tight")
 
 
-# In[86]:
+# In[38]:
 
 
-fig = plt.figure(figsize=(1.5, 1.2))
+fig = plt.figure(figsize=(2, 1.7))
 ax = sns.kdeplot(data=linc_vals, cumulative=True, color=TSS_CLASS_PALETTE["intergenic"], 
                  label="lincRNAs")
 sns.kdeplot(data=pc_vals, cumulative=True, color=TSS_CLASS_PALETTE["protein_coding"], 
             label="mRNAs", ax=ax)
 ax.set_xlabel("log(# of bp covered)")
 ax.set_ylabel("cumulative density")
-ax.set_xlim((0, 2.7))
+ax.set_xlim((0, 2.75))
 #ax.set_ylim((0, 1.02))
 plt.legend(loc=2)
 fig.savefig("max_cov_cluster.cdf.for_talk.pdf", dpi="figure", bbox_inches="tight")
