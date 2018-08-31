@@ -384,12 +384,13 @@ neg_control_plot(pool1_hepg2_elem_norm, talk_order, talk_palette, fontsize, "Hep
 neg_control_plot(pool1_k562_elem_norm, talk_order, talk_palette, fontsize, "K562", axarr[2], None, "K562 MPRA activity", 
                  True, False, False, None)
 plt.tight_layout()
-#f.savefig("Fig_1C_S4A.pdf", bbox_inches="tight", dpi="figure")
+plt.ylim((-10, 11))
+f.savefig("neg_ctrl_boxplots.for_talk.pdf", bbox_inches="tight", dpi="figure")
 
 
 # ### pool 2
 
-# In[35]:
+# In[36]:
 
 
 f, axarr = plt.subplots(2, sharex=True, sharey=True, figsize=(1.78, 3.2))
@@ -405,7 +406,7 @@ f.savefig("Fig_S8.pdf", bbox_inches="tight", dpi="figure")
 
 # the rest of the analysis only uses pool 1 (the TSS pool), as it looks at patterns in expression differences between TSS classes
 
-# In[36]:
+# In[37]:
 
 
 pool1_hepg2_df = pool1_hepg2_elem_norm.merge(annot, left_on="unique_id", right_on="seqID", how="left")
@@ -414,7 +415,7 @@ pool1_k562_df = pool1_k562_elem_norm.merge(annot, left_on="unique_id", right_on=
 pool1_hepg2_df.head()
 
 
-# In[37]:
+# In[38]:
 
 
 f, axarr = plt.subplots(3, sharex=True, sharey=True, figsize=(3.56, 5))
@@ -430,7 +431,7 @@ f.savefig("Fig_1D_S4B.pdf", bbox_inches="tight", dpi="figure")
 
 # ## 6. barplots: find % of sequences active across cell types
 
-# In[38]:
+# In[39]:
 
 
 pool1_hela_df["cell"] = "HeLa"
@@ -440,7 +441,7 @@ pool1_k562_df["cell"] = "K562"
 all_df = pool1_hela_df[["unique_id", "better_type", "cell", "PromType2", "combined_class", "overall_mean"]].append(pool1_hepg2_df[["unique_id", "better_type", "cell", "PromType2", "combined_class", "overall_mean"]]).append(pool1_k562_df[["unique_id", "better_type", "cell", "PromType2", "combined_class", "overall_mean"]])
 
 
-# In[39]:
+# In[40]:
 
 
 df = all_df[all_df["better_type"] == "WILDTYPE"]
@@ -451,7 +452,7 @@ activ_grp = activ_grp[(activ_grp["PromType2"].isin(TSS_CLASS_ORDER)) &
 activ_grp.sample(10)
 
 
-# In[40]:
+# In[41]:
 
 
 activ_grp["active_in_only_one"] = activ_grp.apply(active_in_only_one, axis=1)
@@ -460,7 +461,7 @@ activ_grp["active_in_only_three"] = activ_grp.apply(active_in_only_three, axis=1
 activ_grp.sample(5)
 
 
-# In[41]:
+# In[42]:
 
 
 activ_counts_1 = activ_grp.groupby(["PromType2", "active_in_only_one"])["unique_id"].agg("count").reset_index()
@@ -488,7 +489,7 @@ activ_counts = pd.melt(activ_counts, id_vars="PromType2")
 activ_counts.head()
 
 
-# In[42]:
+# In[43]:
 
 
 df = activ_counts[activ_counts["PromType2"] != "antisense"]
@@ -506,7 +507,7 @@ plt.xlabel("")
 plt.title("% of elements active in # of cell types")
 
 
-# In[43]:
+# In[44]:
 
 
 colors = []
@@ -515,7 +516,7 @@ for c in TSS_CLASS_ORDER:
 colors
 
 
-# In[44]:
+# In[45]:
 
 
 # better plot showing tissue sp
@@ -547,7 +548,7 @@ plt.savefig("Fig_1F.pdf", bbox_inches="tight", dpi="figure")
 
 # ## 7. kdeplot: compare to CAGE
 
-# In[45]:
+# In[46]:
 
 
 hepg2_activ = pool1_hepg2_df[["unique_id", "element", "better_type", "overall_mean", "PromType2"]]
@@ -563,7 +564,7 @@ all_activ = all_activ[(all_activ["PromType2"].isin(TSS_CLASS_ORDER)) &
 all_activ.sample(5)
 
 
-# In[46]:
+# In[47]:
 
 
 all_activ["combined_class"] = ""
@@ -572,14 +573,14 @@ all_activ.drop("combined_class", axis=1, inplace=True)
 all_activ.head()
 
 
-# In[47]:
+# In[48]:
 
 
 all_activ["oligo_reg"] = all_activ.unique_id.str.split("__", expand=True)[2]
 all_activ.sample(5)
 
 
-# In[48]:
+# In[49]:
 
 
 id_map = id_map[["oligo_reg", "K562_rep1", "K562_rep2", "K562_rep3", "HeLa_rep1", "HeLa_rep2", "HeLa_rep3", 
@@ -588,7 +589,7 @@ all_activ = all_activ.merge(id_map, on="oligo_reg")
 all_activ.sample(5)
 
 
-# In[49]:
+# In[50]:
 
 
 all_activ["K562_av"] = all_activ[["K562_rep1", "K562_rep2", "K562_rep3"]].mean(axis=1)
@@ -600,7 +601,7 @@ all_activ["HeLa_log_av"] = np.log(all_activ["HeLa_av"]+1)
 all_activ["HepG2_log_av"] = np.log(all_activ["HepG2_av"]+1)
 
 
-# In[50]:
+# In[51]:
 
 
 all_activ = all_activ[(~all_activ["unique_id"].str.contains("SNP_INDIV")) & 
@@ -609,7 +610,7 @@ all_activ = all_activ[(~all_activ["unique_id"].str.contains("SNP_INDIV")) &
 all_activ.sample(5)
 
 
-# In[51]:
+# In[52]:
 
 
 # first scale mpra ranges to be positive
@@ -618,7 +619,7 @@ all_activ["hela_scaled"] = scale_range(all_activ["HeLa"], 0, 100)
 all_activ["k562_scaled"] = scale_range(all_activ["K562"], 0, 100)
 
 
-# In[52]:
+# In[53]:
 
 
 cage_ts = calculate_tissue_specificity(all_activ[["HepG2_log_av", "K562_log_av", "HeLa_log_av"]])
@@ -631,13 +632,13 @@ all_activ["mpra_ts"] = mpra_ts
 all_activ.head()
 
 
-# In[53]:
+# In[54]:
 
 
 cmap = sns.light_palette("darkslategray", as_cmap=True)
 
 
-# In[54]:
+# In[55]:
 
 
 no_nan = all_activ[(~pd.isnull(all_activ["mpra_ts"])) & (~pd.isnull(all_activ["cage_ts"]))]
@@ -652,7 +653,19 @@ g.ax_joint.annotate("r = {:.2f}\np = {:.2e}".format(r, Decimal(p)), xy=(.1, .8),
 g.savefig("Fig_1E.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[55]:
+# In[62]:
+
+
+g = sns.jointplot(data=no_nan, x="cage_ts", y="mpra_ts", kind="kde", shade_lowest=False, size=2.3, space=0,
+                  stat_func=None, cmap=cmap, color="darkslategrey")
+g.set_axis_labels("endogenous cell-type specificity", "MPRA cell-type specificity")
+r, p = stats.spearmanr(no_nan["cage_ts"], no_nan["mpra_ts"])
+g.ax_joint.annotate("r = {:.2f}\np = {:.2e}".format(r, Decimal(p)), xy=(.1, .75), xycoords=ax.transAxes, 
+                    fontsize=5)
+g.savefig("cage_mpra_corr.for_talk.pdf", bbox_inches="tight", dpi="figure")
+
+
+# In[56]:
 
 
 def cage_v_mpra_ts(row):
@@ -669,7 +682,7 @@ no_nan["ts_status"] = no_nan.apply(cage_v_mpra_ts, axis=1)
 no_nan.ts_status.value_counts()
 
 
-# In[56]:
+# In[57]:
 
 
 tot = 692+402+310+236
@@ -683,13 +696,13 @@ print("lower left: %s" % (lower_left/tot))
 print("lower right: %s" % (lower_right/tot))
 
 
-# In[57]:
+# In[58]:
 
 
 (692+402)/(692+402+310+236)
 
 
-# In[58]:
+# In[59]:
 
 
 no_nan = all_activ[(~pd.isnull(all_activ["mpra_activ"])) & (~pd.isnull(all_activ["cage_activ"]))]
@@ -701,7 +714,7 @@ g.ax_joint.annotate("r = {:.2f}\np = {:.2e}".format(r, Decimal(p)), xy=(.1, .8),
                     fontsize=5)
 
 
-# In[59]:
+# In[60]:
 
 
 # write file with tissue-specificities for later use
