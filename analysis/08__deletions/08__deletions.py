@@ -460,7 +460,7 @@ for dels_dict, fixed_dict in zip([hepg2_dels_clean, k562_dels_clean], [hepg2_del
 hepg2_dels_fixed["ZFAS1__p1__tile2__plus"].head()
 
 
-# In[43]:
+# In[48]:
 
 
 hepg2_all_dels_tfs = pd.DataFrame()
@@ -491,6 +491,10 @@ for dels_fixed, dels_df, cell in zip([hepg2_dels_fixed, k562_dels_fixed], [hepg2
         if name == "ZFAS1__p1__tile2__plus" and cell == "HepG2":
             plot_peaks_and_tfbs((5.6, 2.5), 94, name, cell, scores, yerrs, 
                                 motif_vals, seq, "ZFAS_tile2.for_talk.pdf", True)
+            
+        if name == "ZFAS1__p1__tile2__plus" and cell == "HepG2":
+            plot_peaks_and_tfbs((5.6, 1.5), 94, name, cell, scores, yerrs, 
+                                motif_vals, seq, "ZFAS_tile2.for_poster.pdf", True)
         
     if cell == "HepG2":
         hepg2_all_dels_tfs = dels_df.copy()
@@ -518,7 +522,7 @@ len(sig_only)
 sig_only.head()
 
 
-# In[45]:
+# In[46]:
 
 
 g = sns.jointplot(data=sig_only, x="delta_tfs", y="mean.log2FC", kind="reg", space=0, size=2.5, 
@@ -529,7 +533,7 @@ g.set_axis_labels(r"$\Delta$ motifs (del-ref)", "deletion effect size")
 g.savefig("Fig_3B.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[46]:
+# In[47]:
 
 
 # k562
@@ -550,4 +554,21 @@ g = sns.jointplot(data=sig_only, x="delta_tfs", y="mean.log2FC", kind="reg", spa
 print("K562")
 g.set_axis_labels(r"$\Delta$ motifs (del-ref)", "deletion effect size")
 g.savefig("Fig_S9A.pdf", bbox_inches="tight", dpi="figure")
+
+
+# In[ ]:
+
+
+g = sns.jointplot(data=sig_only, x="delta_tfs", y="mean.log2FC", kind="reg", space=0, size=3, 
+                  marginal_kws={"hist": False}, color="darkgrey", scatter_kws={"s": 40})
+g = g.annotate(stats.spearmanr, fontsize=9)
+print("K562")
+g.set_axis_labels(r"$\Delta$ motifs (del-ref)", "deletion effect size", size=9)
+g.savefig("Fig_S9A.for_poster.pdf", bbox_inches="tight", dpi="figure")
+
+
+# In[ ]:
+
+
+
 

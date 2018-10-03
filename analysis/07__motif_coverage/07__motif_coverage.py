@@ -188,6 +188,7 @@ sns.kdeplot(data=dpc_vals, cumulative=True, color=TSS_CLASS_PALETTE["div_pc"],
             label="div. mRNAs", ax=ax)
 ax.set_xlabel("log(max coverage)")
 ax.set_ylabel("cumulative density")
+fig.savefig("max_cov.all_biotypes.for_poster.pdf", dpi="figure", bbox_inches="tight")
 
 
 # In[14]:
