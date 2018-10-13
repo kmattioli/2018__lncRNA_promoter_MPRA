@@ -556,12 +556,12 @@ g.set_axis_labels(r"$\Delta$ motifs (del-ref)", "deletion effect size")
 g.savefig("Fig_S9A.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[57]:
+# In[59]:
 
 
 g = sns.jointplot(data=sig_only, x="delta_tfs", y="mean.log2FC", kind="reg", space=0, size=2.5, 
                   marginal_kws={"hist": False}, color="darkgrey", scatter_kws={"s": 40})
-g = g.annotate(stats.spearmanr, fontsize=9)
+g = g.annotate(stats.spearmanr, template="spearmanr = {val:.2f}", fontsize=9)
 print("K562")
 g.set_axis_labels(r"$\Delta$ motifs (del-ref)", "deletion effect size", size=9)
 g.savefig("Fig_S9A.for_poster.pdf", bbox_inches="tight", dpi="figure")
