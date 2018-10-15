@@ -1207,7 +1207,7 @@ g.ax_joint.annotate("r = {:.2f}\np = {:.2e}".format(r, Decimal(p)), xy=(.1, .75)
 g.savefig("cage_mpra_corr.for_talk.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[ ]:
+# In[83]:
 
 
 def cage_v_mpra_ts(row):
@@ -1224,7 +1224,7 @@ no_nan["ts_status"] = no_nan.apply(cage_v_mpra_ts, axis=1)
 no_nan.ts_status.value_counts()
 
 
-# In[ ]:
+# In[84]:
 
 
 tot = 692+402+310+236
@@ -1238,13 +1238,13 @@ print("lower left: %s" % (lower_left/tot))
 print("lower right: %s" % (lower_right/tot))
 
 
-# In[ ]:
+# In[85]:
 
 
 (692+402)/(692+402+310+236)
 
 
-# In[ ]:
+# In[86]:
 
 
 no_nan = all_activ[(~pd.isnull(all_activ["mpra_activ"])) & (~pd.isnull(all_activ["cage_activ"]))]
@@ -1256,10 +1256,23 @@ g.ax_joint.annotate("r = {:.2f}\np = {:.2e}".format(r, Decimal(p)), xy=(.1, .8),
                     fontsize=5)
 
 
-# In[ ]:
+# In[87]:
 
 
 # write file with tissue-specificities for later use
 final = all_activ[["unique_id", "PromType2", "cage_activ", "cage_ts", "mpra_activ", "mpra_ts"]]
 final.to_csv("../../data/02__activs/POOL1__pMPRA1__CAGE_vs_MPRA_activs.txt", sep="\t", index=False)
+
+
+# In[88]:
+
+
+# also write file with tss types
+sel_map_expr.to_csv("../../misc/00__tss_properties/CAGE_expr_properties.txt", sep="\t", index=False)
+
+
+# In[ ]:
+
+
+
 
