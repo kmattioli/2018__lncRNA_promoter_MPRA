@@ -679,7 +679,7 @@ plt.xlim((2.5,5))
 fig.savefig("Fig_S7B.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[47]:
+# In[44]:
 
 
 # for each group, split into tissue-sp v dynamic v ubiquitous
@@ -745,7 +745,7 @@ plt.xlim((0, 2.75))
 fig.savefig("Fig_S7C.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[48]:
+# In[46]:
 
 
 # for each group, split into tissue-sp v dynamic v ubiquitous
