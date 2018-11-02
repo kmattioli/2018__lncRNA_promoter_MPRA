@@ -99,7 +99,7 @@ n_samples = 100
 # In[8]:
 
 
-fimo_f = "../../misc/03__fimo/pool1_n_motifs_map.txt"
+fimo_f = "../../data/04__coverage/pool1_n_motifs_map.txt"
 
 
 # In[9]:

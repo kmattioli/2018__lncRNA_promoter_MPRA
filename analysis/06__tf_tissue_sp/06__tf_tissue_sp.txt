@@ -27,6 +27,18 @@ from norm_utils import *
 sns.set(**PAPER_PRESET)
 fontsize = PAPER_FONTSIZE
 
+def fix_small_decimal(row):
+    if row.max_cov < 1:
+        return 0
+    else:
+        return row.max_cov
+
+def get_cage_id(row):
+    if "Enhancer" in row.unique_id:
+        return row.unique_id.split("__")[1]
+    else:
+        return row.unique_id.split("__")[2]
+
 index_dir = "../../data/00__index"
 index_f = "%s/tss_oligo_pool.index.txt" % index_dir
 
@@ -34,22 +46,71 @@ hepg2_activ_f = "../../data/02__activs/POOL1__pMPRA1__HepG2__activities_per_elem
 hela_activ_f = "../../data/02__activs/POOL1__pMPRA1__HeLa__activities_per_element.txt"
 k562_activ_f = "../../data/02__activs/POOL1__pMPRA1__K562__activities_per_element.txt"
 
-fimo_f = "../../misc/05__fimo/pool1_fimo_map.txt"
-fimo_chip_f = "../../misc/05__fimo/pool1_fimo_map.chip_intersected.txt"
+fimo_f = "../../misc/03__fimo/03__grouped_fimo_outputs/all_fimo_map.grouped.uniq.txt"
+fimo_chip_f = "../../misc/03__fimo/03__grouped_fimo_outputs/all_fimo_map.chip_intersected.grouped.uniq.txt"
+pool1_fimo_f = "../../misc/03__fimo/03__grouped_fimo_outputs/pool1_fimo_map.grouped.uniq.txt"
+pool1_fimo_chip_f = "../../misc/03__fimo/03__grouped_fimo_outputs/pool1_fimo_map.chip_intersected.grouped.uniq.txt"
+pool1_fimo_no_ets_f = "../../misc/03__fimo/03__grouped_fimo_outputs/pool1_fimo_map.grouped.no_ETS_motifs.txt"
+pool1_fimo_no_ets_chip_f = "../../misc/03__fimo/03__grouped_fimo_outputs/pool1_fimo_map.chip_intersected.grouped.no_ETS_motifs.txt"
 
-fimo_cov_f = "../../data/04__coverage/FIMO.coverage.new.txt"
-fimo_chip_cov_f = "../../data/04__coverage/FIMO.ChIPIntersect.coverage.new.txt"
+fimo_bp_cov_f = "../../data/04__coverage/all_fimo_map.bp_covered.new.txt"
+fimo_max_cov_f = "../../data/04__coverage/all_fimo_map.max_coverage.new.txt"
+
+fimo_chip_bp_cov_f = "../../data/04__coverage/all_fimo_map.chip_intersected.bp_covered.new.txt"
+fimo_chip_max_cov_f = "../../data/04__coverage/all_fimo_map.chip_intersected.max_coverage.new.txt"
+
+fimo_clust_bp_cov_f = "../../data/04__coverage/all_fimo_map.bulyk_clusters.bp_covered.new.txt"
+fimo_clust_max_cov_f = "../../data/04__coverage/all_fimo_map.bulyk_clusters.max_coverage.new.txt"
+
+fimo_no_ets_bp_cov_f = "../../data/04__coverage/all_fimo_map.no_ETS_motifs.bp_covered.txt"
+fimo_no_ets_max_cov_f = "../../data/04__coverage/all_fimo_map.no_ETS_motifs.max_coverage.txt"
+
+fimo_no_ets_chip_bp_cov_f = "../../data/04__coverage/all_fimo_map.chip_intersected.no_ETS_motifs.bp_covered.txt"
+fimo_no_ets_chip_max_cov_f = "../../data/04__coverage/all_fimo_map.chip_intersected.no_ETS_motifs.max_coverage.txt"
+
+pool1_fimo_bp_cov_f = "../../data/04__coverage/pool1_fimo_map.bp_covered.new.txt"
+pool1_fimo_max_cov_f = "../../data/04__coverage/pool1_fimo_map.max_coverage.new.txt"
+
+pool1_fimo_chip_bp_cov_f = "../../data/04__coverage/pool1_fimo_map.chip_intersected.bp_covered.new.txt"
+pool1_fimo_chip_max_cov_f = "../../data/04__coverage/pool1_fimo_map.chip_intersected.max_coverage.new.txt"
+
+pool1_fimo_no_ets_bp_cov_f = "../../data/04__coverage/pool1_fimo_map.no_ETS_motifs.bp_covered.txt"
+pool1_fimo_no_ets_max_cov_f = "../../data/04__coverage/pool1_fimo_map.no_ETS_motifs.max_coverage.txt"
+
+pool1_fimo_no_ets_chip_bp_cov_f = "../../data/04__coverage/pool1_fimo_map.chip_intersected.no_ETS_motifs.bp_covered.txt"
+pool1_fimo_no_ets_chip_max_cov_f = "../../data/04__coverage/pool1_fimo_map.chip_intersected.no_ETS_motifs.max_coverage.txt"
 
 tf_ts_f = "../../data/04__coverage/TF_tissue_specificities.from_CAGE.txt"
 
 cage_v_mpra_f = "../../data/02__activs/POOL1__pMPRA1__CAGE_vs_MPRA_activs.txt"
 
-fimo = pd.read_table(fimo_f, sep="\t")
-fimo.columns = ["motif", "unique_id", "start", "end", "strand", "score", "pval", "qval", "seq"]
+tss_cage_map_f = "../../misc/00__tss_properties/mpra_tss_detailed_info.txt"
+enh_cage_map_f = "../../misc/00__tss_properties/enhancer_id_map.txt"
+
+fimo = pd.read_table(fimo_f, sep="\t", header=None)
+fimo.columns = ["motif_chr", "motif_start", "motif_end", "unique_id", "score", "strand", "chr", "start", "end", 
+                "motif", "motif_score", "motif_strand"]
 fimo.head()
 
-fimo_chip = pd.read_table(fimo_chip_f, sep="\t")
-fimo_chip.head()
+fimo_chip = pd.read_table(fimo_chip_f, sep="\t", header=None)
+fimo_chip.columns = ["motif_chr", "motif_start", "motif_end", "unique_id", "score", "strand", "chr", "start", "end", 
+                     "motif", "motif_score", "motif_strand"]
+
+pool1_fimo = pd.read_table(pool1_fimo_f, sep="\t", header=None)
+pool1_fimo.columns = ["motif_chr", "motif_start", "motif_end", "unique_id", "score", "strand", "chr", "start", "end", 
+                      "motif", "motif_score", "motif_strand"]
+
+pool1_fimo_chip = pd.read_table(pool1_fimo_chip_f, sep="\t", header=None)
+pool1_fimo_chip.columns = ["motif_chr", "motif_start", "motif_end", "unique_id", "score", "strand", "chr", "start", 
+                           "end", "motif", "motif_score", "motif_strand"]
+
+pool1_fimo_no_ets = pd.read_table(pool1_fimo_no_ets_f, sep="\t", header=None)
+pool1_fimo_no_ets.columns = ["motif_chr", "motif_start", "motif_end", "unique_id", "score", "strand", "chr", "start", 
+                             "end", "motif", "motif_score", "motif_strand"]
+
+pool1_fimo_no_ets_chip = pd.read_table(pool1_fimo_no_ets_chip_f, sep="\t", header=None)
+pool1_fimo_no_ets_chip.columns = ["motif_chr", "motif_start", "motif_end", "unique_id", "score", "strand", "chr", 
+                                  "start", "end", "motif", "motif_score", "motif_strand"]
 
 index = pd.read_table(index_f, sep="\t")
 index_elem = index[["element", "oligo_type", "unique_id", "dupe_info", "SNP", "seq_name"]]
@@ -63,85 +124,236 @@ hepg2_reps = [x for x in hepg2_activ.columns if "rna" in x]
 hela_reps = [x for x in hela_activ.columns if "rna" in x]
 k562_reps = [x for x in k562_activ.columns if "rna" in x]
 
-fimo_cov = pd.read_table(fimo_cov_f, sep="\t")
+fimo_bp_cov = pd.read_table(fimo_bp_cov_f, sep="\t", header=None)
+fimo_bp_cov.columns = ["chr", "start", "end", "unique_id", "score", "strand", "n_motifs", "n_bp_cov", "seq_len", 
+                       "frac_bp_cov"]
+
+fimo_max_cov = pd.read_table(fimo_max_cov_f, sep="\t", header=None)
+fimo_max_cov.columns = ["unique_id", "max_cov"]
+
+fimo_cov = fimo_bp_cov.merge(fimo_max_cov, on="unique_id")
+print(len(fimo_cov))
 fimo_cov.head()
 
-fimo_chip_cov = pd.read_table(fimo_chip_cov_f, sep="\t")
+fimo_no_ets_bp_cov = pd.read_table(fimo_no_ets_bp_cov_f, sep="\t", header=None)
+fimo_no_ets_bp_cov.columns = ["chr", "start", "end", "unique_id", "score", "strand", "n_motifs", "n_bp_cov", 
+                              "seq_len", "frac_bp_cov"]
+
+fimo_no_ets_max_cov = pd.read_table(fimo_no_ets_max_cov_f, sep="\t", header=None)
+fimo_no_ets_max_cov.columns = ["unique_id", "max_cov"]
+
+fimo_no_ets_cov = fimo_no_ets_bp_cov.merge(fimo_no_ets_max_cov, on="unique_id")
+print(len(fimo_no_ets_cov))
+
+fimo_no_ets_chip_bp_cov = pd.read_table(fimo_no_ets_chip_bp_cov_f, sep="\t", header=None)
+fimo_no_ets_chip_bp_cov.columns = ["chr", "start", "end", "unique_id", "score", "strand", "n_motifs", "n_bp_cov", 
+                                   "seq_len", "frac_bp_cov"]
+
+fimo_no_ets_chip_max_cov = pd.read_table(fimo_no_ets_chip_max_cov_f, sep="\t", header=None)
+fimo_no_ets_chip_max_cov.columns = ["unique_id", "max_cov"]
+
+fimo_no_ets_chip_cov = fimo_no_ets_chip_bp_cov.merge(fimo_no_ets_chip_max_cov, on="unique_id")
+print(len(fimo_no_ets_chip_cov))
+
+fimo_chip_bp_cov = pd.read_table(fimo_chip_bp_cov_f, sep="\t", header=None)
+fimo_chip_bp_cov.columns = ["chr", "start", "end", "unique_id", "score", "strand", "n_motifs", "n_bp_cov", "seq_len", 
+                            "frac_bp_cov"]
+
+fimo_chip_max_cov = pd.read_table(fimo_chip_max_cov_f, sep="\t", header=None)
+fimo_chip_max_cov.columns = ["unique_id", "max_cov"]
+
+fimo_chip_cov = fimo_chip_bp_cov.merge(fimo_chip_max_cov, on="unique_id")
+print(len(fimo_chip_cov))
+
+fimo_clust_bp_cov = pd.read_table(fimo_clust_bp_cov_f, sep="\t", header=None)
+fimo_clust_bp_cov.columns = ["chr", "start", "end", "unique_id", "score", "strand", "n_motifs", "n_bp_cov", "seq_len", 
+                             "frac_bp_cov"]
+
+fimo_clust_max_cov = pd.read_table(fimo_clust_max_cov_f, sep="\t", header=None)
+fimo_clust_max_cov.columns = ["unique_id", "max_cov"]
+
+fimo_clust_cov = fimo_clust_bp_cov.merge(fimo_clust_max_cov, on="unique_id")
+print(len(fimo_clust_cov))
+
+pool1_fimo_bp_cov = pd.read_table(pool1_fimo_bp_cov_f, sep="\t", header=None)
+pool1_fimo_bp_cov.columns = ["chr", "start", "end", "unique_id", "score", "strand", "n_motifs", "n_bp_cov", "seq_len", 
+                             "frac_bp_cov"]
+
+pool1_fimo_max_cov = pd.read_table(pool1_fimo_max_cov_f, sep="\t", header=None)
+pool1_fimo_max_cov.columns = ["unique_id", "max_cov"]
+
+pool1_fimo_cov = pool1_fimo_bp_cov.merge(pool1_fimo_max_cov, on="unique_id")
+print(len(pool1_fimo_cov))
+
+pool1_fimo_chip_bp_cov = pd.read_table(pool1_fimo_chip_bp_cov_f, sep="\t", header=None)
+pool1_fimo_chip_bp_cov.columns = ["chr", "start", "end", "unique_id", "score", "strand", "n_motifs", "n_bp_cov", 
+                                  "seq_len", "frac_bp_cov"]
+
+pool1_fimo_chip_max_cov = pd.read_table(pool1_fimo_chip_max_cov_f, sep="\t", header=None)
+pool1_fimo_chip_max_cov.columns = ["unique_id", "max_cov"]
+
+pool1_fimo_chip_cov = pool1_fimo_chip_bp_cov.merge(pool1_fimo_chip_max_cov, on="unique_id")
+print(len(pool1_fimo_chip_cov))
+
+pool1_fimo_no_ets_bp_cov = pd.read_table(pool1_fimo_no_ets_bp_cov_f, sep="\t", header=None)
+pool1_fimo_no_ets_bp_cov.columns = ["chr", "start", "end", "unique_id", "score", "strand", "n_motifs", "n_bp_cov", 
+                                    "seq_len", "frac_bp_cov"]
+
+pool1_fimo_no_ets_max_cov = pd.read_table(pool1_fimo_no_ets_max_cov_f, sep="\t", header=None)
+pool1_fimo_no_ets_max_cov.columns = ["unique_id", "max_cov"]
+
+pool1_fimo_no_ets_cov = pool1_fimo_no_ets_bp_cov.merge(pool1_fimo_no_ets_max_cov, on="unique_id")
+print(len(pool1_fimo_no_ets_cov))
+
+pool1_fimo_no_ets_chip_bp_cov = pd.read_table(pool1_fimo_no_ets_chip_bp_cov_f, sep="\t", header=None)
+pool1_fimo_no_ets_chip_bp_cov.columns = ["chr", "start", "end", "unique_id", "score", "strand", "n_motifs", 
+                                         "n_bp_cov", "seq_len", "frac_bp_cov"]
+
+pool1_fimo_no_ets_chip_max_cov = pd.read_table(pool1_fimo_no_ets_chip_max_cov_f, sep="\t", header=None)
+pool1_fimo_no_ets_chip_max_cov.columns = ["unique_id", "max_cov"]
+
+pool1_fimo_no_ets_chip_cov = pool1_fimo_no_ets_chip_bp_cov.merge(pool1_fimo_no_ets_chip_max_cov, on="unique_id")
+print(len(pool1_fimo_no_ets_chip_cov))
+
+all_cov_dfs = {"fimo": fimo_cov, "fimo_chip": fimo_chip_cov, "fimo_clust": fimo_clust_cov, 
+               "fimo_no_ets": fimo_no_ets_cov, "fimo_no_ets_chip": fimo_no_ets_chip_cov, 
+               "pool1_fimo": pool1_fimo_cov, "pool1_fimo_chip": pool1_fimo_chip_cov, 
+               "pool1_fimo_no_ets": pool1_fimo_no_ets_cov, 
+               "pool1_fimo_no_ets_chip": pool1_fimo_no_ets_chip_cov}
+
+all_motif_dfs = {"fimo": fimo, "fimo_chip": fimo_chip, "pool1_fimo": pool1_fimo, "pool1_fimo_chip": pool1_fimo_chip,
+                 "pool1_fimo_no_ets": pool1_fimo_no_ets, "pool1_fimo_no_ets_chip": pool1_fimo_no_ets_chip}
+
+for key in all_cov_dfs.keys():
+    df = all_cov_dfs[key]
+    df["max_cov"] = df.apply(fix_small_decimal, axis=1)
+    df["log_n_motifs"] = np.log(df["n_motifs"]+1)
+    df["log_bp_cov"] = np.log(df["n_bp_cov"]+1)
+    df["log_max_cov"] = np.log(df["max_cov"]+1)
+    df["cage_id"] = df.apply(get_cage_id, axis=1)
+
 fimo_chip_cov.head()
+
+for key in all_motif_dfs.keys():
+    df = all_motif_dfs[key]
+    df["cage_id"] = df.apply(get_cage_id, axis=1)
+    
+fimo.sample(5)
 
 tf_ts = pd.read_table(tf_ts_f, sep="\t")
 tf_ts.head()
 
 cage_v_mpra = pd.read_table(cage_v_mpra_f, sep="\t")
+cage_v_mpra["oligo_reg"] = cage_v_mpra["unique_id"].str.split("__", expand=True)[2]
 cage_v_mpra.head()
 
-fimo["motif"] = fimo["motif"].str.upper()
-fimo = fimo.merge(tf_ts, left_on="motif", right_on="tf", how="left")
-fimo.head()
+tss_cage_map = pd.read_table(tss_cage_map_f, sep="\t")
+tss_cage_map.head()
 
-fimo_chip["motif"] = fimo_chip["motif"].str.upper()
-fimo_chip = fimo_chip.merge(tf_ts, left_on="motif", right_on="tf", how="left")
-fimo_chip.head()
+enh_cage_map = pd.read_table(enh_cage_map_f, sep="\t")
+enh_cage_map.head()
 
-len(fimo)
+# since enhancers have 2 TSS_ids, need to join these separately
+tmp = cage_v_mpra.merge(tss_cage_map[["oligo_reg", "TSS_id"]], on="oligo_reg", how="left")
+tmp_enh_pos = tmp[(tmp["unique_id"].str.contains("Enhancer")) & (tmp["TSS_id"].str[-1] == "+")]
+tmp_enh_neg = tmp[(tmp["unique_id"].str.contains("Enhancer")) & (tmp["TSS_id"].str[-1] == "-")]
 
-len(fimo_chip)
+tmp_enh_pos = tmp_enh_pos.merge(enh_cage_map[["TSS_id_Pos", "enhancer_id"]], left_on="TSS_id", right_on="TSS_id_Pos",
+                                how="left")
+tmp_enh_neg = tmp_enh_neg.merge(enh_cage_map[["TSS_id_Neg", "enhancer_id"]], left_on="TSS_id", right_on="TSS_id_Neg",
+                                how="left")
+tmp_enh_pos = tmp_enh_pos.drop("TSS_id_Pos", axis=1)
+tmp_enh_neg = tmp_enh_neg.drop("TSS_id_Neg", axis=1)
+tmp_enh = tmp_enh_pos.append(tmp_enh_neg)
+tmp_enh["TSS_id"] = tmp_enh["enhancer_id"]
+tmp_enh.drop("enhancer_id", axis=1, inplace=True)
+tmp_enh.sample(5)
 
-fimo_nonan = fimo[~pd.isnull(fimo["tissue_sp_3"])]
-len(fimo_nonan)
+tmp_no_enh = tmp[~tmp["unique_id"].str.contains("Enhancer")]
+cage_v_mpra = tmp_no_enh.append(tmp_enh)
+cage_v_mpra.sample(5)
 
-fimo_chip_nonan = fimo_chip[~pd.isnull(fimo_chip["tissue_sp_3"])]
-len(fimo_chip_nonan)
+pool1_fimo_cov = pool1_fimo_cov.merge(cage_v_mpra, on="unique_id")
+pool1_fimo = pool1_fimo.merge(cage_v_mpra, on="unique_id")
+pool1_fimo_cov["cage_id"] = pool1_fimo_cov["TSS_id"]
+pool1_fimo["cage_id"] = pool1_fimo["TSS_id"]
+all_cov_dfs["pool1_fimo"] = pool1_fimo_cov
+all_motif_dfs["pool1_fimo"] = pool1_fimo
+print(len(pool1_fimo_cov))
+pool1_fimo_cov.sample(5)
 
-fimo_deduped = fimo_nonan.drop_duplicates(subset=["motif", "unique_id"])
-len(fimo_deduped)
+pool1_fimo_chip_cov = pool1_fimo_chip_cov.merge(cage_v_mpra, on="unique_id")
+pool1_fimo_chip = pool1_fimo_chip.drop("unique_id", axis=1).merge(cage_v_mpra, left_on="cage_id", right_on="TSS_id")
+pool1_fimo_chip_cov["cage_id"] = pool1_fimo_chip_cov["TSS_id"]
+pool1_fimo_chip["cage_id"] = pool1_fimo_chip["TSS_id"]
+all_cov_dfs["pool1_fimo_chip"] = pool1_fimo_chip_cov
+all_motif_dfs["pool1_fimo_chip"] = pool1_fimo_chip
+print(len(pool1_fimo_chip_cov))
 
-fimo_chip_deduped = fimo_chip_nonan.drop_duplicates(subset=["motif", "unique_id"])
-len(fimo_chip_deduped)
+pool1_fimo_no_ets_cov = pool1_fimo_no_ets_cov.merge(cage_v_mpra, on="unique_id")
+pool1_fimo_no_ets = pool1_fimo_no_ets.merge(cage_v_mpra, on="unique_id")
+pool1_fimo_no_ets_cov["cage_id"] = pool1_fimo_no_ets_cov["TSS_id"]
+pool1_fimo_no_ets["cage_id"] = pool1_fimo_no_ets["TSS_id"]
+all_cov_dfs["pool1_fimo_no_ets"] = pool1_fimo_no_ets_cov
+all_motif_dfs["pool1_fimo_no_ets"] = pool1_fimo_no_ets
+print(len(pool1_fimo_no_ets_cov))
 
-avg_sp_fimo = fimo_deduped.groupby(["unique_id"])["tissue_sp_3"].agg("mean").reset_index()
-avg_sp_fimo.columns = ["unique_id", "avg_tf_tissue_sp"]
-avg_sp_fimo.head()
+pool1_fimo_no_ets_chip_cov = pool1_fimo_no_ets_chip_cov.merge(cage_v_mpra, on="unique_id")
+pool1_fimo_no_ets_chip = pool1_fimo_no_ets_chip.drop("unique_id", axis=1).merge(cage_v_mpra, left_on="cage_id", 
+                                                                                right_on="TSS_id")
+pool1_fimo_no_ets_chip_cov["cage_id"] = pool1_fimo_no_ets_chip_cov["TSS_id"]
+pool1_fimo_no_ets_chip["cage_id"] = pool1_fimo_no_ets_chip["TSS_id"]
+all_cov_dfs["pool1_fimo_no_ets_chip"] = pool1_fimo_no_ets_chip_cov
+all_motif_dfs["pool1_fimo_no_ets_chip"] = pool1_fimo_no_ets_chip
+print(len(pool1_fimo_no_ets_chip_cov))
 
-avg_sp_fimo_chip = fimo_chip_deduped.groupby(["unique_id"])["tissue_sp_3"].agg("mean").reset_index()
-avg_sp_fimo_chip.columns = ["unique_id", "avg_tf_tissue_sp"]
-avg_sp_fimo_chip.head()
+all_spec_dfs = {}
+for key in all_motif_dfs.keys():
+    df = all_motif_dfs[key]
+    df["motif"] = df["motif"].str.upper()
+    df = df.merge(tf_ts, left_on="motif", right_on="tf", how="left")
+    df_nonan = df[~pd.isnull(df["tissue_sp_3"])]
+    df_deduped = df_nonan.drop_duplicates(subset=["motif", "unique_id"])
+    avg_sp = df_deduped.groupby(["cage_id"])["tissue_sp_3"].agg("mean").reset_index()
+    avg_sp.columns = ["cage_id", "avg_tf_tissue_sp"]
+    avg_sp["log_avg_tf_tissue_sp"] = np.log(avg_sp["avg_tf_tissue_sp"]+1)
+    all_spec_dfs[key] = avg_sp
+avg_sp.sample(5)
 
-med_sp_fimo = fimo_deduped.groupby(["unique_id"])["tissue_sp_3"].agg("median").reset_index()
-med_sp_fimo.columns = ["unique_id", "med_tf_tissue_sp"]
-med_sp_fimo.head()
+file_prefixes = {"fimo": "all_fimo_map", "fimo_chip": "all_fimo_map.chip_intersected", 
+                 "fimo_clust": "all_fimo_map.bulyk_clusters", "fimo_no_ets": "all_fimo_map.no_ETS_motifs",
+                 "fimo_no_ets_chip": "all_fimo_map.chip_intersected.no_ETS_motifs", 
+                 "pool1_fimo": "pool1_fimo_map", "pool1_fimo_chip": "pool1_fimo_map.chip_intersected", 
+                 "pool1_fimo_no_ets": "pool1_fimo_map.no_ETS_motifs", 
+                 "pool1_fimo_no_ets_chip": "pool1_fimo_map.chip_intersected.no_ETS_motifs"}
 
-med_sp_fimo_chip = fimo_chip_deduped.groupby(["unique_id"])["tissue_sp_3"].agg("median").reset_index()
-med_sp_fimo_chip.columns = ["unique_id", "med_tf_tissue_sp"]
-med_sp_fimo_chip.head()
+for key in all_cov_dfs.keys():
+    print(key)
+    name = file_prefixes[key]
+    cov_df = all_cov_dfs[key]
+    if key in all_spec_dfs.keys():
+        spec_df = all_spec_dfs[key]
+        merge_df = cov_df.merge(spec_df, on="cage_id", how="left")
+        merge_df = merge_df[["unique_id", "cage_id", "n_motifs", "n_bp_cov", "max_cov", "avg_tf_tissue_sp", 
+                             "log_n_motifs", "log_bp_cov", "log_max_cov", "log_avg_tf_tissue_sp"]].drop_duplicates()
+    else:
+        merge_df = cov_df[["unique_id", "cage_id", "n_motifs", "n_bp_cov", "max_cov", 
+                                 "log_n_motifs", "log_bp_cov", "log_max_cov"]].drop_duplicates()
+    
+    merge_df.to_csv("../../data/04__coverage/%s.all_cov.new.txt" % name, sep="\t", index=False)
+    
+    if "pool1" in name:
+        merge_df = merge_df.merge(cage_v_mpra[["unique_id", "mpra_activ", "mpra_ts"]], on="unique_id")
+    all_cov_dfs[key] = merge_df
 
-tissue_sp_fimo = avg_sp_fimo.merge(med_sp_fimo, on="unique_id")
-tissue_sp_fimo["log_avg_tf_tissue_sp"] = np.log(tissue_sp_fimo["avg_tf_tissue_sp"]+1)
-tissue_sp_fimo["log_med_tf_tissue_sp"] = np.log(tissue_sp_fimo["med_tf_tissue_sp"]+1)
-tissue_sp_fimo.head()
-
-tissue_sp_fimo_chip = avg_sp_fimo_chip.merge(med_sp_fimo_chip, on="unique_id")
-tissue_sp_fimo_chip["log_avg_tf_tissue_sp"] = np.log(tissue_sp_fimo_chip["avg_tf_tissue_sp"]+1)
-tissue_sp_fimo_chip["log_med_tf_tissue_sp"] = np.log(tissue_sp_fimo_chip["med_tf_tissue_sp"]+1)
-tissue_sp_fimo_chip.head()
-
-mean_activ_fimo = cage_v_mpra.merge(tissue_sp_fimo, on="unique_id")
-mean_activ_fimo.sample(5)
-
-mean_activ_fimo = mean_activ_fimo.merge(fimo_cov, on="unique_id")
-mean_activ_fimo.sample(5)
-
-mean_activ_fimo_chip = cage_v_mpra.merge(tissue_sp_fimo_chip, on="unique_id")
-mean_activ_fimo_chip.sample(5)
-
-mean_activ_fimo_chip = mean_activ_fimo_chip.merge(fimo_chip_cov, left_on="unique_id", right_on="index")
-mean_activ_fimo_chip.sample(5)
+df = all_cov_dfs["pool1_fimo"]
+df.head()
 
 #cmap = sns.light_palette("#8da0cb", as_cmap=True)
 cmap = sns.light_palette("darkslategray", as_cmap=True)
 
-no_nan = mean_activ_fimo[~pd.isnull(mean_activ_fimo["log_avg_tf_tissue_sp"]) &
-                         ~pd.isnull(mean_activ_fimo["mpra_activ"])]
+no_nan = df[~pd.isnull(df["log_avg_tf_tissue_sp"]) &
+            ~pd.isnull(df["mpra_activ"])]
 
 fig = plt.figure(figsize=(1.2, 1.2))
 ax = sns.kdeplot(no_nan["log_avg_tf_tissue_sp"], no_nan["mpra_activ"], cmap=cmap, 
@@ -152,10 +364,10 @@ ax.set_xlabel("log(mean TF tissue specificity)")
 r, p = stats.spearmanr(no_nan["log_avg_tf_tissue_sp"], no_nan["mpra_activ"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_3.pdf", bbox_inches="tight", dpi="figure")
+#fig.savefig("Fig_2C_3.pdf", bbox_inches="tight", dpi="figure")
 
-no_nan = mean_activ_fimo[~pd.isnull(mean_activ_fimo["log_avg_tf_tissue_sp"]) &
-                         ~pd.isnull(mean_activ_fimo["mpra_ts"])]
+no_nan = pool1_fimo_cov[~pd.isnull(pool1_fimo_cov["log_avg_tf_tissue_sp"]) &
+                        ~pd.isnull(pool1_fimo_cov["mpra_ts"])]
 
 fig = plt.figure(figsize=(1.2, 1.2))
 ax = sns.kdeplot(no_nan["log_avg_tf_tissue_sp"], no_nan["mpra_ts"], cmap=cmap, 
@@ -166,10 +378,10 @@ ax.set_xlabel("log(mean TF tissue specificity)")
 r, p = stats.spearmanr(no_nan["log_avg_tf_tissue_sp"], no_nan["mpra_ts"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_6.pdf", bbox_inches="tight", dpi="figure")
+#fig.savefig("Fig_2C_6.pdf", bbox_inches="tight", dpi="figure")
 
-no_nan = mean_activ_fimo_chip[~pd.isnull(mean_activ_fimo_chip["log_avg_tf_tissue_sp"]) &
-                              ~pd.isnull(mean_activ_fimo_chip["mpra_activ"])]
+no_nan = pool1_fimo_chip_cov[~pd.isnull(pool1_fimo_chip_cov["log_avg_tf_tissue_sp"]) &
+                             ~pd.isnull(pool1_fimo_chip_cov["mpra_activ"])]
 
 fig = plt.figure(figsize=(1.2, 1.2))
 ax = sns.kdeplot(no_nan["log_avg_tf_tissue_sp"], no_nan["mpra_activ"], cmap=cmap, 
@@ -180,10 +392,9 @@ ax.set_xlabel("log(mean TF tissue specificity)")
 r, p = stats.spearmanr(no_nan["log_avg_tf_tissue_sp"], no_nan["mpra_activ"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_3.pdf", bbox_inches="tight", dpi="figure")
 
-no_nan = mean_activ_fimo_chip[~pd.isnull(mean_activ_fimo_chip["log_avg_tf_tissue_sp"]) &
-                              ~pd.isnull(mean_activ_fimo_chip["mpra_ts"])]
+no_nan = pool1_fimo_chip_cov[~pd.isnull(pool1_fimo_chip_cov["log_avg_tf_tissue_sp"]) &
+                             ~pd.isnull(pool1_fimo_chip_cov["mpra_ts"])]
 
 fig = plt.figure(figsize=(1.2, 1.2))
 ax = sns.kdeplot(no_nan["log_avg_tf_tissue_sp"], no_nan["mpra_ts"], cmap=cmap, 
@@ -194,68 +405,213 @@ ax.set_xlabel("log(mean TF tissue specificity)")
 r, p = stats.spearmanr(no_nan["log_avg_tf_tissue_sp"], no_nan["mpra_ts"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_6.pdf", bbox_inches="tight", dpi="figure")
 
-no_nan = mean_activ_fimo[~pd.isnull(mean_activ_fimo["log_n_bp_cov"]) &
-                         ~pd.isnull(mean_activ_fimo["mpra_activ"])]
+no_nan = pool1_fimo_no_ets_cov[~pd.isnull(pool1_fimo_no_ets_cov["log_avg_tf_tissue_sp"]) &
+                               ~pd.isnull(pool1_fimo_no_ets_cov["mpra_activ"])]
 
 fig = plt.figure(figsize=(1.2, 1.2))
-ax = sns.kdeplot(no_nan["log_n_bp_cov"], no_nan["mpra_activ"], cmap="Blues", 
+ax = sns.kdeplot(no_nan["log_avg_tf_tissue_sp"], no_nan["mpra_activ"], cmap=cmap, 
+                 shade=True, shade_lowest=False)
+ax.set_ylabel("mean MPRA activity")
+ax.set_xlabel("log(mean TF tissue specificity)")
+
+r, p = stats.spearmanr(no_nan["log_avg_tf_tissue_sp"], no_nan["mpra_activ"])
+print("r: %s, spearman p: %s" % (r, p))
+ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
+#fig.savefig("Fig_2C_3.pdf", bbox_inches="tight", dpi="figure")
+
+no_nan = pool1_fimo_no_ets_cov[~pd.isnull(pool1_fimo_no_ets_cov["log_avg_tf_tissue_sp"]) &
+                               ~pd.isnull(pool1_fimo_no_ets_cov["mpra_ts"])]
+
+fig = plt.figure(figsize=(1.2, 1.2))
+ax = sns.kdeplot(no_nan["log_avg_tf_tissue_sp"], no_nan["mpra_ts"], cmap=cmap, 
+                 shade=True, shade_lowest=False)
+ax.set_ylabel("tissue specificity in MPRA")
+ax.set_xlabel("log(mean TF tissue specificity)")
+
+r, p = stats.spearmanr(no_nan["log_avg_tf_tissue_sp"], no_nan["mpra_ts"])
+print("r: %s, spearman p: %s" % (r, p))
+ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
+#fig.savefig("Fig_2C_6.pdf", bbox_inches="tight", dpi="figure")
+
+no_nan = pool1_fimo_no_ets_chip_cov[~pd.isnull(pool1_fimo_no_ets_chip_cov["log_avg_tf_tissue_sp"]) &
+                                    ~pd.isnull(pool1_fimo_no_ets_chip_cov["mpra_activ"])]
+
+fig = plt.figure(figsize=(1.2, 1.2))
+ax = sns.kdeplot(no_nan["log_avg_tf_tissue_sp"], no_nan["mpra_activ"], cmap=cmap, 
+                 shade=True, shade_lowest=False)
+ax.set_ylabel("mean MPRA activity")
+ax.set_xlabel("log(mean TF tissue specificity)")
+
+r, p = stats.spearmanr(no_nan["log_avg_tf_tissue_sp"], no_nan["mpra_activ"])
+print("r: %s, spearman p: %s" % (r, p))
+ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
+
+no_nan = pool1_fimo_no_ets_chip_cov[~pd.isnull(pool1_fimo_no_ets_chip_cov["log_avg_tf_tissue_sp"]) &
+                                    ~pd.isnull(pool1_fimo_no_ets_chip_cov["mpra_ts"])]
+
+fig = plt.figure(figsize=(1.2, 1.2))
+ax = sns.kdeplot(no_nan["log_avg_tf_tissue_sp"], no_nan["mpra_ts"], cmap=cmap, 
+                 shade=True, shade_lowest=False)
+ax.set_ylabel("tissue specificity in MPRA")
+ax.set_xlabel("log(mean TF tissue specificity)")
+
+r, p = stats.spearmanr(no_nan["log_avg_tf_tissue_sp"], no_nan["mpra_ts"])
+print("r: %s, spearman p: %s" % (r, p))
+ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
+
+no_nan = pool1_fimo_cov[~pd.isnull(pool1_fimo_cov["log_bp_cov"]) &
+                        ~pd.isnull(pool1_fimo_cov["mpra_activ"])]
+
+# for these, only look at those with >1 motif
+# no_nan = no_nan[no_nan["n_motifs"] > 0]
+len(no_nan)
+
+fig = plt.figure(figsize=(1.2, 1.2))
+ax = sns.kdeplot(no_nan["log_bp_cov"], no_nan["mpra_activ"], cmap="Blues", 
+                 shade=True, shade_lowest=False)
+ax.set_ylabel("mean MPRA activity")
+ax.set_xlabel("log(number of bp covered by motif)")
+ax.set_xlim((3,5))
+
+r, p = stats.spearmanr(no_nan["log_bp_cov"], no_nan["mpra_activ"])
+print("r: %s, spearman p: %s" % (r, p))
+ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
+#fig.savefig("Fig_2C_1.pdf", bbox_inches="tight", dpi="figure")
+
+no_nan = pool1_fimo_cov[~pd.isnull(pool1_fimo_cov["log_bp_cov"]) &
+                         ~pd.isnull(pool1_fimo_cov["mpra_ts"])]
+
+# for these, only look at those with >1 motif
+# no_nan = no_nan[no_nan["n_motifs"] > 0]
+len(no_nan)
+
+fig = plt.figure(figsize=(1.2, 1.2))
+ax = sns.kdeplot(no_nan["log_bp_cov"], no_nan["mpra_ts"], cmap="Blues", 
+                 shade=True, shade_lowest=False)
+ax.set_ylabel("tissue specificity in MPRA")
+ax.set_xlabel("log(number of bp covered by motif)")
+ax.set_xlim((3, 5))
+
+r, p = stats.spearmanr(no_nan["log_bp_cov"], no_nan["mpra_ts"])
+print("r: %s, spearman p: %s" % (r, p))
+ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
+#fig.savefig("Fig_2C_4.pdf", bbox_inches="tight", dpi="figure")
+
+no_nan = pool1_fimo_chip_cov[~pd.isnull(pool1_fimo_chip_cov["log_bp_cov"]) &
+                             ~pd.isnull(pool1_fimo_chip_cov["mpra_activ"])]
+
+# for these, only look at those with >1 motif
+# no_nan = no_nan[no_nan["n_motifs"] > 0]
+len(no_nan)
+
+fig = plt.figure(figsize=(1.2, 1.2))
+ax = sns.kdeplot(no_nan["log_bp_cov"], no_nan["mpra_activ"], cmap="Blues", 
                  shade=True, shade_lowest=False)
 ax.set_ylabel("mean MPRA activity")
 ax.set_xlabel("log(number of bp covered by motif)")
 
-r, p = stats.spearmanr(no_nan["log_n_bp_cov"], no_nan["mpra_activ"])
+r, p = stats.spearmanr(no_nan["log_bp_cov"], no_nan["mpra_activ"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-fig.savefig("Fig_3C_1.pdf", bbox_inches="tight", dpi="figure")
 
-no_nan = mean_activ_fimo[~pd.isnull(mean_activ_fimo["log_n_bp_cov"]) &
-                         ~pd.isnull(mean_activ_fimo["mpra_ts"])]
+no_nan = pool1_fimo_chip_cov[~pd.isnull(pool1_fimo_chip_cov["log_bp_cov"]) &
+                             ~pd.isnull(pool1_fimo_chip_cov["mpra_ts"])]
+
+# for these, only look at those with >1 motif
+# no_nan = no_nan[no_nan["n_motifs"] > 0]
+len(no_nan)
 
 fig = plt.figure(figsize=(1.2, 1.2))
-ax = sns.kdeplot(no_nan["log_n_bp_cov"], no_nan["mpra_ts"], cmap="Blues", 
+ax = sns.kdeplot(no_nan["log_bp_cov"], no_nan["mpra_ts"], cmap="Blues", 
                  shade=True, shade_lowest=False)
 ax.set_ylabel("tissue specificity in MPRA")
 ax.set_xlabel("log(number of bp covered by motif)")
 
-r, p = stats.spearmanr(no_nan["log_n_bp_cov"], no_nan["mpra_ts"])
+r, p = stats.spearmanr(no_nan["log_bp_cov"], no_nan["mpra_ts"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-fig.savefig("Fig_3C_4.pdf", bbox_inches="tight", dpi="figure")
 
-no_nan = mean_activ_fimo_chip[~pd.isnull(mean_activ_fimo_chip["log_n_bp_cov"]) &
-                              ~pd.isnull(mean_activ_fimo_chip["mpra_activ"])]
+no_nan = pool1_fimo_no_ets_cov[~pd.isnull(pool1_fimo_no_ets_cov["log_bp_cov"]) &
+                               ~pd.isnull(pool1_fimo_no_ets_cov["mpra_activ"])]
+
+# for these, only look at those with >1 motif
+# no_nan = no_nan[no_nan["n_motifs"] > 0]
+len(no_nan)
 
 fig = plt.figure(figsize=(1.2, 1.2))
-ax = sns.kdeplot(no_nan["log_n_bp_cov"], no_nan["mpra_activ"], cmap="Blues", 
+ax = sns.kdeplot(no_nan["log_bp_cov"], no_nan["mpra_activ"], cmap="Blues", 
+                 shade=True, shade_lowest=False)
+ax.set_ylabel("mean MPRA activity")
+ax.set_xlabel("log(number of bp covered by motif)")
+ax.set_xlim((3,5))
+
+r, p = stats.spearmanr(no_nan["log_bp_cov"], no_nan["mpra_activ"])
+print("r: %s, spearman p: %s" % (r, p))
+ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
+#fig.savefig("Fig_2C_1.pdf", bbox_inches="tight", dpi="figure")
+
+no_nan = pool1_fimo_no_ets_cov[~pd.isnull(pool1_fimo_no_ets_cov["log_bp_cov"]) &
+                               ~pd.isnull(pool1_fimo_no_ets_cov["mpra_ts"])]
+
+# for these, only look at those with >1 motif
+# no_nan = no_nan[no_nan["n_motifs"] > 0]
+len(no_nan)
+
+fig = plt.figure(figsize=(1.2, 1.2))
+ax = sns.kdeplot(no_nan["log_bp_cov"], no_nan["mpra_ts"], cmap="Blues", 
+                 shade=True, shade_lowest=False)
+ax.set_ylabel("tissue specificity in MPRA")
+ax.set_xlabel("log(number of bp covered by motif)")
+ax.set_xlim((3, 5))
+
+r, p = stats.spearmanr(no_nan["log_bp_cov"], no_nan["mpra_ts"])
+print("r: %s, spearman p: %s" % (r, p))
+ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
+#fig.savefig("Fig_2C_4.pdf", bbox_inches="tight", dpi="figure")
+
+no_nan = pool1_fimo_no_ets_chip_cov[~pd.isnull(pool1_fimo_no_ets_chip_cov["log_bp_cov"]) &
+                                    ~pd.isnull(pool1_fimo_no_ets_chip_cov["mpra_activ"])]
+
+# for these, only look at those with >1 motif
+# no_nan = no_nan[no_nan["n_motifs"] > 0]
+len(no_nan)
+
+fig = plt.figure(figsize=(1.2, 1.2))
+ax = sns.kdeplot(no_nan["log_bp_cov"], no_nan["mpra_activ"], cmap="Blues", 
                  shade=True, shade_lowest=False)
 ax.set_ylabel("mean MPRA activity")
 ax.set_xlabel("log(number of bp covered by motif)")
 
-r, p = stats.spearmanr(no_nan["log_n_bp_cov"], no_nan["mpra_activ"])
+r, p = stats.spearmanr(no_nan["log_bp_cov"], no_nan["mpra_activ"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_1.pdf", bbox_inches="tight", dpi="figure")
 
-no_nan = mean_activ_fimo_chip[~pd.isnull(mean_activ_fimo_chip["log_n_bp_cov"]) &
-                              ~pd.isnull(mean_activ_fimo_chip["mpra_ts"])]
+no_nan = pool1_fimo_chip_cov[~pd.isnull(pool1_fimo_chip_cov["log_bp_cov"]) &
+                             ~pd.isnull(pool1_fimo_chip_cov["mpra_ts"])]
+
+# for these, only look at those with >1 motif
+# no_nan = no_nan[no_nan["n_motifs"] > 0]
+len(no_nan)
 
 fig = plt.figure(figsize=(1.2, 1.2))
-ax = sns.kdeplot(no_nan["log_n_bp_cov"], no_nan["mpra_ts"], cmap="Blues", 
+ax = sns.kdeplot(no_nan["log_bp_cov"], no_nan["mpra_ts"], cmap="Blues", 
                  shade=True, shade_lowest=False)
 ax.set_ylabel("tissue specificity in MPRA")
 ax.set_xlabel("log(number of bp covered by motif)")
 
-r, p = stats.spearmanr(no_nan["log_n_bp_cov"], no_nan["mpra_ts"])
+r, p = stats.spearmanr(no_nan["log_bp_cov"], no_nan["mpra_ts"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_4.pdf", bbox_inches="tight", dpi="figure")
 
 cmap = sns.light_palette("firebrick", as_cmap=True)
 
-no_nan = mean_activ_fimo[~pd.isnull(mean_activ_fimo["log_max_cov"]) &
-                         ~pd.isnull(mean_activ_fimo["mpra_activ"])]
+no_nan = pool1_fimo_cov[~pd.isnull(pool1_fimo_cov["log_max_cov"]) &
+                        ~pd.isnull(pool1_fimo_cov["mpra_activ"])]
+
+# for these, only look at those with >1 motif
+# no_nan = no_nan[no_nan["n_motifs"] > 0]
+len(no_nan)
 
 fig = plt.figure(figsize=(1.2, 1.2))
 ax = sns.kdeplot(no_nan["log_max_cov"], no_nan["mpra_activ"], cmap=cmap, 
@@ -266,10 +622,14 @@ ax.set_xlabel("log(max overlapping motifs)")
 r, p = stats.spearmanr(no_nan["log_max_cov"], no_nan["mpra_activ"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_2.pdf", bbox_inches="tight", dpi="figure")
+fig.savefig("Fig_2C_2.pdf", bbox_inches="tight", dpi="figure")
 
-no_nan = mean_activ_fimo[~pd.isnull(mean_activ_fimo["log_max_cov"]) &
-                         ~pd.isnull(mean_activ_fimo["mpra_ts"])]
+no_nan = pool1_fimo_cov[~pd.isnull(pool1_fimo_cov["log_max_cov"]) &
+                        ~pd.isnull(pool1_fimo_cov["mpra_ts"])]
+
+# for these, only look at those with >1 motif
+# no_nan = no_nan[no_nan["n_motifs"] > 0]
+len(no_nan)
 
 fig = plt.figure(figsize=(1.2, 1.2))
 ax = sns.kdeplot(no_nan["log_max_cov"], no_nan["mpra_ts"], cmap=cmap, 
@@ -280,10 +640,14 @@ ax.set_xlabel("log(max overlapping motifs)")
 r, p = stats.spearmanr(no_nan["log_max_cov"], no_nan["mpra_ts"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_5.pdf", bbox_inches="tight", dpi="figure")
+fig.savefig("Fig_2C_5.pdf", bbox_inches="tight", dpi="figure")
 
-no_nan = mean_activ_fimo_chip[~pd.isnull(mean_activ_fimo_chip["log_max_cov"]) &
-                              ~pd.isnull(mean_activ_fimo_chip["mpra_activ"])]
+no_nan = pool1_fimo_chip_cov[~pd.isnull(pool1_fimo_chip_cov["log_max_cov"]) &
+                             ~pd.isnull(pool1_fimo_chip_cov["mpra_activ"])]
+
+# for these, only look at those with >1 motif
+# no_nan = no_nan[no_nan["n_motifs"] > 0]
+len(no_nan)
 
 fig = plt.figure(figsize=(1.2, 1.2))
 ax = sns.kdeplot(no_nan["log_max_cov"], no_nan["mpra_activ"], cmap=cmap, 
@@ -294,10 +658,13 @@ ax.set_xlabel("log(max overlapping motifs)")
 r, p = stats.spearmanr(no_nan["log_max_cov"], no_nan["mpra_activ"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_2.pdf", bbox_inches="tight", dpi="figure")
 
-no_nan = mean_activ_fimo_chip[~pd.isnull(mean_activ_fimo_chip["log_max_cov"]) &
-                              ~pd.isnull(mean_activ_fimo_chip["mpra_ts"])]
+no_nan = pool1_fimo_chip_cov[~pd.isnull(pool1_fimo_chip_cov["log_max_cov"]) &
+                             ~pd.isnull(pool1_fimo_chip_cov["mpra_ts"])]
+
+# for these, only look at those with >1 motif
+# no_nan = no_nan[no_nan["n_motifs"] > 0]
+len(no_nan)
 
 fig = plt.figure(figsize=(1.2, 1.2))
 ax = sns.kdeplot(no_nan["log_max_cov"], no_nan["mpra_ts"], cmap=cmap, 
@@ -308,202 +675,77 @@ ax.set_xlabel("log(max overlapping motifs)")
 r, p = stats.spearmanr(no_nan["log_max_cov"], no_nan["mpra_ts"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_5.pdf", bbox_inches="tight", dpi="figure")
-
-#cmap = sns.light_palette("#8da0cb", as_cmap=True)
-cmap = sns.light_palette("darkslategray", as_cmap=True)
-
-no_nan = mean_activ_fimo[~pd.isnull(mean_activ_fimo["log_avg_tf_tissue_sp"]) &
-                         ~pd.isnull(mean_activ_fimo["cage_activ"])]
-
-fig = plt.figure(figsize=(1.2, 1.2))
-ax = sns.kdeplot(no_nan["log_avg_tf_tissue_sp"], no_nan["cage_activ"], cmap=cmap, 
-                 shade=True, shade_lowest=False)
-ax.set_ylabel("CAGE expression")
-ax.set_xlabel("log(mean TF tissue specificity)")
-
-r, p = stats.spearmanr(no_nan["log_avg_tf_tissue_sp"], no_nan["cage_activ"])
-print("r: %s, spearman p: %s" % (r, p))
-ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_6.pdf", bbox_inches="tight", dpi="figure")
-
-no_nan = mean_activ_fimo[~pd.isnull(mean_activ_fimo["log_avg_tf_tissue_sp"]) &
-                         ~pd.isnull(mean_activ_fimo["cage_ts"])]
-
-fig = plt.figure(figsize=(1.2, 1.2))
-ax = sns.kdeplot(no_nan["log_avg_tf_tissue_sp"], no_nan["cage_ts"], cmap=cmap, 
-                 shade=True, shade_lowest=False)
-ax.set_ylabel("tissue specificity in CAGE")
-ax.set_xlabel("log(mean TF tissue specificity)")
-
-r, p = stats.spearmanr(no_nan["log_avg_tf_tissue_sp"], no_nan["cage_ts"])
-print("r: %s, spearman p: %s" % (r, p))
-ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_6.pdf", bbox_inches="tight", dpi="figure")
-
-no_nan = mean_activ_fimo_chip[~pd.isnull(mean_activ_fimo_chip["log_avg_tf_tissue_sp"]) &
-                              ~pd.isnull(mean_activ_fimo_chip["cage_activ"])]
-
-fig = plt.figure(figsize=(1.2, 1.2))
-ax = sns.kdeplot(no_nan["log_avg_tf_tissue_sp"], no_nan["cage_activ"], cmap=cmap, 
-                 shade=True, shade_lowest=False)
-ax.set_ylabel("CAGE expression")
-ax.set_xlabel("log(mean TF tissue specificity)")
-
-r, p = stats.spearmanr(no_nan["log_avg_tf_tissue_sp"], no_nan["cage_activ"])
-print("r: %s, spearman p: %s" % (r, p))
-ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_6.pdf", bbox_inches="tight", dpi="figure")
-
-no_nan = mean_activ_fimo_chip[~pd.isnull(mean_activ_fimo_chip["log_avg_tf_tissue_sp"]) &
-                              ~pd.isnull(mean_activ_fimo_chip["cage_ts"])]
-
-fig = plt.figure(figsize=(1.2, 1.2))
-ax = sns.kdeplot(no_nan["log_avg_tf_tissue_sp"], no_nan["cage_ts"], cmap=cmap, 
-                 shade=True, shade_lowest=False)
-ax.set_ylabel("tissue specificity in CAGE")
-ax.set_xlabel("log(mean TF tissue specificity)")
-
-r, p = stats.spearmanr(no_nan["log_avg_tf_tissue_sp"], no_nan["cage_ts"])
-print("r: %s, spearman p: %s" % (r, p))
-ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_6.pdf", bbox_inches="tight", dpi="figure")
-
-no_nan = mean_activ_fimo[~pd.isnull(mean_activ_fimo["log_n_bp_cov"]) &
-                         ~pd.isnull(mean_activ_fimo["cage_activ"])]
-
-fig = plt.figure(figsize=(1.2, 1.2))
-ax = sns.kdeplot(no_nan["log_n_bp_cov"], no_nan["cage_activ"], cmap="Blues", 
-                 shade=True, shade_lowest=False)
-ax.set_ylabel("CAGE expression")
-ax.set_xlabel("log(number of bp covered by motif)")
-
-r, p = stats.spearmanr(no_nan["log_n_bp_cov"], no_nan["cage_activ"])
-print("r: %s, spearman p: %s" % (r, p))
-ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_4.pdf", bbox_inches="tight", dpi="figure")
-
-no_nan = mean_activ_fimo[~pd.isnull(mean_activ_fimo["log_n_bp_cov"]) &
-                         ~pd.isnull(mean_activ_fimo["cage_ts"])]
-
-fig = plt.figure(figsize=(1.2, 1.2))
-ax = sns.kdeplot(no_nan["log_n_bp_cov"], no_nan["cage_ts"], cmap="Blues", 
-                 shade=True, shade_lowest=False)
-ax.set_ylabel("tissue specificity in CAGE")
-ax.set_xlabel("log(number of bp covered by motif)")
-
-r, p = stats.spearmanr(no_nan["log_n_bp_cov"], no_nan["cage_ts"])
-print("r: %s, spearman p: %s" % (r, p))
-ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_4.pdf", bbox_inches="tight", dpi="figure")
-
-no_nan = mean_activ_fimo_chip[~pd.isnull(mean_activ_fimo_chip["log_n_bp_cov"]) &
-                              ~pd.isnull(mean_activ_fimo_chip["cage_activ"])]
-
-fig = plt.figure(figsize=(1.2, 1.2))
-ax = sns.kdeplot(no_nan["log_n_bp_cov"], no_nan["cage_activ"], cmap="Blues", 
-                 shade=True, shade_lowest=False)
-ax.set_ylabel("CAGE expression")
-ax.set_xlabel("log(number of bp covered by motif)")
-
-r, p = stats.spearmanr(no_nan["log_n_bp_cov"], no_nan["cage_activ"])
-print("r: %s, spearman p: %s" % (r, p))
-ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_4.pdf", bbox_inches="tight", dpi="figure")
-
-no_nan = mean_activ_fimo_chip[~pd.isnull(mean_activ_fimo_chip["log_n_bp_cov"]) &
-                              ~pd.isnull(mean_activ_fimo_chip["cage_ts"])]
-
-fig = plt.figure(figsize=(1.2, 1.2))
-ax = sns.kdeplot(no_nan["log_n_bp_cov"], no_nan["cage_ts"], cmap="Blues", 
-                 shade=True, shade_lowest=False)
-ax.set_ylabel("tissue specificity in CAGE")
-ax.set_xlabel("log(number of bp covered by motif)")
-
-r, p = stats.spearmanr(no_nan["log_n_bp_cov"], no_nan["cage_ts"])
-print("r: %s, spearman p: %s" % (r, p))
-ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_4.pdf", bbox_inches="tight", dpi="figure")
 
 cmap = sns.light_palette("firebrick", as_cmap=True)
 
-no_nan = mean_activ_fimo[~pd.isnull(mean_activ_fimo["log_max_cov"]) &
-                         ~pd.isnull(mean_activ_fimo["cage_activ"])]
+no_nan = pool1_fimo_no_ets_cov[~pd.isnull(pool1_fimo_no_ets_cov["log_max_cov"]) &
+                               ~pd.isnull(pool1_fimo_no_ets_cov["mpra_activ"])]
+
+# for these, only look at those with >1 motif
+# no_nan = no_nan[no_nan["n_motifs"] > 0]
+len(no_nan)
 
 fig = plt.figure(figsize=(1.2, 1.2))
-ax = sns.kdeplot(no_nan["log_max_cov"], no_nan["cage_activ"], cmap=cmap, 
+ax = sns.kdeplot(no_nan["log_max_cov"], no_nan["mpra_activ"], cmap=cmap, 
                  shade=True, shade_lowest=False)
-ax.set_ylabel("CAGE expression")
+ax.set_ylabel("mean MPRA activity")
 ax.set_xlabel("log(max overlapping motifs)")
 
-r, p = stats.spearmanr(no_nan["log_max_cov"], no_nan["cage_activ"])
+r, p = stats.spearmanr(no_nan["log_max_cov"], no_nan["mpra_activ"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_5.pdf", bbox_inches="tight", dpi="figure")
+#fig.savefig("Fig_2C_2.pdf", bbox_inches="tight", dpi="figure")
 
-no_nan = mean_activ_fimo[~pd.isnull(mean_activ_fimo["log_max_cov"]) &
-                         ~pd.isnull(mean_activ_fimo["cage_ts"])]
+no_nan = pool1_fimo_no_ets_cov[~pd.isnull(pool1_fimo_no_ets_cov["log_max_cov"]) &
+                               ~pd.isnull(pool1_fimo_no_ets_cov["mpra_ts"])]
+
+# for these, only look at those with >1 motif
+# no_nan = no_nan[no_nan["n_motifs"] > 0]
+len(no_nan)
 
 fig = plt.figure(figsize=(1.2, 1.2))
-ax = sns.kdeplot(no_nan["log_max_cov"], no_nan["cage_ts"], cmap=cmap, 
+ax = sns.kdeplot(no_nan["log_max_cov"], no_nan["mpra_ts"], cmap=cmap, 
                  shade=True, shade_lowest=False)
-ax.set_ylabel("tissue specificity in CAGE")
+ax.set_ylabel("tissue specificity in MPRA")
 ax.set_xlabel("log(max overlapping motifs)")
 
-r, p = stats.spearmanr(no_nan["log_max_cov"], no_nan["cage_ts"])
+r, p = stats.spearmanr(no_nan["log_max_cov"], no_nan["mpra_ts"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_5.pdf", bbox_inches="tight", dpi="figure")
+#fig.savefig("Fig_2C_5.pdf", bbox_inches="tight", dpi="figure")
 
-no_nan = mean_activ_fimo_chip[~pd.isnull(mean_activ_fimo_chip["log_max_cov"]) &
-                              ~pd.isnull(mean_activ_fimo_chip["cage_activ"])]
+no_nan = pool1_fimo_no_ets_chip_cov[~pd.isnull(pool1_fimo_no_ets_chip_cov["log_max_cov"]) &
+                                    ~pd.isnull(pool1_fimo_no_ets_chip_cov["mpra_activ"])]
+
+# for these, only look at those with >1 motif
+# no_nan = no_nan[no_nan["n_motifs"] > 0]
+len(no_nan)
 
 fig = plt.figure(figsize=(1.2, 1.2))
-ax = sns.kdeplot(no_nan["log_max_cov"], no_nan["cage_activ"], cmap=cmap, 
+ax = sns.kdeplot(no_nan["log_max_cov"], no_nan["mpra_activ"], cmap=cmap, 
                  shade=True, shade_lowest=False)
-ax.set_ylabel("CAGE expression")
+ax.set_ylabel("mean MPRA activity")
 ax.set_xlabel("log(max overlapping motifs)")
 
-r, p = stats.spearmanr(no_nan["log_max_cov"], no_nan["cage_activ"])
+r, p = stats.spearmanr(no_nan["log_max_cov"], no_nan["mpra_activ"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_5.pdf", bbox_inches="tight", dpi="figure")
 
-no_nan = mean_activ_fimo_chip[~pd.isnull(mean_activ_fimo_chip["log_max_cov"]) &
-                              ~pd.isnull(mean_activ_fimo_chip["cage_ts"])]
+no_nan = pool1_fimo_no_ets_chip_cov[~pd.isnull(pool1_fimo_no_ets_chip_cov["log_max_cov"]) &
+                                    ~pd.isnull(pool1_fimo_no_ets_chip_cov["mpra_ts"])]
+
+# for these, only look at those with >1 motif
+# no_nan = no_nan[no_nan["n_motifs"] > 0]
+len(no_nan)
 
 fig = plt.figure(figsize=(1.2, 1.2))
-ax = sns.kdeplot(no_nan["log_max_cov"], no_nan["cage_ts"], cmap=cmap, 
+ax = sns.kdeplot(no_nan["log_max_cov"], no_nan["mpra_ts"], cmap=cmap, 
                  shade=True, shade_lowest=False)
-ax.set_ylabel("tissue specificity in CAGE")
+ax.set_ylabel("tissue specificity in MPRA")
 ax.set_xlabel("log(max overlapping motifs)")
 
-r, p = stats.spearmanr(no_nan["log_max_cov"], no_nan["cage_ts"])
+r, p = stats.spearmanr(no_nan["log_max_cov"], no_nan["mpra_ts"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_5.pdf", bbox_inches="tight", dpi="figure")
-
-no_nan = mean_activ_fimo[~pd.isnull(mean_activ_fimo["mpra_ts"]) &
-                         ~pd.isnull(mean_activ_fimo["cage_ts"])]
-
-fig = plt.figure(figsize=(1.2, 1.2))
-ax = sns.kdeplot(no_nan["mpra_ts"], no_nan["cage_ts"], cmap=cmap, 
-                 shade=True, shade_lowest=False)
-ax.set_ylabel("tissue specificity in CAGE")
-ax.set_xlabel("tissue specificity in MPRA")
-
-r, p = stats.spearmanr(no_nan["mpra_ts"], no_nan["cage_ts"])
-print("r: %s, spearman p: %s" % (r, p))
-ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_3C_5.pdf", bbox_inches="tight", dpi="figure")
-
-mean_activ_fimo.drop(["med_tf_tissue_sp", "log_med_tf_tissue_sp", "index"], axis=1, inplace=True)
-
-mean_activ_fimo_chip.drop(["med_tf_tissue_sp", "log_med_tf_tissue_sp", "index"], axis=1, inplace=True)
-
-out_dir = "../../data/04__coverage"
-!mkdir -p $out_dir
-mean_activ_fimo.to_csv("%s/FIMO.coverage.new.txt" % out_dir, sep="\t", index=False)
-mean_activ_fimo_chip.to_csv("%s/FIMO.ChIPIntersect.coverage.new.txt" % out_dir, sep="\t", index=False)
 
 

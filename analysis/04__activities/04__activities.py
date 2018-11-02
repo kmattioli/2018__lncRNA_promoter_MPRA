@@ -33,6 +33,9 @@ from decimal import Decimal
 from scipy import stats
 from statsmodels.sandbox.stats import multicomp
 
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import NearestNeighbors
+
 # import utils
 sys.path.append("../../utils")
 from plotting_utils import *
@@ -118,19 +121,26 @@ annot_f = "../../misc/00__tss_properties/mpra_id_to_biotype_map.txt"
 id_map_f = "../../misc/00__tss_properties/mpra_tss_detailed_info.txt"
 enh_id_map_f = "../../misc/00__tss_properties/enhancer_id_map.txt"
 sel_map_f = "../../misc/00__tss_properties/mpra_tss_selection_info.txt"
-cage_exp_f = "../../misc/other_files/All_TSS_and_enh.CAGE_grouped_exp.tissue_sp.txt"
+cage_exp_f = "../../misc/01__cage/All_TSS_and_enh.CAGE_grouped_exp.tissue_sp.txt"
+rna_seq_exp_f = "../../misc/01__cage/Expression.all.cells.txt"
+
+
+# In[9]:
+
+
+pool1_phylop_f = "../../data/00__index/pool1_tss.phylop46way.txt"
 
 
 # ## 1. import data
 
-# In[9]:
+# In[10]:
 
 
 pool1_index = pd.read_table(pool1_index_f, sep="\t")
 pool2_index = pd.read_table(pool2_index_f, sep="\t")
 
 
-# In[10]:
+# In[11]:
 
 
 pool1_index_elem = pool1_index[["element", "oligo_type", "unique_id", "dupe_info", "SNP"]]
@@ -140,44 +150,61 @@ pool1_index_elem = pool1_index_elem.drop_duplicates()
 pool2_index_elem = pool2_index_elem.drop_duplicates()
 
 
-# In[11]:
+# In[12]:
 
 
 annot = pd.read_table(annot_f, sep="\t")
 annot.head()
 
 
-# In[12]:
+# In[13]:
 
 
 id_map = pd.read_table(id_map_f, sep="\t")
 id_map.head()
 
 
-# In[13]:
+# In[14]:
 
 
 sel_map = pd.read_table(sel_map_f, sep="\t")
 sel_map.head()
 
 
-# In[14]:
+# In[15]:
 
 
 enh_id_map = pd.read_table(enh_id_map_f, sep="\t")
 enh_id_map.head()
 
 
-# In[15]:
+# In[16]:
 
 
 cage_exp = pd.read_table(cage_exp_f, sep="\t")
 cage_exp.head()
 
 
+# In[17]:
+
+
+rna_seq_exp = pd.read_table(rna_seq_exp_f, sep="\t")
+rna_seq_exp.head()
+
+
+# In[18]:
+
+
+pool1_phylop = pd.read_table(pool1_phylop_f, sep="\t", header=None)
+cols = ["chr", "start", "end", "unique_id", "score", "strand", "length"]
+cols.extend(list(np.arange(-80, 34)))
+pool1_phylop.columns = cols
+pool1_phylop.head()
+
+
 # ### pool 1
 
-# In[16]:
+# In[19]:
 
 
 pool1_hela_elem_norm = pd.read_table("%s/%s" % (activ_dir, pool1_hela_elem_activ_f), sep="\t")
@@ -186,7 +213,7 @@ pool1_k562_elem_norm = pd.read_table("%s/%s" % (activ_dir, pool1_k562_elem_activ
 pool1_hepg2_elem_norm.head()
 
 
-# In[17]:
+# In[20]:
 
 
 pool1_hela_reps = [x for x in pool1_hela_elem_norm.columns if "rna_" in x]
@@ -195,7 +222,7 @@ pool1_k562_reps = [x for x in pool1_k562_elem_norm.columns if "rna_" in x]
 pool1_hepg2_reps
 
 
-# In[18]:
+# In[21]:
 
 
 pool1_hela_barc_norm = pd.read_table("%s/%s" % (activ_dir, pool1_hela_barc_activ_f), sep="\t")
@@ -204,7 +231,7 @@ pool1_k562_barc_norm = pd.read_table("%s/%s" % (activ_dir, pool1_k562_barc_activ
 pool1_hepg2_barc_norm.head()
 
 
-# In[19]:
+# In[22]:
 
 
 pool1_hela_pvals = pd.read_table("%s/%s" % (pval_dir, pool1_hela_pvals_f), sep="\t")
@@ -215,7 +242,7 @@ pool1_hepg2_pvals.head()
 
 # ### pool 2
 
-# In[20]:
+# In[23]:
 
 
 pool2_hepg2_elem_norm = pd.read_table("%s/%s" % (activ_dir, pool2_hepg2_elem_activ_f), sep="\t")
@@ -223,7 +250,7 @@ pool2_k562_elem_norm = pd.read_table("%s/%s" % (activ_dir, pool2_k562_elem_activ
 pool2_hepg2_elem_norm.head()
 
 
-# In[21]:
+# In[24]:
 
 
 pool2_hepg2_reps = [x for x in pool2_hepg2_elem_norm.columns if "rna_" in x]
@@ -231,7 +258,7 @@ pool2_k562_reps = [x for x in pool2_k562_elem_norm.columns if "rna_" in x]
 pool2_hepg2_reps
 
 
-# In[22]:
+# In[25]:
 
 
 pool2_hepg2_barc_norm = pd.read_table("%s/%s" % (activ_dir, pool2_hepg2_barc_activ_f), sep="\t")
@@ -239,7 +266,7 @@ pool2_k562_barc_norm = pd.read_table("%s/%s" % (activ_dir, pool2_k562_barc_activ
 pool2_hepg2_barc_norm.head()
 
 
-# In[23]:
+# In[26]:
 
 
 pool2_hepg2_pvals = pd.read_table("%s/%s" % (pval_dir, pool2_hepg2_pvals_f), sep="\t")
@@ -251,7 +278,7 @@ pool2_hepg2_pvals.head()
 
 # ### pool 1
 
-# In[24]:
+# In[27]:
 
 
 pool1_hela_elem_norm = pool1_hela_elem_norm.merge(pool1_index_elem, on=["unique_id", "element"], how="left")
@@ -259,7 +286,7 @@ pool1_hepg2_elem_norm = pool1_hepg2_elem_norm.merge(pool1_index_elem, on=["uniqu
 pool1_k562_elem_norm = pool1_k562_elem_norm.merge(pool1_index_elem, on=["unique_id", "element"], how="left")
 
 
-# In[25]:
+# In[28]:
 
 
 pool1_hela_barc_norm = pool1_hela_barc_norm.merge(pool1_index, left_on="barcode", right_on="barcode", how="left")
@@ -267,7 +294,7 @@ pool1_hepg2_barc_norm = pool1_hepg2_barc_norm.merge(pool1_index, left_on="barcod
 pool1_k562_barc_norm = pool1_k562_barc_norm.merge(pool1_index, left_on="barcode", right_on="barcode", how="left")
 
 
-# In[26]:
+# In[29]:
 
 
 pool1_hela_elem_norm["better_type"] = pool1_hela_elem_norm.apply(better_type, axis=1)
@@ -275,7 +302,7 @@ pool1_hepg2_elem_norm["better_type"] = pool1_hepg2_elem_norm.apply(better_type, 
 pool1_k562_elem_norm["better_type"] = pool1_k562_elem_norm.apply(better_type, axis=1)
 
 
-# In[27]:
+# In[30]:
 
 
 pool1_hela_elem_norm = pool1_hela_elem_norm.merge(pool1_hela_pvals.drop("oligo_type", axis=1), on=["unique_id", "element"], how="left")
@@ -286,28 +313,28 @@ pool1_hepg2_elem_norm.head()
 
 # ### pool 2
 
-# In[28]:
+# In[31]:
 
 
 pool2_hepg2_elem_norm = pool2_hepg2_elem_norm.merge(pool2_index_elem, on=["unique_id", "element"], how="left")
 pool2_k562_elem_norm = pool2_k562_elem_norm.merge(pool2_index_elem, on=["unique_id", "element"], how="left")
 
 
-# In[29]:
+# In[32]:
 
 
 pool2_hepg2_barc_norm = pool2_hepg2_barc_norm.merge(pool2_index, left_on="barcode", right_on="barcode", how="left")
 pool2_k562_barc_norm = pool2_k562_barc_norm.merge(pool2_index, left_on="barcode", right_on="barcode", how="left")
 
 
-# In[30]:
+# In[33]:
 
 
 pool2_hepg2_elem_norm["better_type"] = pool2_hepg2_elem_norm.apply(better_type, axis=1)
 pool2_k562_elem_norm["better_type"] = pool2_k562_elem_norm.apply(better_type, axis=1)
 
 
-# In[31]:
+# In[34]:
 
 
 pool2_hepg2_elem_norm = pool2_hepg2_elem_norm.merge(pool2_hepg2_pvals.drop("oligo_type", axis=1), on=["unique_id", "element"], how="left")
@@ -319,7 +346,7 @@ pool2_hepg2_elem_norm.head()
 
 # ### pool 1
 
-# In[32]:
+# In[35]:
 
 
 pool1_hela_elem_norm["overall_mean"] = pool1_hela_elem_norm[pool1_hela_reps].mean(axis=1)
@@ -331,7 +358,7 @@ pool1_hepg2_elem_norm["overall_median"] = pool1_hepg2_elem_norm[pool1_hepg2_reps
 pool1_k562_elem_norm["overall_median"] = pool1_k562_elem_norm[pool1_k562_reps].median(axis=1)
 
 
-# In[33]:
+# In[36]:
 
 
 for cell, df in zip(["HeLa", "HepG2", "K562"], [pool1_hela_elem_norm, pool1_hepg2_elem_norm, pool1_k562_elem_norm]):
@@ -346,7 +373,7 @@ for cell, df in zip(["HeLa", "HepG2", "K562"], [pool1_hela_elem_norm, pool1_hepg
 
 # ### pool 2
 
-# In[34]:
+# In[37]:
 
 
 pool2_hepg2_elem_norm["overall_mean"] = pool2_hepg2_elem_norm[pool2_hepg2_reps].mean(axis=1)
@@ -356,7 +383,7 @@ pool2_hepg2_elem_norm["overall_median"] = pool2_hepg2_elem_norm[pool2_hepg2_reps
 pool2_k562_elem_norm["overall_median"] = pool2_k562_elem_norm[pool2_k562_reps].median(axis=1)
 
 
-# In[35]:
+# In[38]:
 
 
 for cell, df in zip(["HepG2", "K562"], [pool2_hepg2_elem_norm, pool2_k562_elem_norm]):
@@ -371,7 +398,7 @@ for cell, df in zip(["HepG2", "K562"], [pool2_hepg2_elem_norm, pool2_k562_elem_n
 
 # ## 4. boxplots: neg ctrls vs reference
 
-# In[36]:
+# In[39]:
 
 
 pool1_hepg2_df = pool1_hepg2_elem_norm.merge(annot, left_on="unique_id", right_on="seqID", how="left")
@@ -380,7 +407,7 @@ pool1_k562_df = pool1_k562_elem_norm.merge(annot, left_on="unique_id", right_on=
 pool1_hepg2_df.head()
 
 
-# In[37]:
+# In[40]:
 
 
 pool1_hepg2_df["oligo_reg"] = pool1_hepg2_df.unique_id.str.split("__", expand=True)[2]
@@ -389,7 +416,7 @@ pool1_k562_df["oligo_reg"] = pool1_k562_df.unique_id.str.split("__", expand=True
 pool1_hepg2_df.head()
 
 
-# In[38]:
+# In[41]:
 
 
 def add_neg_ctrl_promtype(row):
@@ -403,7 +430,7 @@ def add_neg_ctrl_promtype(row):
         return row["PromType2"]
 
 
-# In[39]:
+# In[42]:
 
 
 pool1_hepg2_df["PromType2"] = pool1_hepg2_df.apply(add_neg_ctrl_promtype, axis=1)
@@ -414,32 +441,7 @@ pool1_hepg2_df.sample(10)
 
 # ### pool 1
 
-# In[40]:
-
-
-def annotate_pval(ax, x1, x2, y, h, text_y, val, fontsize, mark_points, color1, color2):
-    from decimal import Decimal
-    ax.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1, c="black", linewidth=0.5)
-    if mark_points:
-        ax.plot(x1, y, 's', markersize=5, markerfacecolor='white', markeredgewidth=1, markeredgecolor=color1)
-        ax.plot(x2, y, 's', markersize=5, markerfacecolor='white', markeredgewidth=1, markeredgecolor=color2)
-    if val < 0.0005:
-        text = "{:.1e}".format(Decimal(val))
-        #text = "**"
-    elif val < 0.05:
-        text = "%.3f" % val
-        #text = "*"
-    else:
-        text = "%.3f" % val
-        #text = "n.s."
-        
-    ax.annotate(text, xy=((x1+x2)*.5, y), xycoords="data", xytext=(0, text_y), textcoords="offset pixels",
-                horizontalalignment="center", verticalalignment="bottom", color="black", size=fontsize)
-    
-    # ax.text((x1+x2)*.5, text_y, text, ha='center', va='bottom', color="black", size=fontsize)
-
-
-# In[41]:
+# In[43]:
 
 
 def neg_control_plot(df, order, palette, fontsize, cell_type, ax, figsize, ylabel, sharey, title, save, plotname):
@@ -528,30 +530,7 @@ def neg_control_plot(df, order, palette, fontsize, cell_type, ax, figsize, ylabe
         plt.savefig("%s/%s.pdf" % (figs_dir, plotname), dpi="figure", bbox_inches="tight")
 
 
-# In[42]:
-
-
-def axis_data_coords_sys_transform(axis_obj_in,xin,yin,inverse=False):
-    """ inverse = False : Axis => Data
-                = True  : Data => Axis
-    """
-    xlim = axis_obj_in.get_xlim()
-    ylim = axis_obj_in.get_ylim()
-
-    xdelta = xlim[1] - xlim[0]
-    ydelta = ylim[1] - ylim[0]
-    if not inverse:
-        xout =  xlim[0] + xin * xdelta
-        yout =  ylim[0] + yin * ydelta
-    else:
-        xdelta2 = xin - xlim[0]
-        ydelta2 = yin - ylim[0]
-        xout = xdelta2 / xdelta
-        yout = ydelta2 / ydelta
-    return xout,yout
-
-
-# In[43]:
+# In[44]:
 
 
 order = ["RANDOM", "SCRAMBLED", "WILDTYPE"]
@@ -568,7 +547,7 @@ plt.tight_layout()
 f.savefig("Fig_1C_S4A.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[44]:
+# In[45]:
 
 
 talk_order = ["RANDOM", "WILDTYPE"]
@@ -588,7 +567,7 @@ f.savefig("neg_ctrl_boxplots.for_talk.pdf", bbox_inches="tight", dpi="figure")
 
 # ### pool 2
 
-# In[45]:
+# In[46]:
 
 
 f, axarr = plt.subplots(2, sharex=True, sharey=False, figsize=(1.78, 3.2))
@@ -602,7 +581,7 @@ f.savefig("Fig_S8.pdf", bbox_inches="tight", dpi="figure")
 
 # ## 5. boxplots: across TSS classes
 
-# In[46]:
+# In[47]:
 
 
 def promtype_plot(df, order, palette, labels, fontsize, cell_type, ax, figsize, ylabel, sharey, title, save, plotname):
@@ -737,7 +716,7 @@ def promtype_plot(df, order, palette, labels, fontsize, cell_type, ax, figsize, 
                     color=palette["scrambled"], size=fontsize)
         
     if "random" not in order and "scrambled" not in order:
-        diff = 1/len(order)
+        diff = 1./len(order)
     else:
         diff = 0
     ax.annotate(str(len(enh_dist)), xy=(x_ax_1-diff, 0.02), xycoords="axes fraction", xytext=(0, 0), 
@@ -764,7 +743,7 @@ def promtype_plot(df, order, palette, labels, fontsize, cell_type, ax, figsize, 
         plt.savefig("%s/%s.pdf" % (figs_dir, plotname), dpi="figure", bbox_inches="tight")
 
 
-# In[47]:
+# In[48]:
 
 
 palette = {"random": "gray", "scrambled": "gray", "Enhancer": sns.color_palette("deep")[1], 
@@ -772,7 +751,7 @@ palette = {"random": "gray", "scrambled": "gray", "Enhancer": sns.color_palette(
            "div_lnc": sns.color_palette("deep")[3], "div_pc": sns.color_palette("deep")[0]}
 
 
-# In[48]:
+# In[49]:
 
 
 # random
@@ -790,7 +769,7 @@ plt.tight_layout()
 f.savefig("Fig1_All_Biotypes_v_Random.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[49]:
+# In[50]:
 
 
 # scrambled
@@ -810,7 +789,7 @@ f.savefig("Fig1_All_Biotypes_v_Scrambled.pdf", bbox_inches="tight", dpi="figure"
 
 # ## expression-match
 
-# In[50]:
+# In[51]:
 
 
 def fix_enh_cage_id(row):
@@ -825,7 +804,7 @@ def fix_enh_cage_id(row):
         return row.cage_id
 
 
-# In[51]:
+# In[52]:
 
 
 sel_map["cage_id"] = sel_map["TSS_id"]
@@ -839,29 +818,83 @@ sel_map_expr = sel_map.merge(cage_exp, on="cage_id", how="left")
 sel_map_expr.sample(5)
 
 
-# In[52]:
+# In[53]:
 
 
 sel_map_expr["log_av_exp"] = np.log10(sel_map_expr["av_exp"])
 sel_map_expr.selected.unique()
 
 
-# In[53]:
+# In[54]:
 
 
 rand_sel_types = ["lncRNA", "eRNA.random", "mRNA.random", "mRNA.bidirec70-160"]
 
 
-# In[54]:
+# In[55]:
 
 
 rand_sel_ids = sel_map_expr[sel_map_expr["selected"].isin(rand_sel_types)]
-remaining_ids = sel_map_expr[~sel_map_expr["selected"].isin(rand_sel_types)]
-remaining_ids = remaining_ids.append(sel_map_expr[sel_map_expr["selected"] == "lncRNA"])
-remaining_ids.selected.value_counts()
 
 
-# In[55]:
+# In[56]:
+
+
+rand_sel_ids.PromType2.value_counts()
+
+
+# In[57]:
+
+
+def get_matching_pairs(df_1, df_2, col, scaler=True):
+
+    x_1 = np.asarray(df_1[col])
+    x_2 = np.asarray(df_2[col])
+    x_1 = np.reshape(x_1, (len(df_1), 1))
+    x_2 = np.reshape(x_2, (len(df_2), 1))
+
+    if scaler == True:
+        scaler = StandardScaler()
+    if scaler:
+        scaler.fit(x_2)
+        x_2 = scaler.transform(x_2)
+        x_1 = scaler.transform(x_1)
+        
+    nbrs = NearestNeighbors(n_neighbors=1).fit(x_2)
+    distances, indices = nbrs.kneighbors(x_1)
+    indices = indices.reshape(indices.shape[0])
+    matched = df_2.ix[indices]
+    return matched
+
+
+# In[58]:
+
+
+# match every biotype to the selected lncRNAs
+promtypes = ["Enhancer", "protein_coding", "div_lnc", "div_pc"]
+lncRNAs = sel_map_expr[(sel_map_expr["selected"] == "lncRNA") & 
+                       (sel_map_expr["PromType2"] == "intergenic")].drop_duplicates()
+
+print("total selected lncRNAs: %s" % len(lncRNAs))
+print("min lncRNA expression: %s" % np.min(lncRNAs["av_exp"]))
+print("max lncRNA expression: %s" % np.max(lncRNAs["av_exp"]))
+
+all_matched = lncRNAs.copy()
+for promtype in promtypes:
+    sub_df = sel_map_expr[sel_map_expr["PromType2"] == promtype].drop_duplicates().reset_index()
+    matched = get_matching_pairs(lncRNAs, sub_df, col="log_av_exp")
+    print("%s (total=%s, matched=%s)" % (promtype, len(sub_df), len(matched)))
+    all_matched = all_matched.append(matched)
+all_matched = all_matched.drop_duplicates()
+
+
+# In[59]:
+
+
+all_matched.PromType2.value_counts()
+
+
+# In[60]:
 
 
 def distplot_biotypes(df, figsize, palette, label_dict, ylim, xlabel, save, plotname):
@@ -886,7 +919,7 @@ def distplot_biotypes(df, figsize, palette, label_dict, ylim, xlabel, save, plot
         fig.savefig("%s.pdf" % plotname, dpi="figure", bbox_inches="tight")
 
 
-# In[56]:
+# In[61]:
 
 
 label_dict = {"Enhancer": "eRNAs", "intergenic": "lincRNAs", "div_lnc": "div. lncRNAs", "protein_coding": "mRNAs",
@@ -894,34 +927,13 @@ label_dict = {"Enhancer": "eRNAs", "intergenic": "lincRNAs", "div_lnc": "div. ln
 distplot_biotypes(rand_sel_ids, (3, 2.5), palette, label_dict, (0, 1.01), "log10(average CAGE expression)", True, "Random_Sel_Expr_Dist")
 
 
-# In[57]:
+# In[62]:
 
 
-remaining_ids.PromType2.value_counts()
+distplot_biotypes(all_matched, (3, 2.5), palette, label_dict, (0, 1.01), "log10(average CAGE expression)", True, "ExpMatch_Sel_Expr_Dist")
 
 
-# In[58]:
-
-
-distplot_biotypes(remaining_ids, (3, 2.5), palette, label_dict, (0, 1.01), "log10(average CAGE expression)", False, None)
-
-
-# In[59]:
-
-
-exp_match_ids = remaining_ids[(remaining_ids["log_av_exp"] > 0) & (remaining_ids["log_av_exp"] < 1.5)]
-print("min exp: %s" % (np.min(exp_match_ids["av_exp"])))
-print("max exp: %s" % (np.max(exp_match_ids["av_exp"])))
-exp_match_ids.PromType2.value_counts()
-
-
-# In[60]:
-
-
-distplot_biotypes(exp_match_ids, (3, 2.5), palette, label_dict, (0, 1.01), "log10(average CAGE expression)", True, "ExpMatch_Sel_Expr_Dist")
-
-
-# In[61]:
+# In[63]:
 
 
 pool1_hela_rand = pool1_hela_df[pool1_hela_df["oligo_reg"].isin(rand_sel_ids["oligo_reg"])]
@@ -929,7 +941,7 @@ pool1_hepg2_rand = pool1_hepg2_df[pool1_hepg2_df["oligo_reg"].isin(rand_sel_ids[
 pool1_k562_rand = pool1_k562_df[pool1_k562_df["oligo_reg"].isin(rand_sel_ids["oligo_reg"])]
 
 
-# In[62]:
+# In[64]:
 
 
 order = ["Enhancer", "intergenic", "div_lnc", "protein_coding", "div_pc"]
@@ -946,24 +958,24 @@ plt.tight_layout()
 f.savefig("Fig1_All_Biotypes_Random_Sel.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[63]:
+# In[65]:
 
 
-pool1_hela_exp = pool1_hela_df[pool1_hela_df["oligo_reg"].isin(exp_match_ids["oligo_reg"])]
-pool1_hepg2_exp = pool1_hepg2_df[pool1_hepg2_df["oligo_reg"].isin(exp_match_ids["oligo_reg"])]
-pool1_k562_exp = pool1_k562_df[pool1_k562_df["oligo_reg"].isin(exp_match_ids["oligo_reg"])]
+pool1_hela_exp = pool1_hela_df[pool1_hela_df["oligo_reg"].isin(all_matched["oligo_reg"])]
+pool1_hepg2_exp = pool1_hepg2_df[pool1_hepg2_df["oligo_reg"].isin(all_matched["oligo_reg"])]
+pool1_k562_exp = pool1_k562_df[pool1_k562_df["oligo_reg"].isin(all_matched["oligo_reg"])]
 
 
-# In[64]:
+# In[66]:
 
 
 f, axarr = plt.subplots(3, sharex=True, sharey=False, figsize=(4, 8))
-promtype_plot(pool1_hela_exp, order, palette, labels, fontsize, "HeLa", axarr[0], None, 
-              "HeLa MPRA activity", False, False, False, None)
-promtype_plot(pool1_hepg2_exp, order, palette, labels, fontsize, "HepG2", axarr[1], None, 
-              "HepG2 MPRA activity", False, False, False, None)
-promtype_plot(pool1_k562_exp, order, palette, labels, fontsize, "K562", axarr[2], None, 
-              "K562 MPRA activity", False, False, False, None)
+promtype_plot(pool1_hela_exp, order, palette, labels, 
+              fontsize, "HeLa", axarr[0], None, "HeLa MPRA activity", False, False, False, None)
+promtype_plot(pool1_hepg2_exp, order, palette, labels, 
+              fontsize, "HepG2", axarr[1], None, "HepG2 MPRA activity", False, False, False, None)
+promtype_plot(pool1_k562_exp, order, palette, labels, 
+              fontsize, "K562", axarr[2], None, "K562 MPRA activity", False, False, False, None)
 plt.tight_layout()
 f.savefig("Fig1_All_Biotypes_ExpMatch_Sel.pdf", bbox_inches="tight", dpi="figure")
 
@@ -972,7 +984,7 @@ f.savefig("Fig1_All_Biotypes_ExpMatch_Sel.pdf", bbox_inches="tight", dpi="figure
 
 # ## 6. barplots: find % of sequences active across cell types
 
-# In[65]:
+# In[67]:
 
 
 pool1_hela_df["cell"] = "HeLa"
@@ -982,7 +994,7 @@ pool1_k562_df["cell"] = "K562"
 all_df = pool1_hela_df[["unique_id", "better_type", "cell", "PromType2", "combined_class", "overall_mean"]].append(pool1_hepg2_df[["unique_id", "better_type", "cell", "PromType2", "combined_class", "overall_mean"]]).append(pool1_k562_df[["unique_id", "better_type", "cell", "PromType2", "combined_class", "overall_mean"]])
 
 
-# In[66]:
+# In[68]:
 
 
 df = all_df[all_df["better_type"] == "WILDTYPE"]
@@ -993,7 +1005,7 @@ activ_grp = activ_grp[(activ_grp["PromType2"].isin(TSS_CLASS_ORDER)) &
 activ_grp.sample(10)
 
 
-# In[67]:
+# In[69]:
 
 
 activ_grp["active_in_only_one"] = activ_grp.apply(active_in_only_one, axis=1)
@@ -1002,7 +1014,17 @@ activ_grp["active_in_only_three"] = activ_grp.apply(active_in_only_three, axis=1
 activ_grp.sample(5)
 
 
-# In[68]:
+# In[70]:
+
+
+for PromType2 in TSS_CLASS_ORDER:
+    df = activ_grp[activ_grp["PromType2"] == PromType2]
+    active_in_1 = len(df[df["active_in_only_one"]])
+    active_in_3 = len(df[df["active_in_only_three"]])
+    print("%s | active in 1: %s, active in 3: %s" % (PromType2, active_in_1, active_in_3))
+
+
+# In[71]:
 
 
 activ_counts_1 = activ_grp.groupby(["PromType2", "active_in_only_one"])["unique_id"].agg("count").reset_index()
@@ -1030,7 +1052,7 @@ activ_counts = pd.melt(activ_counts, id_vars="PromType2")
 activ_counts.head()
 
 
-# In[69]:
+# In[72]:
 
 
 df = activ_counts[activ_counts["PromType2"] != "antisense"]
@@ -1048,7 +1070,7 @@ plt.xlabel("")
 plt.title("% of elements active in # of cell types")
 
 
-# In[70]:
+# In[73]:
 
 
 colors = []
@@ -1057,7 +1079,7 @@ for c in TSS_CLASS_ORDER:
 colors
 
 
-# In[71]:
+# In[74]:
 
 
 # better plot showing tissue sp
@@ -1089,7 +1111,7 @@ plt.savefig("Fig_1F.pdf", bbox_inches="tight", dpi="figure")
 
 # ## 7. kdeplot: compare to CAGE
 
-# In[72]:
+# In[75]:
 
 
 hepg2_activ = pool1_hepg2_df[["unique_id", "element", "better_type", "overall_mean", "PromType2"]]
@@ -1105,7 +1127,7 @@ all_activ = all_activ[(all_activ["PromType2"].isin(TSS_CLASS_ORDER)) &
 all_activ.sample(5)
 
 
-# In[73]:
+# In[76]:
 
 
 all_activ["combined_class"] = ""
@@ -1114,35 +1136,35 @@ all_activ.drop("combined_class", axis=1, inplace=True)
 all_activ.head()
 
 
-# In[74]:
+# In[77]:
 
 
 all_activ["oligo_reg"] = all_activ.unique_id.str.split("__", expand=True)[2]
 all_activ.sample(5)
 
 
-# In[75]:
+# In[78]:
 
 
-id_map = id_map[["oligo_reg", "K562_rep1", "K562_rep2", "K562_rep3", "HeLa_rep1", "HeLa_rep2", "HeLa_rep3", 
+id_map = id_map[["oligo_reg", "gene_id", "K562_rep1", "K562_rep2", "K562_rep3", "HeLa_rep1", "HeLa_rep2", "HeLa_rep3", 
                  "HepG2_rep1", "HepG2_rep2", "HepG2_rep3"]]
 all_activ = all_activ.merge(id_map, on="oligo_reg")
 all_activ.sample(5)
 
 
-# In[76]:
+# In[79]:
 
 
 all_activ["K562_av"] = all_activ[["K562_rep1", "K562_rep2", "K562_rep3"]].mean(axis=1)
 all_activ["HeLa_av"] = all_activ[["HeLa_rep1", "HeLa_rep2", "HeLa_rep3"]].mean(axis=1)
 all_activ["HepG2_av"] = all_activ[["HepG2_rep1", "HepG2_rep2", "HepG2_rep3"]].mean(axis=1)
 
-all_activ["K562_log_av"] = np.log(all_activ["K562_av"]+1)
-all_activ["HeLa_log_av"] = np.log(all_activ["HeLa_av"]+1)
-all_activ["HepG2_log_av"] = np.log(all_activ["HepG2_av"]+1)
+all_activ["K562_log_av"] = np.log10(all_activ["K562_av"]+1)
+all_activ["HeLa_log_av"] = np.log10(all_activ["HeLa_av"]+1)
+all_activ["HepG2_log_av"] = np.log10(all_activ["HepG2_av"]+1)
 
 
-# In[77]:
+# In[80]:
 
 
 all_activ = all_activ[(~all_activ["unique_id"].str.contains("SNP_INDIV")) & 
@@ -1151,7 +1173,7 @@ all_activ = all_activ[(~all_activ["unique_id"].str.contains("SNP_INDIV")) &
 all_activ.sample(5)
 
 
-# In[78]:
+# In[81]:
 
 
 # first scale mpra ranges to be positive
@@ -1160,7 +1182,7 @@ all_activ["hela_scaled"] = scale_range(all_activ["HeLa"], 0, 100)
 all_activ["k562_scaled"] = scale_range(all_activ["K562"], 0, 100)
 
 
-# In[79]:
+# In[82]:
 
 
 cage_ts = calculate_tissue_specificity(all_activ[["HepG2_log_av", "K562_log_av", "HeLa_log_av"]])
@@ -1173,13 +1195,13 @@ all_activ["mpra_ts"] = mpra_ts
 all_activ.head()
 
 
-# In[80]:
+# In[83]:
 
 
 cmap = sns.light_palette("darkslategray", as_cmap=True)
 
 
-# In[81]:
+# In[84]:
 
 
 no_nan = all_activ[(~pd.isnull(all_activ["mpra_ts"])) & (~pd.isnull(all_activ["cage_ts"]))]
@@ -1189,12 +1211,14 @@ g.ax_joint.axhline(y=0.2, color="black", linewidth=1, linestyle="dashed")
 g.ax_joint.axvline(x=0.5, color="black", linewidth=1, linestyle="dashed")
 g.set_axis_labels("CAGE cell-type specificity", "MPRA cell-type specificity")
 r, p = stats.spearmanr(no_nan["cage_ts"], no_nan["mpra_ts"])
-g.ax_joint.annotate("r = {:.2f}\np = {:.2e}".format(r, Decimal(p)), xy=(.1, .8), xycoords=ax.transAxes, 
+g.ax_joint.annotate("r = {:.2f}\np = {:.2e}".format(r, Decimal(p)), xy=(.1, .75), xycoords=ax.transAxes, 
+                    fontsize=5)
+g.ax_joint.annotate("n = %s" % len(no_nan), xy=(.5, .8), xycoords=ax.transAxes, 
                     fontsize=5)
 g.savefig("Fig_1E.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[82]:
+# In[85]:
 
 
 no_nan = all_activ[(~pd.isnull(all_activ["mpra_ts"])) & (~pd.isnull(all_activ["cage_ts"]))]
@@ -1207,7 +1231,7 @@ g.ax_joint.annotate("r = {:.2f}\np = {:.2e}".format(r, Decimal(p)), xy=(.1, .75)
 g.savefig("cage_mpra_corr.for_talk.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[83]:
+# In[86]:
 
 
 def cage_v_mpra_ts(row):
@@ -1224,7 +1248,7 @@ no_nan["ts_status"] = no_nan.apply(cage_v_mpra_ts, axis=1)
 no_nan.ts_status.value_counts()
 
 
-# In[84]:
+# In[87]:
 
 
 tot = 692+402+310+236
@@ -1238,25 +1262,221 @@ print("lower left: %s" % (lower_left/tot))
 print("lower right: %s" % (lower_right/tot))
 
 
-# In[85]:
+# In[88]:
 
 
 (692+402)/(692+402+310+236)
 
 
-# In[86]:
+# In[89]:
 
 
 no_nan = all_activ[(~pd.isnull(all_activ["mpra_activ"])) & (~pd.isnull(all_activ["cage_activ"]))]
 g = sns.jointplot(data=no_nan, x="cage_activ", y="mpra_activ", kind="kde", shade_lowest=False, size=2.3, space=0,
-                  stat_func=None, xlim=(-0.75, 1.75), ylim=(-3.5, 3), cmap=cmap, color="darkslategray")
-g.set_axis_labels("mean CAGE expression", "mean MPRA activity")
+                  stat_func=None, xlim=(-0.75, 1.25), ylim=(-3.5, 3), cmap=cmap, color="darkslategray")
+g.set_axis_labels("mean log10(CAGE expression)", "mean MPRA activity")
 r, p = stats.spearmanr(no_nan["cage_activ"], no_nan["mpra_activ"])
-g.ax_joint.annotate("r = {:.2f}\np = {:.2e}".format(r, Decimal(p)), xy=(.1, .8), xycoords=ax.transAxes, 
+g.ax_joint.annotate("r = {:.2f}\np = {:.2e}".format(r, Decimal(p)), xy=(.06, .75), xycoords=ax.transAxes, 
                     fontsize=5)
+g.ax_joint.annotate("n = %s" % len(no_nan), xy=(.48, .8), xycoords=ax.transAxes, 
+                    fontsize=5)
+g.savefig("av_CAGE_v_av_MPRA.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[87]:
+# ## 8. compare MPRA and CAGE to RNA-seq
+
+# In[90]:
+
+
+rna_seq_exp = rna_seq_exp[["gene_id", "HepG2", "HeLa-S3", "K562"]]
+rna_seq_exp.columns = ["gene_id", "HepG2_rna_seq", "HeLa_rna_seq", "K562_rna_seq"]
+rna_seq_exp["HepG2_rna_seq_log"] = np.log10(rna_seq_exp["HepG2_rna_seq"]+1)
+rna_seq_exp["HeLa_rna_seq_log"] = np.log10(rna_seq_exp["HeLa_rna_seq"]+1)
+rna_seq_exp["K562_rna_seq_log"] = np.log10(rna_seq_exp["K562_rna_seq"]+1)
+all_activ_rna_seq = all_activ.merge(rna_seq_exp, on="gene_id")
+all_activ_rna_seq.sample(5)
+
+
+# In[91]:
+
+
+all_activ_rna_seq.PromType2.value_counts()
+
+
+# In[92]:
+
+
+for cell in ["HepG2", "HeLa", "K562"]:
+    mpra_col = cell
+    seq_col = "%s_rna_seq_log" % cell
+    
+    no_nan = all_activ_rna_seq[(~pd.isnull(all_activ_rna_seq[mpra_col])) & (~pd.isnull(all_activ_rna_seq[seq_col]))]
+    g = sns.jointplot(data=no_nan, x=mpra_col, y=seq_col, kind="kde", shade_lowest=False, size=2.3, space=0,
+                      stat_func=None, cmap=cmap, color="darkslategray", ylim=(-0.5, 3))
+    g.set_axis_labels("%s MPRA activity" % cell, "log10(%s RNA-seq expression)" % cell)
+    r, p = stats.spearmanr(no_nan[mpra_col], no_nan[seq_col])
+    g.ax_joint.annotate("r = {:.2f}\np = {:.2e}".format(r, Decimal(p)), xy=(.1, .75), xycoords=ax.transAxes, 
+                        fontsize=5)
+    
+    # add n-value
+    g.ax_joint.annotate("n = %s" % len(no_nan), xy=(.475, .8), xycoords=ax.transAxes, 
+                        fontsize=5)
+    
+    plt.show()
+    g.savefig("%s_mpra_v_seq.pdf" % cell, bbox_inches="tight", dpi="figure")
+
+
+# In[93]:
+
+
+for cell in ["HepG2", "HeLa", "K562"]:
+    cage_col = "%s_log_av" % cell
+    seq_col = "%s_rna_seq_log" % cell
+    
+    no_nan = all_activ_rna_seq[(~pd.isnull(all_activ_rna_seq[cage_col])) & (~pd.isnull(all_activ_rna_seq[seq_col]))]
+    g = sns.jointplot(data=no_nan, x=cage_col, y=seq_col, kind="kde", shade_lowest=False, size=2.3, space=0,
+                      stat_func=None, cmap=cmap, color="darkslategray", ylim=(-0.5, 2.5), xlim=(-0.5, 2))
+    g.set_axis_labels("log10(%s CAGE expression)" % cell, "log10(%s RNA-seq expression)" % cell)
+    r, p = stats.spearmanr(no_nan[cage_col], no_nan[seq_col])
+    g.ax_joint.annotate("r = {:.2f}\np = {:.2e}".format(r, Decimal(p)), xy=(.1, .75), xycoords=ax.transAxes, 
+                        fontsize=5)
+    
+    # add n-value
+    g.ax_joint.annotate("n = %s" % len(no_nan), xy=(.475, .8), xycoords=ax.transAxes, 
+                        fontsize=5)
+    
+    plt.show()
+    g.savefig("%s_cage_v_seq.pdf" % cell, bbox_inches="tight", dpi="figure")
+
+
+# ## 9. correlate activity with TSS conservation
+
+# In[94]:
+
+
+len(all_activ)
+
+
+# In[95]:
+
+
+all_activ_phylop = all_activ.merge(pool1_phylop.drop(["chr", "start", "end", "score", "strand", "length"], axis=1), 
+                                   on="unique_id")
+print(len(all_activ_phylop))
+all_activ_phylop.head()
+
+
+# In[96]:
+
+
+all_activ.columns
+
+
+# In[97]:
+
+
+res_dict = {}
+df = all_activ_phylop
+nuc_cols = list(np.arange(-80, 34, step=1))
+
+for PromType2 in TSS_CLASS_ORDER:
+    df_filt = df[df["PromType2"] == PromType2]
+    prev_max = -4
+    activ_res_dict = {}
+    print(PromType2)
+    for max_activ in [-2, -1, 0, 2, 4]:
+        sub = df_filt[(df_filt["mpra_activ"] > prev_max) & (df_filt["mpra_activ"] <= max_activ)]
+        n_seqs = len(sub)
+        print("max activ: %s, n: %s" % (max_activ, n_seqs))
+        nums = np.asarray(sub[nuc_cols])
+
+        avg = np.nanmean(nums, axis=0)
+        std = np.nanstd(nums, axis=0)
+
+        y1 = avg - std
+        y2 = avg + std
+
+        activ_res_dict[max_activ] = {"n_seqs": n_seqs, "avg": avg, "y1": y1, "y2": y2}
+        prev_max = max_activ
+    res_dict[PromType2] = activ_res_dict
+
+
+# In[98]:
+
+
+fig = plt.figure(figsize=(7,2))
+palette = {-2: sns.cubehelix_palette(5, start=.75, rot=-.75)[0], -1: sns.cubehelix_palette(5, start=.75, rot=-.75)[1], 
+           0: sns.cubehelix_palette(5, start=.75, rot=-.75)[2], 2: sns.cubehelix_palette(5, start=.75, rot=-.75)[3],
+           4: sns.cubehelix_palette(5, start=.75, rot=-.75)[4]}
+labels = ["-3.1 < MPRA activity ≤ -2", "-2 < MPRA activity ≤ -1", "-1 < MPRA activity ≤ 0", 
+          "0 < MPRA activity ≤ 2", "2 < MPRA activity ≤ 3.7"]
+
+for PromType2 in TSS_CLASS_ORDER:
+    activ_res = res_dict[PromType2]
+    print(PromType2)
+    for n, label in zip(activ_res_dict.keys(), labels):
+        res = activ_res[n]
+        n_seqs = res["n_seqs"]
+        avg = res["avg"]
+        y1 = res["y1"]
+        y2 = res["y2"]
+        # x = signal.savgol_filter(df["mean"], 15, 1)
+        # plt.fill_between(nuc_cols, y1, y2, color=palette[n], alpha=0.5)
+        plt.plot(nuc_cols, avg, color=palette[n], linewidth=3, label="%s (n=%s)" % (label, n_seqs))
+    # plt.xlim((lower, upper))
+    # plt.axvline(x=-75, color="black", linestyle="dashed", linewidth=1)
+    # plt.axvline(x=25, color="black", linestyle="dashed", linewidth=1)
+    plt.legend(ncol=1, loc=1, bbox_to_anchor=(1.4, 1))
+    plt.xlabel("nucleotide (0 = TSS)")
+    plt.ylabel("phylop 46-way")
+    plt.show()
+
+
+# In[99]:
+
+
+all_avg_nucs = all_activ_phylop[nuc_cols].mean(axis=0)
+plt.plot(nuc_cols, all_avg_nucs, linewidth=3)
+
+
+# In[100]:
+
+
+pc_avg_nucs = all_activ_phylop[all_activ_phylop["PromType2"] == "protein_coding"][nuc_cols].mean(axis=0)
+plt.plot(nuc_cols, pc_avg_nucs, linewidth=3)
+
+
+# In[101]:
+
+
+lnc_avg_nucs = all_activ_phylop[all_activ_phylop["PromType2"] == "intergenic"][nuc_cols].mean(axis=0)
+plt.plot(nuc_cols, lnc_avg_nucs, linewidth=3)
+
+
+# In[102]:
+
+
+all_activ_phylop["av_phylop"] = all_activ_phylop[nuc_cols].mean(axis=1)
+df = all_activ_phylop[all_activ_phylop["PromType2"] == "intergenic"]
+sns.jointplot(data=df, x="cage_activ", y="av_phylop")
+
+
+# In[103]:
+
+
+df = all_activ_phylop[all_activ_phylop["PromType2"] == "intergenic"]
+sns.jointplot(data=df, x="mpra_ts", y="av_phylop")
+
+
+# In[104]:
+
+
+df.sort_values(by="av_phylop", ascending=False).head()
+
+
+# ## 10. write final files
+
+# In[105]:
 
 
 # write file with tissue-specificities for later use
@@ -1264,7 +1484,7 @@ final = all_activ[["unique_id", "PromType2", "cage_activ", "cage_ts", "mpra_acti
 final.to_csv("../../data/02__activs/POOL1__pMPRA1__CAGE_vs_MPRA_activs.txt", sep="\t", index=False)
 
 
-# In[88]:
+# In[106]:
 
 
 # also write file with tss types

@@ -62,194 +62,200 @@ mosbat_file = "../../misc/02__mosbat/results.from_mosbat.txt"
 # In[4]:
 
 
-all_tss_f = "../../data/00__index/0__all_tss/All.TSS.114bp.bed"
-motif_cov_f = "../../misc/03__fimo/All.TSS.114bp.Motifs.txt"
-motif_max_f = "../../misc/03__fimo/All.TSS.114bp.maxonly.txt"
-chip_cov_f = "../../misc/03__fimo/All.TSS.114bp.Motifs.Intersect.Chip.ALL.txt"
-cluster_cov_f = "../../misc/03__fimo/All.TSS.114bp.Cluster.ALL.txt"
-cage_expr_f = "../../misc/other_files/All_TSS_and_enh.CAGE_grouped_exp.tissue_sp.txt"
+all_tss_f = "../../data/00__index/0__all_tss/All.TSS.114bp.uniq.bed"
+cage_expr_f = "../../misc/01__cage/All_TSS_and_enh.CAGE_grouped_exp.tissue_sp.txt"
+
+
+# In[5]:
+
+
+fimo_cov_f = "../../data/04__coverage/all_fimo_map.all_cov.new.txt"
+fimo_chip_cov_f = "../../data/04__coverage/all_fimo_map.chip_intersected.all_cov.new.txt"
+fimo_clust_cov_f = "../../data/04__coverage/all_fimo_map.bulyk_clusters.all_cov.new.txt"
+fimo_no_ets_cov_f = "../../data/04__coverage/all_fimo_map.no_ETS_motifs.all_cov.new.txt"
+fimo_no_ets_chip_cov_f = "../../data/04__coverage/all_fimo_map.chip_intersected.no_ETS_motifs.all_cov.new.txt"
+
+pool1_fimo_cov_f = "../../data/04__coverage/pool1_fimo_map.all_cov.new.txt"
+pool1_fimo_chip_cov_f = "../../data/04__coverage/all_fimo_map.chip_intersectedall_cov.new.txt"
+
+
+# In[6]:
+
+
+fimo_phylop_f = "../../misc/03__fimo/04__merged_grouped_beds/all_fimo_map.phylop46way.with_promtype.txt"
+fimo_chip_phylop_f = "../../misc/03__fimo/04__merged_grouped_beds/all_fimo_map.chip_intersected.phylop46way.with_promtype.txt"
+fimo_clust_phylop_f = "../../misc/03__fimo/04__merged_grouped_beds/all_fimo_map.bulyk_clusters.phylop46way.with_promtype.txt"
+
+
+# In[7]:
+
+
+all_phylop_f = "../../data/00__index/0__all_tss/All.TSS.114bp.uniq.phylop46way.txt"
+
+
+# In[8]:
+
+
+fimo_count_f = "../../misc/03__fimo/05__overlap_per_motif/all_fimo_map.all_tfs.txt"
+fimo_chip_count_f = "../../misc/03__fimo/05__overlap_per_motif/all_fimo_map.chip_intersected.all_tfs.txt"
+fimo_clust_count_f = "../../misc/03__fimo/05__overlap_per_motif/all_fimo_map.bulyk_clusters.all_tfs.txt"
 
 
 # note: the reason why some IDs are not in the expression file is these are FANTOM CAT IDs that for some reason are not present in the FANTOM5 robust set. so, we exclude these.
 
 # ## 1. import data
 
-# In[5]:
+# In[9]:
 
 
 corr = pd.read_table(mosbat_file, sep="\t")
 
 
-# In[6]:
-
-
-all_tss = pd.read_table(all_tss_f, sep="\t", header=None)
-all_tss.columns = ["chr", "start", "end", "seqID", "score", "strand"]
-all_tss = all_tss.drop_duplicates()
-print(len(all_tss))
-print(len(all_tss["seqID"].unique()))
-all_tss.head()
-
-
-# In[7]:
-
-
-motif_cov = pd.read_table(motif_cov_f, sep="\t")
-motif_cov = motif_cov.drop_duplicates()
-motif_max = pd.read_table(motif_max_f, sep="\t", header=None)
-motif_max = motif_max.drop_duplicates()
-motif_max.columns = ["seqID", "MaxCov"]
-
-# get promtype2
-motif_cov["PromType2"] = motif_cov.seqID.str.split("__", expand=True)[0]
-
-
-# merge w/ All_TSS to get 0s
-motif_cov = all_tss[["seqID"]].merge(motif_cov, on="seqID", how="left")
-motif_cov = motif_cov.merge(motif_max, on="seqID", how="left")
-motif_cov.fillna(0, inplace=True)
-print(len(motif_cov))
-
-# get promtype2
-motif_cov["PromType2"] = motif_cov.seqID.str.split("__", expand=True)[0]
-
-
-motif_cov.sample(5)
-
-
-# In[8]:
-
-
-chip_cov = pd.read_table(chip_cov_f, sep="\t")
-chip_cov = chip_cov.drop_duplicates()
-
-# get promtype2
-chip_cov["PromType2"] = chip_cov.seqID.str.split("__", expand=True)[0]
-
-# merge w/ All_TSS to get 0s
-chip_cov = all_tss[["seqID"]].merge(chip_cov, on="seqID", how="left")
-chip_cov.fillna(0, inplace=True)
-print(len(chip_cov))
-
-# get promtype2
-chip_cov["PromType2"] = chip_cov.seqID.str.split("__", expand=True)[0]
-
-
-chip_cov.sample(5)
-
-
-# In[9]:
-
-
-def fix_enh_seqid(row):
-    if "Enhancer" in row.seqID:
-        if "NA" in row.seqID:
-            new_id = row.seqID.split("__")[0] + "__" + row.seqID.split("__")[2]
-            return new_id
-        else:
-            return row.seqID
-    else:
-        return row.seqID
-
-
 # In[10]:
 
 
-cluster_cov = pd.read_table(cluster_cov_f, sep="\t")
-cluster_cov = cluster_cov.drop_duplicates()
+fimo_count = pd.read_table(fimo_count_f, sep="\t", header=None)
+fimo_count.columns = ["motif", "num", "mean_overlap", "std_overlap"]
 
-# get promtype2
-cluster_cov["PromType2"] = cluster_cov.seqID.str.split("__", expand=True)[0]
-cluster_cov["seqID"] = cluster_cov.apply(fix_enh_seqid, axis=1)
+fimo_chip_count = pd.read_table(fimo_chip_count_f, sep="\t", header=None)
+fimo_chip_count.columns = ["motif", "num", "mean_overlap", "std_overlap"]
 
-# # merge w/ All_TSS to get 0s
-cluster_cov = all_tss[["seqID"]].merge(cluster_cov, on="seqID", how="left")
-cluster_cov.fillna(0, inplace=True)
-print(len(cluster_cov))
-
-# get promtype2
-cluster_cov["PromType2"] = cluster_cov.seqID.str.split("__", expand=True)[0]
-
-cluster_cov.sample(5)
+fimo_clust_count = pd.read_table(fimo_clust_count_f, sep="\t", header=None)
+fimo_clust_count.columns = ["motif", "num", "mean_overlap", "std_overlap"]
+fimo_clust_count.head()
 
 
 # In[11]:
 
 
-# filter to those that have at least 1 motif so distributions are not 0-skewed
-motif_cov = motif_cov[motif_cov["numMotifs"] > 0]
-print(len(motif_cov))
+fimo_phylop = pd.read_table(fimo_phylop_f, sep="\t")
+fimo_phylop.columns = ["chr", "start", "end", "n_ov_motifs", "size", "phylop", "unique_id"]
 
-chip_cov = chip_cov[chip_cov["numMotifs"] > 0]
-print(len(chip_cov))
+fimo_chip_phylop = pd.read_table(fimo_chip_phylop_f, sep="\t")
+fimo_chip_phylop.columns = ["chr", "start", "end", "n_ov_motifs", "size", "phylop", "unique_id"]
 
-cluster_cov = cluster_cov[cluster_cov["numMotifs"] > 0]
-print(len(cluster_cov))
+fimo_clust_phylop = pd.read_table(fimo_clust_phylop_f, sep="\t")
+fimo_clust_phylop.columns = ["chr", "start", "end", "n_ov_motifs", "size", "phylop", "unique_id"]
+fimo_clust_phylop.sample(5)
 
 
 # In[12]:
+
+
+all_phylop = pd.read_table(all_phylop_f, sep="\t")
+all_phylop.columns = ["chr", "start", "end", "unique_id", "score", "strand", "size", "num_data", "min", "max",
+                      "mean", "median"]
+all_phylop.head()
+
+
+# In[13]:
+
+
+fimo_phylop = fimo_phylop.merge(all_phylop[["unique_id", "mean"]], on="unique_id")
+fimo_chip_phylop = fimo_chip_phylop.merge(all_phylop[["unique_id", "mean"]], on="unique_id")
+fimo_clust_phylop = fimo_clust_phylop.merge(all_phylop[["unique_id", "mean"]], on="unique_id")
+fimo_phylop.head()
+
+
+# In[14]:
+
+
+fimo_cov = pd.read_table(fimo_cov_f, sep="\t")
+fimo_chip_cov = pd.read_table(fimo_chip_cov_f, sep="\t")
+fimo_clust_cov = pd.read_table(fimo_clust_cov_f, sep="\t")
+fimo_no_ets_cov = pd.read_table(fimo_no_ets_cov_f, sep="\t")
+fimo_no_ets_chip_cov = pd.read_table(fimo_no_ets_chip_cov_f, sep="\t")
+fimo_chip_cov.sample(5)
+
+
+# In[15]:
+
+
+print(len(fimo_cov))
+print(len(fimo_chip_cov))
+print(len(fimo_clust_cov))
+
+
+# In[16]:
+
+
+fimo_cov["PromType2"] = fimo_cov["unique_id"].str.split("__", expand=True)[0]
+fimo_chip_cov["PromType2"] = fimo_chip_cov["unique_id"].str.split("__", expand=True)[0]
+fimo_clust_cov["PromType2"] = fimo_clust_cov["unique_id"].str.split("__", expand=True)[0]
+fimo_no_ets_cov["PromType2"] = fimo_no_ets_cov["unique_id"].str.split("__", expand=True)[0]
+fimo_no_ets_chip_cov["PromType2"] = fimo_no_ets_chip_cov["unique_id"].str.split("__", expand=True)[0]
+fimo_cov.sample(5)
+
+
+# In[17]:
+
+
+# filter to those that have at least 1 motif so distributions are not 0-skewed
+fimo_cov = fimo_cov[fimo_cov["n_motifs"] > 0]
+print(len(fimo_cov))
+
+fimo_chip_cov = fimo_chip_cov[fimo_chip_cov["n_motifs"] > 0]
+print(len(fimo_chip_cov))
+
+fimo_no_ets_cov = fimo_no_ets_cov[fimo_no_ets_cov["n_motifs"] > 0]
+print(len(fimo_no_ets_cov))
+
+fimo_no_ets_chip_cov = fimo_no_ets_chip_cov[fimo_no_ets_chip_cov["n_motifs"] > 0]
+print(len(fimo_no_ets_chip_cov))
+
+fimo_clust_cov = fimo_clust_cov[fimo_clust_cov["n_motifs"] > 0]
+print(len(fimo_clust_cov))
+
+
+# In[18]:
 
 
 cage_expr = pd.read_table(cage_expr_f, sep="\t")
 cage_expr.head()
 
 
-# In[13]:
+# In[19]:
 
 
-def get_cage_id(row):
-    split = row.seqID.split("__")
-    if len(split) == 2:
-        return split[1]
-    else:
-        return split[2]
+fimo_cov = fimo_cov.merge(cage_expr, on="cage_id", how="left")
+fimo_cov.head()
 
 
-# In[14]:
+# In[20]:
 
 
-motif_cov["cage_id"] = motif_cov.apply(get_cage_id, axis=1)
-motif_cov = motif_cov.merge(cage_expr, on="cage_id", how="left")
-motif_cov.head()
+fimo_chip_cov = fimo_chip_cov.merge(cage_expr, on="cage_id", how="left")
+fimo_chip_cov.sample(5)
 
 
-# In[15]:
+# In[21]:
 
 
-chip_cov["cage_id"] = chip_cov.apply(get_cage_id, axis=1)
-chip_cov = chip_cov.merge(cage_expr, on="cage_id", how="left")
-chip_cov.sample(10)
+fimo_clust_cov = fimo_clust_cov.merge(cage_expr, on="cage_id", how="left")
+fimo_clust_cov.head()
 
 
-# In[16]:
+# In[22]:
 
 
-cluster_cov["cage_id"] = cluster_cov.apply(get_cage_id, axis=1)
-cluster_cov = cluster_cov.merge(cage_expr, on="cage_id", how="left")
-cluster_cov.head()
+chip_cov_exp = fimo_chip_cov[~pd.isnull(fimo_chip_cov["av_exp"])]
+motif_cov_exp = fimo_cov[~pd.isnull(fimo_cov["av_exp"])]
+cluster_cov_exp = fimo_clust_cov[~pd.isnull(fimo_clust_cov["av_exp"])]
 
 
-# In[17]:
-
-
-chip_cov_exp = chip_cov[~pd.isnull(chip_cov["av_exp"])]
-motif_cov_exp = motif_cov[~pd.isnull(motif_cov["av_exp"])]
-cluster_cov_exp = cluster_cov[~pd.isnull(cluster_cov["av_exp"])]
-
-
-# In[18]:
+# In[23]:
 
 
 motif_cov_exp.PromType2.value_counts()
 
 
-# In[19]:
+# In[24]:
 
 
 chip_cov_exp.PromType2.value_counts()
 
 
-# In[20]:
+# In[25]:
 
 
 cluster_cov_exp.PromType2.value_counts()
@@ -259,24 +265,14 @@ cluster_cov_exp.PromType2.value_counts()
 
 # ### all motifs
 
-# In[21]:
+# In[26]:
 
 
-motif_cov["log_bp_covered"] = np.log(motif_cov["numBPcovered"]+1)
-motif_cov["log_max_cov"] = np.log(motif_cov["MaxCov"]+1)
-
-motif_cov_exp["log_bp_covered"] = np.log(motif_cov_exp["numBPcovered"]+1)
-motif_cov_exp["log_max_cov"] = np.log(motif_cov_exp["MaxCov"]+1)
-
-
-# In[22]:
-
-
-enh_vals = motif_cov[motif_cov["PromType2"] == "Enhancer"]["log_bp_covered"]
-linc_vals = motif_cov[motif_cov["PromType2"] == "intergenic"]["log_bp_covered"]
-dlnc_vals = motif_cov[motif_cov["PromType2"] == "div_lnc"]["log_bp_covered"]
-pc_vals = motif_cov[motif_cov["PromType2"] == "protein_coding"]["log_bp_covered"]
-dpc_vals = motif_cov[motif_cov["PromType2"] == "div_pc"]["log_bp_covered"]
+enh_vals = fimo_cov[fimo_cov["PromType2"] == "Enhancer"]["log_bp_cov"]
+linc_vals = fimo_cov[fimo_cov["PromType2"] == "intergenic"]["log_bp_cov"]
+dlnc_vals = fimo_cov[fimo_cov["PromType2"] == "div_lnc"]["log_bp_cov"]
+pc_vals = fimo_cov[fimo_cov["PromType2"] == "protein_coding"]["log_bp_cov"]
+dpc_vals = fimo_cov[fimo_cov["PromType2"] == "div_pc"]["log_bp_cov"]
 
 fig = plt.figure(figsize=(2.75, 2))
 ax = sns.kdeplot(data=enh_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE["Enhancer"], 
@@ -294,7 +290,7 @@ ax.set_ylabel("cumulative density")
 ax.set_xlim((2, 5))
 
 
-# In[23]:
+# In[27]:
 
 
 # for each group, split into tissue-sp v dynamic v ubiquitous
@@ -302,7 +298,7 @@ idxs = list(range(0, 5))
 promtypes = ["Enhancer", "intergenic", "protein_coding"]
 names = ["eRNAs", "lincRNAs", "mRNAs"]
 df = motif_cov_exp
-col = "log_bp_covered"
+col = "log_bp_cov"
 xlabel = "log(# of bp covered)"
 xlim = (2, 5)
 
@@ -316,6 +312,15 @@ for i, promtype, name in zip(idxs, promtypes, names):
     ts_vals = promtype_vals[promtype_vals["tss_type"] == "tissue-specific"][col]
     ub_vals = promtype_vals[promtype_vals["tss_type"] == "ubiquitous"][col]
     dy_vals = promtype_vals[promtype_vals["tss_type"] == "dynamic"][col]
+    
+    ub_ts_u, ub_ts_pval = stats.mannwhitneyu(ub_vals, ts_vals, alternative="two-sided", use_continuity=False)
+    print("ub/ts pval: %s" % ub_ts_pval)
+    
+    ub_dy_u, ub_dy_pval = stats.mannwhitneyu(ub_vals, dy_vals, alternative="two-sided", use_continuity=False)
+    print("ub/dy pval: %s" % ub_dy_pval)
+    
+    ts_dy_u, ts_dy_pval = stats.mannwhitneyu(ts_vals, dy_vals, alternative="two-sided", use_continuity=False)
+    print("ts/dy pval: %s" % ts_dy_pval)
     
     sns.kdeplot(data=ts_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE[promtype], linestyle="dashed",
                 label="tissue-specific\n(n=%s)" % len(ts_vals), ax=ax)
@@ -333,29 +338,14 @@ for i, promtype, name in zip(idxs, promtypes, names):
         ax.set_ylabel("cumulative density")
 
 
-# In[24]:
+# In[28]:
 
 
-fig = plt.figure(figsize=(2, 1.7))
-ax = sns.kdeplot(data=linc_vals, cumulative=True, color=TSS_CLASS_PALETTE["intergenic"], 
-                 label="lincRNAs")
-sns.kdeplot(data=pc_vals, cumulative=True, color=TSS_CLASS_PALETTE["protein_coding"], 
-            label="mRNAs", ax=ax)
-ax.set_xlabel("log(# of bp covered)")
-ax.set_ylabel("cumulative density")
-ax.set_xlim((2, 5))
-ax.set_ylim((0, 1.02))
-fig.savefig("num_bp_cov.cdf.for_talk.pdf", dpi="figure", bbox_inches="tight")
-
-
-# In[25]:
-
-
-enh_vals = motif_cov[motif_cov["PromType2"] == "Enhancer"]["log_max_cov"]
-linc_vals = motif_cov[motif_cov["PromType2"] == "intergenic"]["log_max_cov"]
-dlnc_vals = motif_cov[motif_cov["PromType2"] == "div_lnc"]["log_max_cov"]
-pc_vals = motif_cov[motif_cov["PromType2"] == "protein_coding"]["log_max_cov"]
-dpc_vals = motif_cov[motif_cov["PromType2"] == "div_pc"]["log_max_cov"]
+enh_vals = fimo_cov[fimo_cov["PromType2"] == "Enhancer"]["log_max_cov"]
+linc_vals = fimo_cov[fimo_cov["PromType2"] == "intergenic"]["log_max_cov"]
+dlnc_vals = fimo_cov[fimo_cov["PromType2"] == "div_lnc"]["log_max_cov"]
+pc_vals = fimo_cov[fimo_cov["PromType2"] == "protein_coding"]["log_max_cov"]
+dpc_vals = fimo_cov[fimo_cov["PromType2"] == "div_pc"]["log_max_cov"]
 
 fig = plt.figure(figsize=(2.75, 2))
 ax = sns.kdeplot(data=enh_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE["Enhancer"], 
@@ -374,7 +364,7 @@ ax.legend(loc="upper left")
 fig.savefig("max_cov.all_biotypes.for_poster.pdf", dpi="figure", bbox_inches="tight")
 
 
-# In[26]:
+# In[29]:
 
 
 # for each group, split into tissue-sp v dynamic v ubiquitous
@@ -397,6 +387,15 @@ for i, promtype, name in zip(idxs, promtypes, names):
     ub_vals = promtype_vals[promtype_vals["tss_type"] == "ubiquitous"][col]
     dy_vals = promtype_vals[promtype_vals["tss_type"] == "dynamic"][col]
     
+    ub_ts_u, ub_ts_pval = stats.mannwhitneyu(ub_vals, ts_vals, alternative="two-sided", use_continuity=False)
+    print("ub/ts pval: %s" % ub_ts_pval)
+    
+    ub_dy_u, ub_dy_pval = stats.mannwhitneyu(ub_vals, dy_vals, alternative="two-sided", use_continuity=False)
+    print("ub/dy pval: %s" % ub_dy_pval)
+    
+    ts_dy_u, ts_dy_pval = stats.mannwhitneyu(ts_vals, dy_vals, alternative="two-sided", use_continuity=False)
+    print("ts/dy pval: %s" % ts_dy_pval)
+    
     sns.kdeplot(data=ts_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE[promtype], linestyle="dashed",
                 label="tissue-sp.\n(n=%s)" % len(ts_vals), ax=ax)
     sns.kdeplot(data=ub_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE[promtype], linestyle="solid",
@@ -413,42 +412,16 @@ for i, promtype, name in zip(idxs, promtypes, names):
         ax.set_ylabel("cumulative density")
 
 
-# In[27]:
-
-
-fig = plt.figure(figsize=(2, 1.7))
-ax = sns.kdeplot(data=linc_vals, cumulative=True, color=TSS_CLASS_PALETTE["intergenic"], 
-                 label="lincRNAs")
-sns.kdeplot(data=pc_vals, cumulative=True, color=TSS_CLASS_PALETTE["protein_coding"], 
-            label="mRNAs", ax=ax)
-ax.set_xlabel("log(max # overlapping motifs)")
-ax.set_ylabel("cumulative density")
-ax.set_xlim((0.2, 4.8))
-ax.set_ylim((0, 1.02))
-plt.legend(loc=2)
-fig.savefig("max_cov.cdf.for_talk.pdf", dpi="figure", bbox_inches="tight")
-
-
 # ### ChIP-validated motifs
 
-# In[28]:
+# In[30]:
 
 
-chip_cov["log_bp_covered"] = np.log(chip_cov["numBPcovered"]+1)
-chip_cov["log_max_cov"] = np.log(chip_cov["MaxCov"]+1)
-
-chip_cov_exp["log_bp_covered"] = np.log(chip_cov_exp["numBPcovered"]+1)
-chip_cov_exp["log_max_cov"] = np.log(chip_cov_exp["MaxCov"]+1)
-
-
-# In[29]:
-
-
-enh_vals = chip_cov[chip_cov["PromType2"] == "Enhancer"]["log_bp_covered"]
-linc_vals = chip_cov[chip_cov["PromType2"] == "intergenic"]["log_bp_covered"]
-dlnc_vals = chip_cov[chip_cov["PromType2"] == "div_lnc"]["log_bp_covered"]
-pc_vals = chip_cov[chip_cov["PromType2"] == "protein_coding"]["log_bp_covered"]
-dpc_vals = chip_cov[chip_cov["PromType2"] == "div_pc"]["log_bp_covered"]
+enh_vals = fimo_chip_cov[fimo_chip_cov["PromType2"] == "Enhancer"]["log_bp_cov"]
+linc_vals = fimo_chip_cov[fimo_chip_cov["PromType2"] == "intergenic"]["log_bp_cov"]
+dlnc_vals = fimo_chip_cov[fimo_chip_cov["PromType2"] == "div_lnc"]["log_bp_cov"]
+pc_vals = fimo_chip_cov[fimo_chip_cov["PromType2"] == "protein_coding"]["log_bp_cov"]
+dpc_vals = fimo_chip_cov[fimo_chip_cov["PromType2"] == "div_pc"]["log_bp_cov"]
 
 fig = plt.figure(figsize=(2.75, 2))
 ax = sns.kdeplot(data=enh_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE["Enhancer"], 
@@ -466,7 +439,7 @@ ax.set_ylabel("cumulative density")
 fig.savefig("Fig_2D.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[30]:
+# In[31]:
 
 
 # for each group, split into tissue-sp v dynamic v ubiquitous
@@ -474,7 +447,7 @@ idxs = list(range(0, 5))
 promtypes = ["Enhancer", "intergenic", "protein_coding"]
 names = ["eRNAs", "lincRNAs", "mRNAs"]
 df = chip_cov_exp
-col = "log_bp_covered"
+col = "log_bp_cov"
 xlabel = "log(# of bp covered)"
 xlim = (0, 4.5)
 
@@ -488,6 +461,15 @@ for i, promtype, name in zip(idxs, promtypes, names):
     ts_vals = promtype_vals[promtype_vals["tss_type"] == "tissue-specific"][col]
     ub_vals = promtype_vals[promtype_vals["tss_type"] == "ubiquitous"][col]
     dy_vals = promtype_vals[promtype_vals["tss_type"] == "dynamic"][col]
+    
+    ub_ts_u, ub_ts_pval = stats.mannwhitneyu(ub_vals, ts_vals, alternative="two-sided", use_continuity=False)
+    print("ub/ts pval: %s" % ub_ts_pval)
+    
+    ub_dy_u, ub_dy_pval = stats.mannwhitneyu(ub_vals, dy_vals, alternative="two-sided", use_continuity=False)
+    print("ub/dy pval: %s" % ub_dy_pval)
+    
+    ts_dy_u, ts_dy_pval = stats.mannwhitneyu(ts_vals, dy_vals, alternative="two-sided", use_continuity=False)
+    print("ts/dy pval: %s" % ts_dy_pval)
     
     sns.kdeplot(data=ts_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE[promtype], linestyle="dashed",
                 label="tissue-sp.\n(n=%s)" % len(ts_vals), ax=ax)
@@ -506,14 +488,14 @@ for i, promtype, name in zip(idxs, promtypes, names):
 f.savefig("Fig_2D_biotype_split.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[31]:
+# In[32]:
 
 
-enh_vals = chip_cov[chip_cov["PromType2"] == "Enhancer"]["log_max_cov"]
-linc_vals = chip_cov[chip_cov["PromType2"] == "intergenic"]["log_max_cov"]
-dlnc_vals = chip_cov[chip_cov["PromType2"] == "div_lnc"]["log_max_cov"]
-pc_vals = chip_cov[chip_cov["PromType2"] == "protein_coding"]["log_max_cov"]
-dpc_vals = chip_cov[chip_cov["PromType2"] == "div_pc"]["log_max_cov"]
+enh_vals = fimo_chip_cov[fimo_chip_cov["PromType2"] == "Enhancer"]["log_max_cov"]
+linc_vals = fimo_chip_cov[fimo_chip_cov["PromType2"] == "intergenic"]["log_max_cov"]
+dlnc_vals = fimo_chip_cov[fimo_chip_cov["PromType2"] == "div_lnc"]["log_max_cov"]
+pc_vals = fimo_chip_cov[fimo_chip_cov["PromType2"] == "protein_coding"]["log_max_cov"]
+dpc_vals = fimo_chip_cov[fimo_chip_cov["PromType2"] == "div_pc"]["log_max_cov"]
 
 fig = plt.figure(figsize=(2.5, 2))
 ax = sns.kdeplot(data=enh_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE["Enhancer"], 
@@ -531,7 +513,7 @@ ax.set_ylabel("cumulative density")
 fig.savefig("Fig_2E.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[32]:
+# In[33]:
 
 
 # for each group, split into tissue-sp v dynamic v ubiquitous
@@ -554,6 +536,15 @@ for i, promtype, name in zip(idxs, promtypes, names):
     ub_vals = promtype_vals[promtype_vals["tss_type"] == "ubiquitous"][col]
     dy_vals = promtype_vals[promtype_vals["tss_type"] == "dynamic"][col]
     
+    ub_ts_u, ub_ts_pval = stats.mannwhitneyu(ub_vals, ts_vals, alternative="two-sided", use_continuity=False)
+    print("ub/ts pval: %s" % ub_ts_pval)
+    
+    ub_dy_u, ub_dy_pval = stats.mannwhitneyu(ub_vals, dy_vals, alternative="two-sided", use_continuity=False)
+    print("ub/dy pval: %s" % ub_dy_pval)
+    
+    ts_dy_u, ts_dy_pval = stats.mannwhitneyu(ts_vals, dy_vals, alternative="two-sided", use_continuity=False)
+    print("ts/dy pval: %s" % ts_dy_pval)
+    
     sns.kdeplot(data=ts_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE[promtype], linestyle="dashed",
                 label="tissue-sp.\n(n=%s)" % len(ts_vals), ax=ax)
     sns.kdeplot(data=ub_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE[promtype], linestyle="solid",
@@ -571,9 +562,159 @@ for i, promtype, name in zip(idxs, promtypes, names):
 f.savefig("Fig_2E_biotype_split.pdf", bbox_inches="tight", dpi="figure")
 
 
+# ### clustered motifs
+
+# In[34]:
+
+
+enh_vals = fimo_clust_cov[fimo_clust_cov["PromType2"] == "Enhancer"]["log_bp_cov"]
+linc_vals = fimo_clust_cov[fimo_clust_cov["PromType2"] == "intergenic"]["log_bp_cov"]
+dlnc_vals = fimo_clust_cov[fimo_clust_cov["PromType2"] == "div_lnc"]["log_bp_cov"]
+pc_vals = fimo_clust_cov[fimo_clust_cov["PromType2"] == "protein_coding"]["log_bp_cov"]
+dpc_vals = fimo_clust_cov[fimo_clust_cov["PromType2"] == "div_pc"]["log_bp_cov"]
+
+fig = plt.figure(figsize=(2.75, 2))
+ax = sns.kdeplot(data=enh_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE["Enhancer"], 
+                 label="eRNAs\n(n=%s)" % len(enh_vals))
+sns.kdeplot(data=linc_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE["intergenic"], 
+            label="lincRNAs\n(n=%s)" % len(linc_vals), ax=ax)
+sns.kdeplot(data=dlnc_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE["div_lnc"], 
+            label="div. lncRNAs\n(n=%s)" % len(dlnc_vals), ax=ax)
+sns.kdeplot(data=pc_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE["protein_coding"], 
+            label="mRNAs\n(n=%s)" % len(pc_vals), ax=ax)
+sns.kdeplot(data=dpc_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE["div_pc"], 
+            label="div. mRNAs\n(n=%s)" % len(dpc_vals), ax=ax)
+ax.set_xlabel("log(# of bp covered)")
+ax.set_ylabel("cumulative density")
+#fig.savefig("Fig_2D.pdf", bbox_inches="tight", dpi="figure")
+
+
+# In[35]:
+
+
+# for each group, split into tissue-sp v dynamic v ubiquitous
+idxs = list(range(0, 5))
+promtypes = ["Enhancer", "intergenic", "protein_coding"]
+names = ["eRNAs", "lincRNAs", "mRNAs"]
+df = cluster_cov_exp
+col = "log_bp_cov"
+xlabel = "log(# of bp covered)"
+xlim = (0, 4.5)
+
+f, axarr = plt.subplots(nrows=1, ncols=3, sharex=False, sharey=True, figsize=(7.2, 2))
+
+for i, promtype, name in zip(idxs, promtypes, names):
+    print("i: %s, promtype: %s, name: %s" % (i, promtype, name))
+    ax = axarr[i]
+    
+    promtype_vals = df[df["PromType2"] == promtype]
+    ts_vals = promtype_vals[promtype_vals["tss_type"] == "tissue-specific"][col]
+    ub_vals = promtype_vals[promtype_vals["tss_type"] == "ubiquitous"][col]
+    dy_vals = promtype_vals[promtype_vals["tss_type"] == "dynamic"][col]
+    
+    ub_ts_u, ub_ts_pval = stats.mannwhitneyu(ub_vals, ts_vals, alternative="two-sided", use_continuity=False)
+    print("ub/ts pval: %s" % ub_ts_pval)
+    
+    ub_dy_u, ub_dy_pval = stats.mannwhitneyu(ub_vals, dy_vals, alternative="two-sided", use_continuity=False)
+    print("ub/dy pval: %s" % ub_dy_pval)
+    
+    ts_dy_u, ts_dy_pval = stats.mannwhitneyu(ts_vals, dy_vals, alternative="two-sided", use_continuity=False)
+    print("ts/dy pval: %s" % ts_dy_pval)
+    
+    sns.kdeplot(data=ts_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE[promtype], linestyle="dashed",
+                label="tissue-sp.\n(n=%s)" % len(ts_vals), ax=ax)
+    sns.kdeplot(data=ub_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE[promtype], linestyle="solid",
+                label="ubiq.\n(n=%s)" % len(ub_vals), ax=ax)
+    sns.kdeplot(data=dy_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE[promtype], linestyle="dotted",
+                label="dynamic\n(n=%s)" % len(dy_vals), ax=ax)
+    
+    ax.set_title("%s (%s total)" % (name, len(promtype_vals)))
+    ax.set_xlabel(xlabel)
+    ax.legend(loc="bottom right")
+    ax.set_xlim(xlim)
+    
+    if i == 0:
+        ax.set_ylabel("cumulative density")
+#f.savefig("Fig_2D_biotype_split.pdf", bbox_inches="tight", dpi="figure")
+
+
+# In[36]:
+
+
+enh_vals = fimo_clust_cov[fimo_clust_cov["PromType2"] == "Enhancer"]["log_max_cov"]
+linc_vals = fimo_clust_cov[fimo_clust_cov["PromType2"] == "intergenic"]["log_max_cov"]
+dlnc_vals = fimo_clust_cov[fimo_clust_cov["PromType2"] == "div_lnc"]["log_max_cov"]
+pc_vals = fimo_clust_cov[fimo_clust_cov["PromType2"] == "protein_coding"]["log_max_cov"]
+dpc_vals = fimo_clust_cov[fimo_clust_cov["PromType2"] == "div_pc"]["log_max_cov"]
+
+fig = plt.figure(figsize=(2.5, 2))
+ax = sns.kdeplot(data=enh_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE["Enhancer"], 
+                 label="eRNAs (n=%s)" % len(enh_vals))
+sns.kdeplot(data=linc_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE["intergenic"], 
+            label="lincRNAs (n=%s)" % len(linc_vals), ax=ax)
+sns.kdeplot(data=dlnc_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE["div_lnc"], 
+            label="div. lncRNAs (n=%s)" % len(dlnc_vals), ax=ax)
+sns.kdeplot(data=pc_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE["protein_coding"], 
+            label="mRNAs (n=%s)" % len(pc_vals), ax=ax)
+sns.kdeplot(data=dpc_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE["div_pc"], 
+            label="div. mRNAs (n=%s)" % len(dpc_vals), ax=ax)
+ax.set_xlabel("log(max coverage)")
+ax.set_ylabel("cumulative density")
+#fig.savefig("Fig_2E.pdf", bbox_inches="tight", dpi="figure")
+
+
+# In[37]:
+
+
+# for each group, split into tissue-sp v dynamic v ubiquitous
+idxs = list(range(0, 5))
+promtypes = ["Enhancer", "intergenic", "protein_coding"]
+names = ["eRNAs", "lincRNAs", "mRNAs"]
+df = cluster_cov_exp
+col = "log_max_cov"
+xlabel = "log(max coverage)"
+xlim = (-0.5, 3)
+
+f, axarr = plt.subplots(nrows=1, ncols=3, sharex=False, sharey=True, figsize=(7.2, 2))
+
+for i, promtype, name in zip(idxs, promtypes, names):
+    print("i: %s, promtype: %s, name: %s" % (i, promtype, name))
+    ax = axarr[i]
+    
+    promtype_vals = df[df["PromType2"] == promtype]
+    ts_vals = promtype_vals[promtype_vals["tss_type"] == "tissue-specific"][col]
+    ub_vals = promtype_vals[promtype_vals["tss_type"] == "ubiquitous"][col]
+    dy_vals = promtype_vals[promtype_vals["tss_type"] == "dynamic"][col]
+    
+    ub_ts_u, ub_ts_pval = stats.mannwhitneyu(ub_vals, ts_vals, alternative="two-sided", use_continuity=False)
+    print("ub/ts pval: %s" % ub_ts_pval)
+    
+    ub_dy_u, ub_dy_pval = stats.mannwhitneyu(ub_vals, dy_vals, alternative="two-sided", use_continuity=False)
+    print("ub/dy pval: %s" % ub_dy_pval)
+    
+    ts_dy_u, ts_dy_pval = stats.mannwhitneyu(ts_vals, dy_vals, alternative="two-sided", use_continuity=False)
+    print("ts/dy pval: %s" % ts_dy_pval)
+    
+    sns.kdeplot(data=ts_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE[promtype], linestyle="dashed",
+                label="tissue-sp.\n(n=%s)" % len(ts_vals), ax=ax)
+    sns.kdeplot(data=ub_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE[promtype], linestyle="solid",
+                label="ubiq.\n(n=%s)" % len(ub_vals), ax=ax)
+    sns.kdeplot(data=dy_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE[promtype], linestyle="dotted",
+                label="dynamic\n(n=%s)" % len(dy_vals), ax=ax)
+    
+    ax.set_title("%s (%s total)" % (name, len(promtype_vals)))
+    ax.set_xlabel(xlabel)
+    ax.legend(loc="bottom right")
+    ax.set_xlim(xlim)
+    
+    if i == 0:
+        ax.set_ylabel("cumulative density")
+#f.savefig("Fig_2E_biotype_split.pdf", bbox_inches="tight", dpi="figure")
+
+
 # ## 2. cluster the motifs using MoSBAT output
 
-# In[33]:
+# In[38]:
 
 
 corr.set_index(corr["Motif"], inplace=True)
@@ -581,32 +722,32 @@ corr.drop("Motif", axis=1, inplace=True)
 corr.head()
 
 
-# In[34]:
+# In[39]:
 
 
 row_linkage = hierarchy.linkage(distance.pdist(corr, 'correlation'), method="average")
 col_linkage = hierarchy.linkage(distance.pdist(corr.T, 'correlation'), method="average")
 
 
-# In[35]:
+# In[40]:
 
 
 dists = plot_dendrogram(row_linkage, 0.4, "correlation")
 
 
-# In[36]:
+# In[41]:
 
 
 clusters = hierarchy.fcluster(row_linkage, 0.1, criterion="distance")
 
 
-# In[37]:
+# In[42]:
 
 
 print("n clusters: %s" % np.max(clusters))
 
 
-# In[38]:
+# In[43]:
 
 
 cluster_map = pd.DataFrame.from_dict(dict(zip(list(corr.index), clusters)), orient="index")
@@ -614,9 +755,15 @@ cluster_map.columns = ["cluster"]
 cluster_map.head()
 
 
+# In[44]:
+
+
+cluster_map.loc["BHLHE40"]
+
+
 # ## 3. plot clustered motif heatmap
 
-# In[39]:
+# In[45]:
 
 
 colors = sns.husl_palette(np.max(clusters), s=0.75)
@@ -625,13 +772,13 @@ lut = dict(zip(range(np.min(clusters), np.max(clusters)+1), colors))
 row_colors = cluster_map["cluster"].map(lut)
 
 
-# In[40]:
+# In[46]:
 
 
 cmap = sns.cubehelix_palette(8, start=.5, light=1, dark=0.25, hue=0.9, rot=-0.75, as_cmap=True)
 
 
-# In[41]:
+# In[47]:
 
 
 cg = sns.clustermap(corr, method="average", row_linkage=row_linkage, robust=True,
@@ -640,10 +787,18 @@ cg = sns.clustermap(corr, method="average", row_linkage=row_linkage, robust=True
 cg.savefig("Fig_S7A.pdf", bbox_inches="tight", dpi="figure")
 
 
+# In[48]:
+
+
+cluster_map.to_csv("../../misc/02__mosbat/cluster_map.txt", sep="\t", index=True)
+
+
 # ## 4. re-plot # bp covered and max coverage per biotype *after* clustering
 # note that i sent the cluster results to marta, who re-ran her coverage scripts using them, and i re-upload them in this notebook (so in real life there is a break between the above part and the following part of this notebook)
+# 
+# 10/22/18 NOTE: MARTA NEEDS TO REDO THIS PART, OR WE CUT
 
-# In[42]:
+# In[49]:
 
 
 cluster_cov["log_bp_covered"] = np.log(cluster_cov["numBPcovered"]+1)
@@ -653,7 +808,7 @@ cluster_cov_exp["log_bp_covered"] = np.log(cluster_cov_exp["numBPcovered"]+1)
 cluster_cov_exp["log_max_cov"] = np.log(cluster_cov_exp["MaxCov"]+1)
 
 
-# In[43]:
+# In[ ]:
 
 
 enh_vals = cluster_cov[cluster_cov["PromType2"] == "Enhancer"]["log_bp_covered"]
@@ -679,7 +834,7 @@ plt.xlim((2.5,5))
 fig.savefig("Fig_S7B.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[44]:
+# In[ ]:
 
 
 # for each group, split into tissue-sp v dynamic v ubiquitous
@@ -719,7 +874,7 @@ for i, promtype, name in zip(idxs, promtypes, names):
 f.savefig("Fig_S7B_biotype_split.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[45]:
+# In[ ]:
 
 
 enh_vals = cluster_cov[cluster_cov["PromType2"] == "Enhancer"]["log_max_cov"]
@@ -745,7 +900,7 @@ plt.xlim((0, 2.75))
 fig.savefig("Fig_S7C.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[46]:
+# In[ ]:
 
 
 # for each group, split into tissue-sp v dynamic v ubiquitous
@@ -783,6 +938,231 @@ for i, promtype, name in zip(idxs, promtypes, names):
     if i == 0:
         ax.set_ylabel("cumulative density")
 f.savefig("Fig_S7C_biotype_split.pdf", bbox_inches="tight", dpi="figure")
+
+
+# ## 5. find good examples of lots of motifs and few motifs
+
+# In[52]:
+
+
+motif_cov_exp.sort_values(by=["av_exp", "max_cov"], ascending=False).head()
+
+
+# In[119]:
+
+
+clust_cov_exp_tss = cluster_cov_exp[cluster_cov_exp["PromType2"] != "Enhancer"]
+chip_cov_exp_tss = chip_cov_exp[chip_cov_exp["PromType2"] != "Enhancer"]
+tss_merge = clust_cov_exp_tss.merge(chip_cov_exp_tss, on=["unique_id", "cage_id"], suffixes=("_clust", "_chip"))
+tss_merge = tss_merge[["unique_id", "n_motifs_chip", "n_motifs_clust", "max_cov_clust", "max_cov_chip", "av_exp_chip", "tissue_sp_all_chip", "tss_type_chip"]]
+tss_merge.sample(5)
+
+
+# In[129]:
+
+
+tss_merge[(tss_merge["unique_id"].str.contains("intergenic")) & (tss_merge["tss_type_chip"] == "ubiquitous")].sort_values(by=["max_cov_chip", "max_cov_clust"], ascending=False).head(40)
+
+
+# In[76]:
+
+
+tss_merge[(tss_merge["tss_type_chip"] == "tissue-specific") & (tss_merge["n_motifs_chip"] > 1)].sort_values(by=["max_cov_chip", "max_cov_clust"], ascending=True).head(50)
+
+
+# ## 3. look at conservation of nucleotides vs. motif coverage
+
+# In[49]:
+
+
+fimo_phylop_f = "../../misc/03__fimo/06__phylop_meta_plot/all_fimo_map.phylop46way.txt"
+fimo_chip_phylop_f = "../../misc/03__fimo/06__phylop_meta_plot/all_fimo_map.chip_intersected.phylop46way.txt"
+fimo_clust_phylop_f = "../../misc/03__fimo/06__phylop_meta_plot/all_fimo_map.bulyk_clusters.phylop46way.txt"
+
+
+# In[52]:
+
+
+fimo_phylop = pd.read_table(fimo_phylop_f, sep="\t", header=None)
+cols = ["chr", "start", "end", "motif", "n_ov", "tss_dist"]
+cols.extend(np.arange(-150, 150, step=1))
+fimo_phylop.columns = cols
+fimo_phylop.head()
+
+
+# In[116]:
+
+
+res_dict = {}
+df = fimo_phylop
+nuc_cols = list(np.arange(-150, 150, step=1))
+
+prev_max = 0
+for max_motifs in [1, 10, 30, 86]:
+    sub = df[(df["n_ov"] > prev_max) & (df["n_ov"] <= max_motifs)]
+    n_motifs = len(sub)
+    nums = np.asarray(sub[nuc_cols])
+    signs = np.asarray(sub["tss_dist"].astype(int))
+    
+    avg = np.nanmean(nums, axis=0)
+    std = np.nanstd(nums, axis=0)
+    
+    y1 = avg - std
+    y2 = avg + std
+    
+    res_dict[max_motifs] = {"n_motifs": n_motifs, "avg": avg, "y1": y1, "y2": y2}
+    prev_max = max_motifs
+
+
+# In[117]:
+
+
+fig = plt.figure(figsize=(7,2))
+palette = {1: sns.cubehelix_palette(4, start=.75, rot=-.75)[0], 10: sns.cubehelix_palette(4, start=.75, rot=-.75)[1], 
+           30: sns.cubehelix_palette(4, start=.75, rot=-.75)[2], 86: sns.cubehelix_palette(4, start=.75, rot=-.75)[3]}
+labels = ["1 motif", "2-10 motifs", "11-30 motifs", "31+ motifs"]
+
+for n, label in zip(res_dict.keys(), labels):
+    res = res_dict[n]
+    n_motifs = res["n_motifs"]
+    avg = res["avg"]
+    y1 = res["y1"]
+    y2 = res["y2"]
+    # x = signal.savgol_filter(df["mean"], 15, 1)
+    # plt.fill_between(nuc_cols, y1, y2, color=palette[n], alpha=0.5)
+    plt.plot(nuc_cols, avg, color=palette[n], linewidth=3, label="%s (n=%s)" % (label, n_motifs))
+# plt.xlim((lower, upper))
+# plt.axvline(x=-75, color="black", linestyle="dashed", linewidth=1)
+# plt.axvline(x=25, color="black", linestyle="dashed", linewidth=1)
+plt.legend(ncol=1, loc=1, bbox_to_anchor=(1.25, 1))
+plt.xlabel("nucleotide (0 = middle of motif)")
+plt.ylabel("phylop 46-way")
+
+
+# In[120]:
+
+
+fimo_chip_phylop = pd.read_table(fimo_chip_phylop_f, sep="\t", header=None)
+cols = ["chr", "start", "end", "motif", "n_ov", "tss_dist"]
+cols.extend(np.arange(-150, 150, step=1))
+fimo_chip_phylop.columns = cols
+fimo_chip_phylop.head()
+
+
+# In[121]:
+
+
+fimo_chip_phylop["n_ov"].max()
+
+
+# In[127]:
+
+
+res_dict = {}
+df = fimo_chip_phylop
+nuc_cols = list(np.arange(-150, 150, step=1))
+
+prev_max = 0
+for max_motifs in [1, 4, 8, 13]:
+    sub = df[(df["n_ov"] > prev_max) & (df["n_ov"] <= max_motifs)]
+    n_motifs = len(sub)
+    nums = np.asarray(sub[nuc_cols])
+    
+    avg = np.nanmean(nums, axis=0)
+    std = np.nanstd(nums, axis=0)
+    
+    y1 = avg - std
+    y2 = avg + std
+    
+    res_dict[max_motifs] = {"n_motifs": n_motifs, "avg": avg, "y1": y1, "y2": y2}
+    prev_max = max_motifs
+
+
+# In[128]:
+
+
+fig = plt.figure(figsize=(7,2))
+palette = {1: sns.cubehelix_palette(4, start=.75, rot=-.75)[0], 4: sns.cubehelix_palette(4, start=.75, rot=-.75)[1], 
+           8: sns.cubehelix_palette(4, start=.75, rot=-.75)[2], 13: sns.cubehelix_palette(4, start=.75, rot=-.75)[3]}
+labels = ["1 motif", "2-4 motifs", "5-8 motifs", "9+ motifs"]
+
+for n, label in zip(res_dict.keys(), labels):
+    res = res_dict[n]
+    n_motifs = res["n_motifs"]
+    avg = res["avg"]
+    y1 = res["y1"]
+    y2 = res["y2"]
+    # x = signal.savgol_filter(df["mean"], 15, 1)
+    # plt.fill_between(nuc_cols, y1, y2, color=palette[n], alpha=0.5)
+    plt.plot(nuc_cols, avg, color=palette[n], linewidth=3, label="%s (n=%s)" % (label, n_motifs))
+# plt.xlim((lower, upper))
+# plt.axvline(x=-75, color="black", linestyle="dashed", linewidth=1)
+# plt.axvline(x=25, color="black", linestyle="dashed", linewidth=1)
+plt.legend(ncol=1, loc=1, bbox_to_anchor=(1.25, 1))
+plt.xlabel("nucleotide (0 = middle of motif)")
+plt.ylabel("phylop 46-way")
+
+
+# In[129]:
+
+
+fimo_clust_phylop = pd.read_table(fimo_clust_phylop_f, sep="\t", header=None)
+fimo_clust_phylop.columns = cols
+fimo_clust_phylop.head()
+
+
+# In[130]:
+
+
+fimo_clust_phylop["n_ov"].max()
+
+
+# In[135]:
+
+
+res_dict = {}
+df = fimo_clust_phylop
+nuc_cols = list(np.arange(-150, 150, step=1))
+
+prev_max = 0
+for max_motifs in [1, 3, 6, 13]:
+    sub = df[(df["n_ov"] > prev_max) & (df["n_ov"] <= max_motifs)]
+    n_motifs = len(sub)
+    nums = np.asarray(sub[nuc_cols])
+    
+    avg = np.nanmean(nums, axis=0)
+    std = np.nanstd(nums, axis=0)
+    
+    y1 = avg - std
+    y2 = avg + std
+    
+    res_dict[max_motifs] = {"n_motifs": n_motifs, "avg": avg, "y1": y1, "y2": y2}
+    prev_max = max_motifs
+
+
+# In[137]:
+
+
+fig = plt.figure(figsize=(7,2))
+palette = {1: sns.cubehelix_palette(4, start=.75, rot=-.75)[0], 3: sns.cubehelix_palette(4, start=.75, rot=-.75)[1], 
+           6: sns.cubehelix_palette(4, start=.75, rot=-.75)[2], 13: sns.cubehelix_palette(4, start=.75, rot=-.75)[3]}
+labels = ["1 motif", "2-3 motifs", "4-6 motifs", "7+ motifs"]
+
+for n, label in zip(res_dict.keys(), labels):
+    res = res_dict[n]
+    n_motifs = res["n_motifs"]
+    avg = res["avg"]
+    y1 = res["y1"]
+    y2 = res["y2"]
+    # x = signal.savgol_filter(df["mean"], 15, 1)
+    # plt.fill_between(nuc_cols, y1, y2, color=palette[n], alpha=0.5)
+    plt.plot(nuc_cols, avg, color=palette[n], linewidth=3, label="%s (n=%s)" % (label, n_motifs))
+# plt.xlim((lower, upper))
+# plt.axvline(x=-75, color="black", linestyle="dashed", linewidth=1)
+# plt.axvline(x=25, color="black", linestyle="dashed", linewidth=1)
+plt.legend(ncol=1, loc=1, bbox_to_anchor=(1.25, 1))
+plt.xlabel("nucleotide (0 = middle of motif)")
+plt.ylabel("phylop 46-way")
 
 
 # In[ ]:

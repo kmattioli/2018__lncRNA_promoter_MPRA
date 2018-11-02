@@ -65,7 +65,7 @@ tf_expr_f = "../../data/04__coverage/TF_tissue_specificities.from_CAGE.txt"
 # In[5]:
 
 
-fimo_f = "../../misc/03__fimo/pool2_fimo_map.txt"
+fimo_f = "../../misc/03__fimo/00__fimo_outputs/pool2_fimo_map.orig.txt"
 
 
 # In[6]:
@@ -251,7 +251,7 @@ def getOverlap(a, b):
     return max(a[0], b[0]) - min(a[1], b[1])
 
 
-# In[43]:
+# In[21]:
 
 
 hepg2_motif_peaks = {}
@@ -557,7 +557,7 @@ results_df.columns = ["gene", "n_sig_motifs", "type"]
 results_df.head()
 
 
-# In[36]:
+# In[40]:
 
 
 fig = plt.figure(figsize=(2.5, 2))
@@ -579,12 +579,12 @@ both_dist = both_dist[~np.isnan(both_dist)]
 u, pval = stats.mannwhitneyu(one_dist, both_dist, alternative="less", use_continuity=False)
 
 # statistical annotation
-annotate_pval(ax, 0.2, 0.8, 40, 0, 39, pval, fontsize)
+annotate_pval(ax, 0.2, 0.8, 40, 0, 0, pval, fontsize, False, None, None)
 
 fig.savefig("Fig_S11.pdf", dpi="figure", bbox_inches="tight")
 
 
-# In[37]:
+# In[41]:
 
 
 pval
@@ -592,7 +592,7 @@ pval
 
 # ## 8. plot correlation b/w number of motifs found and ref tile activity
 
-# In[38]:
+# In[42]:
 
 
 hepg2_dict = {}
@@ -612,7 +612,7 @@ for del_dict, motif_dict, d in zip([hepg2_data_peaks, k562_data_peaks],
         d[key] = [wt_activ, n_tot_sig]
 
 
-# In[39]:
+# In[43]:
 
 
 hepg2_activ = pd.DataFrame.from_dict(hepg2_dict, orient="index").reset_index()
@@ -622,28 +622,62 @@ k562_activ = pd.DataFrame.from_dict(k562_dict, orient="index").reset_index()
 k562_activ.columns = ["seq_name", "activ", "n_sig"]
 
 
-# In[40]:
+# In[44]:
 
 
 hepg2_activ.head()
 
 
-# In[41]:
+# In[48]:
 
 
 g = sns.jointplot(data=hepg2_activ, x="activ", y="n_sig", kind="reg", space=0, size=2.625, stat_func=spearmanr, 
                   marginal_kws={"hist": True, "kde": False, "bins": 10}, color="darkgrey", scatter_kws={"s": 25},
                   xlim=(-1, 6), ylim=(-10, 60))
+
+# add n-value
+g.ax_joint.annotate("n = %s" % len(hepg2_activ), ha="right", xy=(.95, .05), xycoords=g.ax_joint.transAxes, 
+                    fontsize=fontsize)
+
 g.set_axis_labels("reference activity", "# motifs")
 
 
-# In[42]:
+# In[49]:
 
 
 g = sns.jointplot(data=k562_activ, x="activ", y="n_sig", kind="reg", space=0, size=2.625, stat_func=spearmanr, 
                   marginal_kws={"hist": True, "kde": False, "bins": 10}, color="darkgrey", scatter_kws={"s": 25},
                   xlim=(-1, 6), ylim=(-10, 60))
+
+# add n-value
+g.ax_joint.annotate("n = %s" % len(k562_activ), ha="right", xy=(.95, .05), xycoords=g.ax_joint.transAxes, 
+                    fontsize=fontsize)
+
 g.set_axis_labels("reference activity", "# motifs")
+
+
+# In[50]:
+
+
+hepg2_activ[hepg2_activ["seq_name"] == "FALEC__p1__tile2__plus"]
+
+
+# In[51]:
+
+
+k562_activ[k562_activ["seq_name"] == "FALEC__p1__tile2__plus"]
+
+
+# In[52]:
+
+
+hepg2_activ[hepg2_activ["seq_name"] == "MEG3__p1__tile2__plus"]
+
+
+# In[53]:
+
+
+k562_activ[k562_activ["seq_name"] == "MEG3__p1__tile2__plus"]
 
 
 # In[ ]:

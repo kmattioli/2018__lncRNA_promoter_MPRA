@@ -113,6 +113,29 @@ class Scale(matplotlib.patheffects.RendererBase):
 
 # ## plotting functions
 
+# In[ ]:
+
+
+def axis_data_coords_sys_transform(axis_obj_in,xin,yin,inverse=False):
+    """ inverse = False : Axis => Data
+                = True  : Data => Axis
+    """
+    xlim = axis_obj_in.get_xlim()
+    ylim = axis_obj_in.get_ylim()
+
+    xdelta = xlim[1] - xlim[0]
+    ydelta = ylim[1] - ylim[0]
+    if not inverse:
+        xout =  xlim[0] + xin * xdelta
+        yout =  ylim[0] + yin * ydelta
+    else:
+        xdelta2 = xin - xlim[0]
+        ydelta2 = yin - ylim[0]
+        xout = xdelta2 / xdelta
+        yout = ydelta2 / ydelta
+    return xout,yout
+
+
 # In[8]:
 
 
@@ -141,18 +164,24 @@ def mimic_r_boxplot(ax):
 # In[ ]:
 
 
-def annotate_pval(ax, x1, x2, y, h, text_y, val, fontsize):
+def annotate_pval(ax, x1, x2, y, h, text_y, val, fontsize, mark_points, color1, color2):
     from decimal import Decimal
     ax.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1, c="black", linewidth=0.5)
-    if val < 0.0001:
-        #text = "{:.2e}".format(Decimal(val))
-        text = "**"
+    if mark_points:
+        ax.plot(x1, y, 's', markersize=5, markerfacecolor='white', markeredgewidth=1, markeredgecolor=color1)
+        ax.plot(x2, y, 's', markersize=5, markerfacecolor='white', markeredgewidth=1, markeredgecolor=color2)
+    if val < 0.0005:
+        text = "{:.1e}".format(Decimal(val))
+        #text = "**"
     elif val < 0.05:
-        #text = "%.4f" % val
-        text = "*"
+        text = "%.3f" % val
+        #text = "*"
     else:
-        text = "n.s."
-    ax.text((x1+x2)*.5, text_y, text, ha='center', va='bottom', color="black", size=fontsize)
+        text = "%.3f" % val
+        #text = "n.s."
+        
+    ax.annotate(text, xy=((x1+x2)*.5, y), xycoords="data", xytext=(0, text_y), textcoords="offset pixels",
+                horizontalalignment="center", verticalalignment="bottom", color="black", size=fontsize)
 
 
 # In[ ]:
