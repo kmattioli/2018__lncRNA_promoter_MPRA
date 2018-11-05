@@ -1453,11 +1453,11 @@ lnc_avg_nucs = all_activ_phylop[all_activ_phylop["PromType2"] == "intergenic"][n
 plt.plot(nuc_cols, lnc_avg_nucs, linewidth=3)
 
 
-# In[102]:
+# In[107]:
 
 
 all_activ_phylop["av_phylop"] = all_activ_phylop[nuc_cols].mean(axis=1)
-df = all_activ_phylop[all_activ_phylop["PromType2"] == "intergenic"]
+df = all_activ_phylop[all_activ_phylop["PromType2"] == "protein_coding"]
 sns.jointplot(data=df, x="cage_activ", y="av_phylop")
 
 

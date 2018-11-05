@@ -168,8 +168,8 @@ def annotate_pval(ax, x1, x2, y, h, text_y, val, fontsize, mark_points, color1, 
     from decimal import Decimal
     ax.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1, c="black", linewidth=0.5)
     if mark_points:
-        ax.plot(x1, y, 's', markersize=5, markerfacecolor='white', markeredgewidth=1, markeredgecolor=color1)
-        ax.plot(x2, y, 's', markersize=5, markerfacecolor='white', markeredgewidth=1, markeredgecolor=color2)
+        ax.plot(x1, y, '|', markersize=5, markerfacecolor=color1, markeredgewidth=1, markeredgecolor=color1)
+        ax.plot(x2, y, '|', markersize=5, markerfacecolor=color2, markeredgewidth=1, markeredgecolor=color2)
     if val < 0.0005:
         text = "{:.1e}".format(Decimal(val))
         #text = "**"
