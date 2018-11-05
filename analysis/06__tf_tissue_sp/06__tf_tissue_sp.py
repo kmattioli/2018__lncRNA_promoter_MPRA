@@ -91,8 +91,8 @@ k562_activ_f = "../../data/02__activs/POOL1__pMPRA1__K562__activities_per_elemen
 # In[7]:
 
 
-fimo_f = "../../misc/03__fimo/00__fimo_outputs/all_fimo_map.new_deduped.txt"
-fimo_chip_f = "../../misc/03__fimo/00__fimo_outputs/all_fimo_map.new_chip_intersected.new_deduped.txt"
+fimo_f = "../../misc/03__fimo/00__fimo_outputs/all_fimo_map.new_deduped.txt.gz"
+fimo_chip_f = "../../misc/03__fimo/00__fimo_outputs/all_fimo_map.new_chip_intersected.new_deduped.txt.gz"
 pool1_fimo_f = "../../misc/03__fimo/00__fimo_outputs/pool1_fimo_map.new_deduped.txt"
 pool1_fimo_chip_f = "../../misc/03__fimo/00__fimo_outputs/pool1_fimo_map.new_chip_intersected.new_deduped.txt"
 pool1_fimo_no_ets_f = "../../misc/03__fimo/00__fimo_outputs/pool1_fimo_map.no_ETS_motifs.new_deduped.txt"
@@ -177,7 +177,7 @@ enh_cage_map_f = "../../misc/00__tss_properties/enhancer_id_map.txt"
 # In[16]:
 
 
-fimo = pd.read_table(fimo_f, sep="\t", header=None)
+fimo = pd.read_table(fimo_f, sep="\t", header=None, compression="gzip")
 fimo.columns = ["motif_chr", "motif_start", "motif_end", "unique_id", "score", "strand", "chr", "start", "end", 
                 "motif", "motif_score", "motif_strand"]
 fimo.head()
@@ -186,7 +186,7 @@ fimo.head()
 # In[17]:
 
 
-fimo_chip = pd.read_table(fimo_chip_f, sep="\t", header=None)
+fimo_chip = pd.read_table(fimo_chip_f, sep="\t", header=None, compression="gzip")
 fimo_chip.columns = ["motif_chr", "motif_start", "motif_end", "unique_id", "score", "strand", "chr", "start", "end", 
                      "motif", "motif_score", "motif_strand"]
 
