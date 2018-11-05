@@ -758,7 +758,7 @@ palette = {"random": "gray", "scrambled": "gray", "Enhancer": sns.color_palette(
 order = ["random", "Enhancer", "intergenic", "div_lnc", "protein_coding", "div_pc"]
 labels = ["random", "eRNAs", "lincRNAs", "div. lncRNAs", "mRNAs", "div. mRNAs"]
 
-f, axarr = plt.subplots(3, sharex=True, sharey=False, figsize=(4, 8))
+f, axarr = plt.subplots(3, sharex=True, sharey=False, figsize=(5.3, 8))
 promtype_plot(pool1_hela_df, order, palette, labels, fontsize, "HeLa", axarr[0], None, 
               "HeLa MPRA activity", False, False, False, None)
 promtype_plot(pool1_hepg2_df, order, palette, labels, fontsize, "HepG2", axarr[1], None, 
@@ -776,7 +776,7 @@ f.savefig("Fig1_All_Biotypes_v_Random.pdf", bbox_inches="tight", dpi="figure")
 order = ["scrambled", "Enhancer", "intergenic", "div_lnc", "protein_coding", "div_pc"]
 labels = ["scrambled", "eRNAs", "lincRNAs", "div. lncRNAs", "mRNAs", "div. mRNAs"]
 
-f, axarr = plt.subplots(3, sharex=True, sharey=False, figsize=(4, 8))
+f, axarr = plt.subplots(3, sharex=True, sharey=False, figsize=(5.3, 8))
 promtype_plot(pool1_hela_df, order, palette, labels, fontsize, "HeLa", axarr[0], None, 
               "HeLa MPRA activity", False, False, False, None)
 promtype_plot(pool1_hepg2_df, order, palette, labels, fontsize, "HepG2", axarr[1], None, 
@@ -1303,7 +1303,7 @@ all_activ_rna_seq.sample(5)
 all_activ_rna_seq.PromType2.value_counts()
 
 
-# In[92]:
+# In[ ]:
 
 
 for cell in ["HepG2", "HeLa", "K562"]:
@@ -1326,7 +1326,7 @@ for cell in ["HepG2", "HeLa", "K562"]:
     g.savefig("%s_mpra_v_seq.pdf" % cell, bbox_inches="tight", dpi="figure")
 
 
-# In[93]:
+# In[ ]:
 
 
 for cell in ["HepG2", "HeLa", "K562"]:
@@ -1351,13 +1351,13 @@ for cell in ["HepG2", "HeLa", "K562"]:
 
 # ## 9. correlate activity with TSS conservation
 
-# In[94]:
+# In[ ]:
 
 
 len(all_activ)
 
 
-# In[95]:
+# In[ ]:
 
 
 all_activ_phylop = all_activ.merge(pool1_phylop.drop(["chr", "start", "end", "score", "strand", "length"], axis=1), 
@@ -1366,13 +1366,13 @@ print(len(all_activ_phylop))
 all_activ_phylop.head()
 
 
-# In[96]:
+# In[ ]:
 
 
 all_activ.columns
 
 
-# In[97]:
+# In[ ]:
 
 
 res_dict = {}
@@ -1401,7 +1401,7 @@ for PromType2 in TSS_CLASS_ORDER:
     res_dict[PromType2] = activ_res_dict
 
 
-# In[98]:
+# In[ ]:
 
 
 fig = plt.figure(figsize=(7,2))
@@ -1432,28 +1432,28 @@ for PromType2 in TSS_CLASS_ORDER:
     plt.show()
 
 
-# In[99]:
+# In[ ]:
 
 
 all_avg_nucs = all_activ_phylop[nuc_cols].mean(axis=0)
 plt.plot(nuc_cols, all_avg_nucs, linewidth=3)
 
 
-# In[100]:
+# In[ ]:
 
 
 pc_avg_nucs = all_activ_phylop[all_activ_phylop["PromType2"] == "protein_coding"][nuc_cols].mean(axis=0)
 plt.plot(nuc_cols, pc_avg_nucs, linewidth=3)
 
 
-# In[101]:
+# In[ ]:
 
 
 lnc_avg_nucs = all_activ_phylop[all_activ_phylop["PromType2"] == "intergenic"][nuc_cols].mean(axis=0)
 plt.plot(nuc_cols, lnc_avg_nucs, linewidth=3)
 
 
-# In[107]:
+# In[ ]:
 
 
 all_activ_phylop["av_phylop"] = all_activ_phylop[nuc_cols].mean(axis=1)
@@ -1461,14 +1461,14 @@ df = all_activ_phylop[all_activ_phylop["PromType2"] == "protein_coding"]
 sns.jointplot(data=df, x="cage_activ", y="av_phylop")
 
 
-# In[103]:
+# In[ ]:
 
 
 df = all_activ_phylop[all_activ_phylop["PromType2"] == "intergenic"]
 sns.jointplot(data=df, x="mpra_ts", y="av_phylop")
 
 
-# In[104]:
+# In[ ]:
 
 
 df.sort_values(by="av_phylop", ascending=False).head()
@@ -1476,7 +1476,7 @@ df.sort_values(by="av_phylop", ascending=False).head()
 
 # ## 10. write final files
 
-# In[105]:
+# In[ ]:
 
 
 # write file with tissue-specificities for later use
@@ -1484,7 +1484,7 @@ final = all_activ[["unique_id", "PromType2", "cage_activ", "cage_ts", "mpra_acti
 final.to_csv("../../data/02__activs/POOL1__pMPRA1__CAGE_vs_MPRA_activs.txt", sep="\t", index=False)
 
 
-# In[106]:
+# In[ ]:
 
 
 # also write file with tss types
