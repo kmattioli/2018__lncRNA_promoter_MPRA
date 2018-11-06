@@ -206,7 +206,7 @@ all_tss.PromType2.unique()
 all_tss["log_av_exp"] = np.log(all_tss["av_exp"]+1)
 
 
-# In[24]:
+# In[27]:
 
 
 fig = plt.figure(figsize=(3.5, 2.5))
@@ -217,11 +217,13 @@ mimic_r_boxplot(ax)
 
 
 # calc p-vals b/w divergent and non
+enhs = np.asarray(all_tss[all_tss["PromType2"] == "Enhancer"]["log_av_exp"])
 lincs = np.asarray(all_tss[all_tss["PromType2"] == "intergenic"]["log_av_exp"])
 div_lncs = np.asarray(all_tss[all_tss["PromType2"] == "div_lnc"]["log_av_exp"])
 pcs = np.asarray(all_tss[all_tss["PromType2"] == "protein_coding"]["log_av_exp"])
 div_pcs = np.asarray(all_tss[all_tss["PromType2"] == "div_pc"]["log_av_exp"])
 
+enhs = enhs[~np.isnan(enhs)]
 lincs = lincs[~np.isnan(lincs)]
 div_lncs = div_lncs[~np.isnan(div_lncs)]
 pcs = pcs[~np.isnan(pcs)]
@@ -233,20 +235,42 @@ pc_u, pc_pval = stats.mannwhitneyu(pcs, div_pcs, alternative="two-sided", use_co
 annotate_pval(ax, 1, 2, 7.3, 0, 0, lnc_pval, fontsize, False, None, None)
 annotate_pval(ax, 3, 4, 8.5, 0, 0, pc_pval, fontsize, False, None, None)
 
-plt.ylim((-0.5, 9.5))
+plt.ylim((-1, 9.5))
 plt.xlabel("")
 plt.ylabel("log(mean CAGE expression)")
+
+x_ax_0, y_ax = axis_data_coords_sys_transform(ax, 0, 0, inverse=True)
+x_ax_1, y_ax = axis_data_coords_sys_transform(ax, 1, 0, inverse=True)
+x_ax_diff = x_ax_1 - x_ax_0
+
+ax.annotate(str(len(enhs)), xy=(x_ax_0, 0.02), xycoords="axes fraction", xytext=(0, 0), 
+            textcoords="offset pixels", ha='center', va='bottom', 
+            color=TSS_CLASS_PALETTE["Enhancer"], size=fontsize)
+ax.annotate(str(len(lincs)), xy=(x_ax_0+(x_ax_diff*1), 0.02), xycoords="axes fraction", xytext=(0, 0), 
+            textcoords="offset pixels", ha='center', va='bottom', 
+            color=TSS_CLASS_PALETTE["intergenic"], size=fontsize)
+ax.annotate(str(len(div_lncs)), xy=(x_ax_0+(x_ax_diff*2), 0.02), xycoords="axes fraction", xytext=(0, 0), 
+            textcoords="offset pixels", ha='center', va='bottom', 
+            color=TSS_CLASS_PALETTE["div_lnc"], size=fontsize)
+ax.annotate(str(len(pcs)), xy=(x_ax_0+(x_ax_diff*3), 0.02), xycoords="axes fraction", xytext=(0, 0), 
+            textcoords="offset pixels", ha='center', va='bottom', 
+            color=TSS_CLASS_PALETTE["protein_coding"], size=fontsize)
+ax.annotate(str(len(div_pcs)), xy=(x_ax_0+(x_ax_diff*4), 0.02), xycoords="axes fraction", xytext=(0, 0), 
+            textcoords="offset pixels", ha='center', va='bottom', 
+            color=TSS_CLASS_PALETTE["div_pc"], size=fontsize)
+    
+
 fig.savefig("cage_exp_all_proms.pdf", dpi="figure", bbox_inches="tight")
 
 
-# In[25]:
+# In[28]:
 
 
 print("lnc pval: %s" % lnc_pval)
 print("pc pval: %s" % pc_pval)
 
 
-# In[27]:
+# In[29]:
 
 
 fig = plt.figure(figsize=(3.5, 2.5))
@@ -257,11 +281,13 @@ mimic_r_boxplot(ax)
 
 
 # calc p-vals b/w divergent and non
+enhs = np.asarray(all_tss[all_tss["PromType2"] == "Enhancer"]["tissue_sp_all"])
 lincs = np.asarray(all_tss[all_tss["PromType2"] == "intergenic"]["tissue_sp_all"])
 div_lncs = np.asarray(all_tss[all_tss["PromType2"] == "div_lnc"]["tissue_sp_all"])
 pcs = np.asarray(all_tss[all_tss["PromType2"] == "protein_coding"]["tissue_sp_all"])
 div_pcs = np.asarray(all_tss[all_tss["PromType2"] == "div_pc"]["tissue_sp_all"])
 
+enhs = enhs[~np.isnan(enhs)]
 lincs = lincs[~np.isnan(lincs)]
 div_lncs = div_lncs[~np.isnan(div_lncs)]
 pcs = pcs[~np.isnan(pcs)]
@@ -273,13 +299,33 @@ pc_u, pc_pval = stats.mannwhitneyu(pcs, div_pcs, alternative="two-sided", use_co
 annotate_pval(ax, 1, 2, 1.05, 0, 0, lnc_pval, fontsize, False, None, None)
 annotate_pval(ax, 3, 4, 1.05, 0, 0, pc_pval, fontsize, False, None, None)
 
+x_ax_0, y_ax = axis_data_coords_sys_transform(ax, 0, 0, inverse=True)
+x_ax_1, y_ax = axis_data_coords_sys_transform(ax, 1, 0, inverse=True)
+x_ax_diff = x_ax_1 - x_ax_0
+
+ax.annotate(str(len(enhs)), xy=(x_ax_0, 0.02), xycoords="axes fraction", xytext=(0, 0), 
+            textcoords="offset pixels", ha='center', va='bottom', 
+            color=TSS_CLASS_PALETTE["Enhancer"], size=fontsize)
+ax.annotate(str(len(lincs)), xy=(x_ax_0+(x_ax_diff*1), 0.02), xycoords="axes fraction", xytext=(0, 0), 
+            textcoords="offset pixels", ha='center', va='bottom', 
+            color=TSS_CLASS_PALETTE["intergenic"], size=fontsize)
+ax.annotate(str(len(div_lncs)), xy=(x_ax_0+(x_ax_diff*2), 0.02), xycoords="axes fraction", xytext=(0, 0), 
+            textcoords="offset pixels", ha='center', va='bottom', 
+            color=TSS_CLASS_PALETTE["div_lnc"], size=fontsize)
+ax.annotate(str(len(pcs)), xy=(x_ax_0+(x_ax_diff*3), 0.02), xycoords="axes fraction", xytext=(0, 0), 
+            textcoords="offset pixels", ha='center', va='bottom', 
+            color=TSS_CLASS_PALETTE["protein_coding"], size=fontsize)
+ax.annotate(str(len(div_pcs)), xy=(x_ax_0+(x_ax_diff*4), 0.02), xycoords="axes fraction", xytext=(0, 0), 
+            textcoords="offset pixels", ha='center', va='bottom', 
+            color=TSS_CLASS_PALETTE["div_pc"], size=fontsize)
+
 plt.ylim((0.2, 1.15))
 plt.xlabel("")
 plt.ylabel("CAGE tissue-specificity")
 fig.savefig("cage_ts_all_proms.pdf", dpi="figure", bbox_inches="tight")
 
 
-# In[28]:
+# In[30]:
 
 
 print("lnc pval: %s" % lnc_pval)
@@ -291,20 +337,20 @@ print("pc pval: %s" % pc_pval)
 # dynamic = on in < 50% of samples, in at least 1 sample on at > 10
 # tissue-sp = on in < 50% of samples
 
-# In[29]:
+# In[31]:
 
 
 all_cage_exp["n_expr"] = all_cage_exp[samples].astype(bool).sum(axis=1)
 all_cage_exp.head()
 
 
-# In[30]:
+# In[32]:
 
 
 len(all_cage_exp)
 
 
-# In[31]:
+# In[33]:
 
 
 def expr_type(row, samples, thresh):
@@ -324,7 +370,7 @@ all_cage_exp["tss_type"] = all_cage_exp.apply(expr_type, axis=1, samples=samples
 all_cage_exp.sample(10)
 
 
-# In[32]:
+# In[34]:
 
 
 all_cage_exp.tss_type.value_counts()
@@ -332,33 +378,33 @@ all_cage_exp.tss_type.value_counts()
 
 # ## write file
 
-# In[33]:
+# In[35]:
 
 
 final = all_cage_exp[["cage_id", "av_exp", "tissue_sp_all",  "tissue_sp_3", "n_expr", "tss_type"]]
 final.sample(5)
 
 
-# In[34]:
+# In[36]:
 
 
 final[final["tss_type"] == "dynamic"].sample(5)
 
 
-# In[35]:
+# In[37]:
 
 
 # chr16:2918256-2918257
 final[final["cage_id"].str.contains("chr16:2918")]
 
 
-# In[36]:
+# In[38]:
 
 
 final.to_csv("../../misc/01__cage/All_TSS_and_enh.CAGE_grouped_exp.tissue_sp.txt", sep="\t", index=False)
 
 
-# In[37]:
+# In[39]:
 
 
 len(final)
