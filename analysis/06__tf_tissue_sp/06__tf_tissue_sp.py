@@ -110,7 +110,7 @@ pool1_fimo_no_ets_chip_f = "../../misc/03__fimo/00__fimo_outputs/pool1_fimo_map.
 # pool1_fimo_no_ets_chip_f = "../../misc/03__fimo/03__grouped_fimo_outputs/pool1_fimo_map.new_chip_intersected.grouped.no_ETS_motifs.txt"
 
 
-# In[9]:
+# In[116]:
 
 
 fimo_bp_cov_f = "../../data/04__coverage/all_fimo_map.new_deduped.bp_covered.txt"
@@ -121,6 +121,9 @@ fimo_chip_max_cov_f = "../../data/04__coverage/all_fimo_map.new_chip_intersected
 
 fimo_clust_bp_cov_f = "../../data/04__coverage/all_fimo_map.bulyk_clusters.new_deduped.bp_covered.txt"
 fimo_clust_max_cov_f = "../../data/04__coverage/all_fimo_map.bulyk_clusters.new_deduped.max_coverage.txt"
+
+fimo_mosbat_bp_cov_f = "../../data/04__coverage/all_fimo_map.mosbat_clusters.bp_covered.txt"
+fimo_mosbat_max_cov_f = "../../data/04__coverage/all_fimo_map.mosbat_clusters.max_coverage.txt"
 
 
 # In[10]:
@@ -318,6 +321,20 @@ fimo_clust_cov = fimo_clust_bp_cov.merge(fimo_clust_max_cov, on="unique_id")
 print(len(fimo_clust_cov))
 
 
+# In[117]:
+
+
+fimo_mosbat_bp_cov = pd.read_table(fimo_mosbat_bp_cov_f, sep="\t", header=None)
+fimo_mosbat_bp_cov.columns = ["chr", "start", "end", "unique_id", "score", "strand", "n_motifs", "n_bp_cov", "seq_len", 
+                             "frac_bp_cov"]
+
+fimo_mosbat_max_cov = pd.read_table(fimo_mosbat_max_cov_f, sep="\t", header=None)
+fimo_mosbat_max_cov.columns = ["unique_id", "max_cov"]
+
+fimo_mosbat_cov = fimo_clust_bp_cov.merge(fimo_mosbat_max_cov, on="unique_id")
+print(len(fimo_mosbat_cov))
+
+
 # In[30]:
 
 
@@ -374,20 +391,21 @@ pool1_fimo_no_ets_chip_cov = pool1_fimo_no_ets_chip_bp_cov.merge(pool1_fimo_no_e
 print(len(pool1_fimo_no_ets_chip_cov))
 
 
-# In[34]:
+# In[118]:
 
 
 all_cov_dfs = {"fimo": fimo_cov, "fimo_chip": fimo_chip_cov, "fimo_clust": fimo_clust_cov, 
                "fimo_no_ets": fimo_no_ets_cov, "fimo_no_ets_chip": fimo_no_ets_chip_cov, 
                "pool1_fimo": pool1_fimo_cov, "pool1_fimo_chip": pool1_fimo_chip_cov, 
                "pool1_fimo_no_ets": pool1_fimo_no_ets_cov, 
-               "pool1_fimo_no_ets_chip": pool1_fimo_no_ets_chip_cov}
+               "pool1_fimo_no_ets_chip": pool1_fimo_no_ets_chip_cov,
+               "fimo_mosbat": fimo_mosbat_cov}
 
 all_motif_dfs = {"fimo": fimo, "fimo_chip": fimo_chip, "pool1_fimo": pool1_fimo, "pool1_fimo_chip": pool1_fimo_chip,
                  "pool1_fimo_no_ets": pool1_fimo_no_ets, "pool1_fimo_no_ets_chip": pool1_fimo_no_ets_chip}
 
 
-# In[35]:
+# In[119]:
 
 
 for key in all_cov_dfs.keys():
@@ -560,7 +578,7 @@ avg_sp.sample(5)
 
 # ## 4. merge and write coverage files
 
-# In[49]:
+# In[120]:
 
 
 file_prefixes = {"fimo": "all_fimo_map", "fimo_chip": "all_fimo_map.chip_intersected", 
@@ -568,7 +586,8 @@ file_prefixes = {"fimo": "all_fimo_map", "fimo_chip": "all_fimo_map.chip_interse
                  "fimo_no_ets_chip": "all_fimo_map.chip_intersected.no_ETS_motifs", 
                  "pool1_fimo": "pool1_fimo_map", "pool1_fimo_chip": "pool1_fimo_map.chip_intersected", 
                  "pool1_fimo_no_ets": "pool1_fimo_map.no_ETS_motifs", 
-                 "pool1_fimo_no_ets_chip": "pool1_fimo_map.chip_intersected.no_ETS_motifs"}
+                 "pool1_fimo_no_ets_chip": "pool1_fimo_map.chip_intersected.no_ETS_motifs",
+                 "fimo_mosbat": "all_fimo_map.mosbat_clusters"}
 
 for key in all_cov_dfs.keys():
     print(key)
@@ -634,7 +653,7 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 # add n-value
 ax.annotate("n = %s" % len(no_nan), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
             fontsize=fontsize)
-#fig.savefig("Fig_2C_3.pdf", bbox_inches="tight", dpi="figure")
+fig.savefig("Fig_2C_3.fimo_only.pdf", bbox_inches="tight", dpi="figure")
 
 
 # In[54]:
@@ -661,7 +680,7 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 # add n-value
 ax.annotate("n = %s" % len(no_nan), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
             fontsize=fontsize)
-#fig.savefig("Fig_2C_6.pdf", bbox_inches="tight", dpi="figure")
+fig.savefig("Fig_2C_6.fimo_only.pdf", bbox_inches="tight", dpi="figure")
 
 
 # #### fimo intersected w/ chip
@@ -696,6 +715,7 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 # add n-value
 ax.annotate("n = %s" % len(no_nan), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
             fontsize=fontsize)
+fig.savefig("Fig_2C_3.chip_int.pdf", bbox_inches="tight", dpi="figure")
 
 
 # In[59]:
@@ -722,6 +742,7 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 # add n-value
 ax.annotate("n = %s" % len(no_nan), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
             fontsize=fontsize)
+fig.savefig("Fig_2C_6.chip_int.pdf", bbox_inches="tight", dpi="figure")
 
 
 # #### fimo only -- no ETS
@@ -881,11 +902,12 @@ ax.set_xlim((3,5))
 r, p = stats.spearmanr(no_nan["log_bp_cov"], no_nan["mpra_activ"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_2C_1.pdf", bbox_inches="tight", dpi="figure")
 
 # add n-value
 ax.annotate("n = %s" % len(no_nan), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
             fontsize=fontsize)
+
+fig.savefig("Fig_2C_1.fimo_only.pdf", bbox_inches="tight", dpi="figure")
 
 
 # In[74]:
@@ -912,11 +934,12 @@ ax.set_xlim((3, 5))
 r, p = stats.spearmanr(no_nan["log_bp_cov"], no_nan["mpra_ts"])
 print("r: %s, spearman p: %s" % (r, p))
 ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_2C_4.pdf", bbox_inches="tight", dpi="figure")
 
 # add n-value
 ax.annotate("n = %s" % len(no_nan), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
             fontsize=fontsize)
+
+fig.savefig("Fig_2C_4.fimo_only.pdf", bbox_inches="tight", dpi="figure")
 
 
 # #### fimo intersected w/ chip
@@ -957,6 +980,8 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 ax.annotate("n = %s" % len(no_nan), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
             fontsize=fontsize)
 
+fig.savefig("Fig_2C_1.chip_int.pdf", bbox_inches="tight", dpi="figure")
+
 
 # In[79]:
 
@@ -985,6 +1010,8 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 # add n-value
 ax.annotate("n = %s" % len(no_nan), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
             fontsize=fontsize)
+
+fig.savefig("Fig_2C_4.chip_int.pdf", bbox_inches="tight", dpi="figure")
 
 
 # #### fimo only -- no ETS motifs
@@ -1167,7 +1194,7 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 ax.annotate("n = %s" % len(no_nan), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
             fontsize=fontsize)
 
-fig.savefig("Fig_2C_2.pdf", bbox_inches="tight", dpi="figure")
+fig.savefig("Fig_2C_2.fimo_only.pdf", bbox_inches="tight", dpi="figure")
 
 
 # In[95]:
@@ -1198,7 +1225,7 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 ax.annotate("n = %s" % len(no_nan), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
             fontsize=fontsize)
 
-fig.savefig("Fig_2C_5.pdf", bbox_inches="tight", dpi="figure")
+fig.savefig("Fig_2C_5.fimo_only.pdf", bbox_inches="tight", dpi="figure")
 
 
 # #### fimo intersected w/ chip
@@ -1237,6 +1264,8 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 ax.annotate("n = %s" % len(no_nan), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
             fontsize=fontsize)
 
+fig.savefig("Fig_2C_2.chip_int.pdf", bbox_inches="tight", dpi="figure")
+
 
 # In[100]:
 
@@ -1265,6 +1294,8 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 # add n-value
 ax.annotate("n = %s" % len(no_nan), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
             fontsize=fontsize)
+
+fig.savefig("Fig_2C_5.chip_int.pdf", bbox_inches="tight", dpi="figure")
 
 
 # #### fimo only -- no ETS motifs

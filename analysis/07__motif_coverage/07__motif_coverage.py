@@ -72,6 +72,7 @@ cage_expr_f = "../../misc/01__cage/All_TSS_and_enh.CAGE_grouped_exp.tissue_sp.tx
 fimo_cov_f = "../../data/04__coverage/all_fimo_map.all_cov.new.txt"
 fimo_chip_cov_f = "../../data/04__coverage/all_fimo_map.chip_intersected.all_cov.new.txt"
 fimo_clust_cov_f = "../../data/04__coverage/all_fimo_map.bulyk_clusters.all_cov.new.txt"
+fimo_mosbat_cov_f = "../../data/04__coverage/all_fimo_map.mosbat_clusters.all_cov.new.txt"
 fimo_no_ets_cov_f = "../../data/04__coverage/all_fimo_map.no_ETS_motifs.all_cov.new.txt"
 fimo_no_ets_chip_cov_f = "../../data/04__coverage/all_fimo_map.chip_intersected.no_ETS_motifs.all_cov.new.txt"
 
@@ -143,6 +144,7 @@ fimo_chip_cov = pd.read_table(fimo_chip_cov_f, sep="\t")
 fimo_clust_cov = pd.read_table(fimo_clust_cov_f, sep="\t")
 fimo_no_ets_cov = pd.read_table(fimo_no_ets_cov_f, sep="\t")
 fimo_no_ets_chip_cov = pd.read_table(fimo_no_ets_chip_cov_f, sep="\t")
+fimo_mosbat_cov = pd.read_table(fimo_mosbat_cov_f, sep="\t")
 fimo_chip_cov.sample(5)
 
 
@@ -152,6 +154,7 @@ fimo_chip_cov.sample(5)
 print(len(fimo_cov))
 print(len(fimo_chip_cov))
 print(len(fimo_clust_cov))
+print(len(fimo_mosbat_cov))
 
 
 # In[15]:
@@ -162,6 +165,7 @@ fimo_chip_cov["PromType2"] = fimo_chip_cov["unique_id"].str.split("__", expand=T
 fimo_clust_cov["PromType2"] = fimo_clust_cov["unique_id"].str.split("__", expand=True)[0]
 fimo_no_ets_cov["PromType2"] = fimo_no_ets_cov["unique_id"].str.split("__", expand=True)[0]
 fimo_no_ets_chip_cov["PromType2"] = fimo_no_ets_chip_cov["unique_id"].str.split("__", expand=True)[0]
+fimo_mosbat_cov["PromType2"] = fimo_mosbat_cov["unique_id"].str.split("__", expand=True)[0]
 fimo_cov.sample(5)
 
 
@@ -183,6 +187,9 @@ print(len(fimo_no_ets_chip_cov))
 
 fimo_clust_cov = fimo_clust_cov[fimo_clust_cov["n_motifs"] > 0]
 print(len(fimo_clust_cov))
+
+fimo_mosbat_cov = fimo_mosbat_cov[fimo_mosbat_cov["n_motifs"] > 0]
+print(len(fimo_mosbat_cov))
 
 
 # In[17]:
@@ -216,24 +223,32 @@ fimo_clust_cov.head()
 # In[21]:
 
 
-chip_cov_exp = fimo_chip_cov[~pd.isnull(fimo_chip_cov["av_exp"])]
-motif_cov_exp = fimo_cov[~pd.isnull(fimo_cov["av_exp"])]
-cluster_cov_exp = fimo_clust_cov[~pd.isnull(fimo_clust_cov["av_exp"])]
+fimo_mosbat_cov = fimo_mosbat_cov.merge(cage_expr, on="cage_id", how="left")
+fimo_mosbat_cov.head()
 
 
 # In[22]:
 
 
-motif_cov_exp.PromType2.value_counts()
+chip_cov_exp = fimo_chip_cov[~pd.isnull(fimo_chip_cov["av_exp"])]
+motif_cov_exp = fimo_cov[~pd.isnull(fimo_cov["av_exp"])]
+cluster_cov_exp = fimo_clust_cov[~pd.isnull(fimo_clust_cov["av_exp"])]
+mosbat_cov_exp = fimo_mosbat_cov[~pd.isnull(fimo_mosbat_cov["av_exp"])]
 
 
 # In[23]:
 
 
-chip_cov_exp.PromType2.value_counts()
+motif_cov_exp.PromType2.value_counts()
 
 
 # In[24]:
+
+
+chip_cov_exp.PromType2.value_counts()
+
+
+# In[25]:
 
 
 cluster_cov_exp.PromType2.value_counts()
@@ -243,7 +258,7 @@ cluster_cov_exp.PromType2.value_counts()
 
 # ### all motifs
 
-# In[25]:
+# In[26]:
 
 
 enh_vals = fimo_cov[fimo_cov["PromType2"] == "Enhancer"]["log_bp_cov"]
@@ -252,7 +267,7 @@ dlnc_vals = fimo_cov[fimo_cov["PromType2"] == "div_lnc"]["log_bp_cov"]
 pc_vals = fimo_cov[fimo_cov["PromType2"] == "protein_coding"]["log_bp_cov"]
 dpc_vals = fimo_cov[fimo_cov["PromType2"] == "div_pc"]["log_bp_cov"]
 
-fig = plt.figure(figsize=(2.75, 2))
+fig = plt.figure(figsize=(2.25, 2))
 ax = sns.kdeplot(data=enh_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE["Enhancer"], 
                  label="eRNAs (n=%s)" % len(enh_vals))
 sns.kdeplot(data=linc_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE["intergenic"], 
@@ -266,9 +281,11 @@ sns.kdeplot(data=dpc_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE["div
 ax.set_xlabel("log(# of bp covered)")
 ax.set_ylabel("cumulative density")
 ax.set_xlim((2, 5))
+ax.set_ylim((0, 1.05))
+plt.legend(handlelength=1)
 
 
-# In[26]:
+# In[27]:
 
 
 # for each group, split into tissue-sp v dynamic v ubiquitous
@@ -280,7 +297,7 @@ col = "log_bp_cov"
 xlabel = "log(# of bp covered)"
 xlim = (2, 5)
 
-f, axarr = plt.subplots(nrows=1, ncols=3, sharex=False, sharey=True, figsize=(7, 2))
+f, axarr = plt.subplots(nrows=1, ncols=3, sharex=False, sharey=True, figsize=(5.5, 2))
 
 for i, promtype, name in zip(idxs, promtypes, names):
     print("i: %s, promtype: %s, name: %s" % (i, promtype, name))
@@ -309,14 +326,17 @@ for i, promtype, name in zip(idxs, promtypes, names):
     
     ax.set_title("%s (%s total)" % (name, len(promtype_vals)))
     ax.set_xlabel(xlabel)
-    ax.legend(loc="upper left")
+    ax.legend(loc="upper left", handlelength=2)
     ax.set_xlim(xlim)
     
     if i == 0:
         ax.set_ylabel("cumulative density")
 
+plt.subplots_adjust(wspace=0.1)
+plt.ylim((0, 1.05))
 
-# In[27]:
+
+# In[28]:
 
 
 enh_vals = fimo_cov[fimo_cov["PromType2"] == "Enhancer"]["log_max_cov"]
@@ -325,7 +345,7 @@ dlnc_vals = fimo_cov[fimo_cov["PromType2"] == "div_lnc"]["log_max_cov"]
 pc_vals = fimo_cov[fimo_cov["PromType2"] == "protein_coding"]["log_max_cov"]
 dpc_vals = fimo_cov[fimo_cov["PromType2"] == "div_pc"]["log_max_cov"]
 
-fig = plt.figure(figsize=(2.75, 2))
+fig = plt.figure(figsize=(2.35, 2))
 ax = sns.kdeplot(data=enh_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE["Enhancer"], 
                  label="eRNAs\n(n=%s)" % len(enh_vals))
 sns.kdeplot(data=linc_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE["intergenic"], 
@@ -338,11 +358,12 @@ sns.kdeplot(data=dpc_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE["div
             label="div. mRNAs\n(n=%s)" % len(dpc_vals), ax=ax)
 ax.set_xlabel("log(max coverage)")
 ax.set_ylabel("cumulative density")
-ax.legend(loc="upper left")
+ax.set_ylim((0, 1.05))
+ax.legend(loc="bottom right", handlelength=1)
 fig.savefig("max_cov.all_biotypes.for_poster.pdf", dpi="figure", bbox_inches="tight")
 
 
-# In[28]:
+# In[29]:
 
 
 # for each group, split into tissue-sp v dynamic v ubiquitous
@@ -354,7 +375,7 @@ col = "log_max_cov"
 xlabel = "log(max coverage)"
 xlim = (0, 5.5)
 
-f, axarr = plt.subplots(nrows=1, ncols=3, sharex=False, sharey=True, figsize=(7, 2))
+f, axarr = plt.subplots(nrows=1, ncols=3, sharex=False, sharey=True, figsize=(5.5, 2))
 
 for i, promtype, name in zip(idxs, promtypes, names):
     print("i: %s, promtype: %s, name: %s" % (i, promtype, name))
@@ -383,8 +404,9 @@ for i, promtype, name in zip(idxs, promtypes, names):
     
     ax.set_title("%s (%s total)" % (name, len(promtype_vals)))
     ax.set_xlabel(xlabel)
-    ax.legend(loc="bottom right")
+    ax.legend(loc="bottom right", handlelength=2)
     ax.set_xlim(xlim)
+    ax.set_ylim((0, 1.05))
     
     if i == 0:
         ax.set_ylabel("cumulative density")
@@ -392,7 +414,7 @@ for i, promtype, name in zip(idxs, promtypes, names):
 
 # ### ChIP-validated motifs
 
-# In[29]:
+# In[30]:
 
 
 enh_vals = fimo_chip_cov[fimo_chip_cov["PromType2"] == "Enhancer"]["log_bp_cov"]
@@ -401,7 +423,7 @@ dlnc_vals = fimo_chip_cov[fimo_chip_cov["PromType2"] == "div_lnc"]["log_bp_cov"]
 pc_vals = fimo_chip_cov[fimo_chip_cov["PromType2"] == "protein_coding"]["log_bp_cov"]
 dpc_vals = fimo_chip_cov[fimo_chip_cov["PromType2"] == "div_pc"]["log_bp_cov"]
 
-fig = plt.figure(figsize=(2.75, 2))
+fig = plt.figure(figsize=(2.25, 2))
 ax = sns.kdeplot(data=enh_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE["Enhancer"], 
                  label="eRNAs\n(n=%s)" % len(enh_vals))
 sns.kdeplot(data=linc_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE["intergenic"], 
@@ -414,10 +436,12 @@ sns.kdeplot(data=dpc_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE["div
             label="div. mRNAs\n(n=%s)" % len(dpc_vals), ax=ax)
 ax.set_xlabel("log(# of bp covered)")
 ax.set_ylabel("cumulative density")
+ax.set_ylim((0, 1.05))
+plt.legend(handlelength=1)
 fig.savefig("Fig_2D.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[30]:
+# In[31]:
 
 
 # for each group, split into tissue-sp v dynamic v ubiquitous
@@ -429,7 +453,7 @@ col = "log_bp_cov"
 xlabel = "log(# of bp covered)"
 xlim = (0, 5)
 
-f, axarr = plt.subplots(nrows=1, ncols=3, sharex=False, sharey=True, figsize=(7.2, 2))
+f, axarr = plt.subplots(nrows=1, ncols=3, sharex=False, sharey=True, figsize=(5.5, 2))
 
 for i, promtype, name in zip(idxs, promtypes, names):
     print("i: %s, promtype: %s, name: %s" % (i, promtype, name))
@@ -458,15 +482,18 @@ for i, promtype, name in zip(idxs, promtypes, names):
     
     ax.set_title("%s (%s total)" % (name, len(promtype_vals)))
     ax.set_xlabel(xlabel)
-    ax.legend(loc="bottom right")
+    ax.legend(loc="bottom right", handlelength=2)
     ax.set_xlim(xlim)
+    ax.set_ylim((0, 1.05))
     
     if i == 0:
         ax.set_ylabel("cumulative density")
+        
+plt.subplots_adjust(wspace=0.1)
 f.savefig("Fig_2D_biotype_split.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[31]:
+# In[32]:
 
 
 enh_vals = fimo_chip_cov[fimo_chip_cov["PromType2"] == "Enhancer"]["log_max_cov"]
@@ -475,7 +502,7 @@ dlnc_vals = fimo_chip_cov[fimo_chip_cov["PromType2"] == "div_lnc"]["log_max_cov"
 pc_vals = fimo_chip_cov[fimo_chip_cov["PromType2"] == "protein_coding"]["log_max_cov"]
 dpc_vals = fimo_chip_cov[fimo_chip_cov["PromType2"] == "div_pc"]["log_max_cov"]
 
-fig = plt.figure(figsize=(2.5, 2))
+fig = plt.figure(figsize=(2.25, 2))
 ax = sns.kdeplot(data=enh_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE["Enhancer"], 
                  label="eRNAs (n=%s)" % len(enh_vals))
 sns.kdeplot(data=linc_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE["intergenic"], 
@@ -488,10 +515,13 @@ sns.kdeplot(data=dpc_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE["div
             label="div. mRNAs (n=%s)" % len(dpc_vals), ax=ax)
 ax.set_xlabel("log(max coverage)")
 ax.set_ylabel("cumulative density")
+ax.set_ylim((0, 1.05))
+plt.legend(handlelength=1)
+
 fig.savefig("Fig_2E.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[32]:
+# In[33]:
 
 
 # for each group, split into tissue-sp v dynamic v ubiquitous
@@ -501,9 +531,9 @@ names = ["eRNAs", "lincRNAs", "mRNAs"]
 df = chip_cov_exp
 col = "log_max_cov"
 xlabel = "log(max coverage)"
-xlim = (-0.5, 3)
+xlim = (-0.75, 3)
 
-f, axarr = plt.subplots(nrows=1, ncols=3, sharex=False, sharey=True, figsize=(7.2, 2))
+f, axarr = plt.subplots(nrows=1, ncols=3, sharex=False, sharey=True, figsize=(5.5, 2))
 
 for i, promtype, name in zip(idxs, promtypes, names):
     print("i: %s, promtype: %s, name: %s" % (i, promtype, name))
@@ -532,17 +562,19 @@ for i, promtype, name in zip(idxs, promtypes, names):
     
     ax.set_title("%s (%s total)" % (name, len(promtype_vals)))
     ax.set_xlabel(xlabel)
-    ax.legend(loc="bottom right")
+    ax.legend(loc="upper left", handlelength=2)
+    ax.set_ylim((0, 1.05))
     ax.set_xlim(xlim)
     
     if i == 0:
         ax.set_ylabel("cumulative density")
+plt.subplots_adjust(wspace=0.1)
 f.savefig("Fig_2E_biotype_split.pdf", bbox_inches="tight", dpi="figure")
 
 
 # ### clustered motifs
 
-# In[33]:
+# In[34]:
 
 
 enh_vals = fimo_clust_cov[fimo_clust_cov["PromType2"] == "Enhancer"]["log_bp_cov"]
@@ -551,7 +583,7 @@ dlnc_vals = fimo_clust_cov[fimo_clust_cov["PromType2"] == "div_lnc"]["log_bp_cov
 pc_vals = fimo_clust_cov[fimo_clust_cov["PromType2"] == "protein_coding"]["log_bp_cov"]
 dpc_vals = fimo_clust_cov[fimo_clust_cov["PromType2"] == "div_pc"]["log_bp_cov"]
 
-fig = plt.figure(figsize=(2.75, 2))
+fig = plt.figure(figsize=(2.25, 2))
 ax = sns.kdeplot(data=enh_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE["Enhancer"], 
                  label="eRNAs\n(n=%s)" % len(enh_vals))
 sns.kdeplot(data=linc_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE["intergenic"], 
@@ -564,10 +596,12 @@ sns.kdeplot(data=dpc_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE["div
             label="div. mRNAs\n(n=%s)" % len(dpc_vals), ax=ax)
 ax.set_xlabel("log(# of bp covered)")
 ax.set_ylabel("cumulative density")
+ax.set_ylim((0, 1.05))
+plt.legend(handlelength=1)
 fig.savefig("Fig_2D_clusters.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[34]:
+# In[35]:
 
 
 # for each group, split into tissue-sp v dynamic v ubiquitous
@@ -579,7 +613,7 @@ col = "log_bp_cov"
 xlabel = "log(# of bp covered)"
 xlim = (0, 5)
 
-f, axarr = plt.subplots(nrows=1, ncols=3, sharex=False, sharey=True, figsize=(7.2, 2))
+f, axarr = plt.subplots(nrows=1, ncols=3, sharex=False, sharey=True, figsize=(5.5, 2))
 
 for i, promtype, name in zip(idxs, promtypes, names):
     print("i: %s, promtype: %s, name: %s" % (i, promtype, name))
@@ -608,15 +642,17 @@ for i, promtype, name in zip(idxs, promtypes, names):
     
     ax.set_title("%s (%s total)" % (name, len(promtype_vals)))
     ax.set_xlabel(xlabel)
-    ax.legend(loc="bottom right")
+    ax.legend(loc="bottom right", handlelength=2)
     ax.set_xlim(xlim)
+    ax.set_ylim((0, 1.05))
     
     if i == 0:
         ax.set_ylabel("cumulative density")
+plt.subplots_adjust(wspace=0.1)
 f.savefig("Fig_2D_clusters_biotype_split.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[35]:
+# In[36]:
 
 
 enh_vals = fimo_clust_cov[fimo_clust_cov["PromType2"] == "Enhancer"]["log_max_cov"]
@@ -625,7 +661,7 @@ dlnc_vals = fimo_clust_cov[fimo_clust_cov["PromType2"] == "div_lnc"]["log_max_co
 pc_vals = fimo_clust_cov[fimo_clust_cov["PromType2"] == "protein_coding"]["log_max_cov"]
 dpc_vals = fimo_clust_cov[fimo_clust_cov["PromType2"] == "div_pc"]["log_max_cov"]
 
-fig = plt.figure(figsize=(2.5, 2))
+fig = plt.figure(figsize=(2.25, 2))
 ax = sns.kdeplot(data=enh_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE["Enhancer"], 
                  label="eRNAs (n=%s)" % len(enh_vals))
 sns.kdeplot(data=linc_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE["intergenic"], 
@@ -638,10 +674,12 @@ sns.kdeplot(data=dpc_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE["div
             label="div. mRNAs (n=%s)" % len(dpc_vals), ax=ax)
 ax.set_xlabel("log(max coverage)")
 ax.set_ylabel("cumulative density")
+ax.set_ylim((0, 1.05))
+plt.legend(handlelength=1)
 fig.savefig("Fig_2E_clusters.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[36]:
+# In[37]:
 
 
 # for each group, split into tissue-sp v dynamic v ubiquitous
@@ -653,7 +691,7 @@ col = "log_max_cov"
 xlabel = "log(max coverage)"
 xlim = (-0.5, 3)
 
-f, axarr = plt.subplots(nrows=1, ncols=3, sharex=False, sharey=True, figsize=(7.2, 2))
+f, axarr = plt.subplots(nrows=1, ncols=3, sharex=False, sharey=True, figsize=(5.5, 2))
 
 for i, promtype, name in zip(idxs, promtypes, names):
     print("i: %s, promtype: %s, name: %s" % (i, promtype, name))
@@ -682,17 +720,19 @@ for i, promtype, name in zip(idxs, promtypes, names):
     
     ax.set_title("%s (%s total)" % (name, len(promtype_vals)))
     ax.set_xlabel(xlabel)
-    ax.legend(loc="bottom right")
+    ax.legend(loc="bottom right", handlelength=2)
     ax.set_xlim(xlim)
+    ax.set_ylim((0,1.05))
     
     if i == 0:
         ax.set_ylabel("cumulative density")
+plt.subplots_adjust(wspace=0.1)
 f.savefig("Fig_2E_clusters_biotype_split.pdf", bbox_inches="tight", dpi="figure")
 
 
 # ## 2. cluster the motifs using MoSBAT output
 
-# In[37]:
+# In[38]:
 
 
 corr.set_index(corr["Motif"], inplace=True)
@@ -700,32 +740,32 @@ corr.drop("Motif", axis=1, inplace=True)
 corr.head()
 
 
-# In[38]:
+# In[39]:
 
 
 row_linkage = hierarchy.linkage(distance.pdist(corr, 'correlation'), method="average")
 col_linkage = hierarchy.linkage(distance.pdist(corr.T, 'correlation'), method="average")
 
 
-# In[39]:
+# In[40]:
 
 
 dists = plot_dendrogram(row_linkage, 0.4, "correlation")
 
 
-# In[40]:
+# In[41]:
 
 
 clusters = hierarchy.fcluster(row_linkage, 0.1, criterion="distance")
 
 
-# In[41]:
+# In[42]:
 
 
 print("n clusters: %s" % np.max(clusters))
 
 
-# In[42]:
+# In[43]:
 
 
 cluster_map = pd.DataFrame.from_dict(dict(zip(list(corr.index), clusters)), orient="index")
@@ -733,7 +773,7 @@ cluster_map.columns = ["cluster"]
 cluster_map.head()
 
 
-# In[43]:
+# In[44]:
 
 
 cluster_map.loc["BHLHE40"]
@@ -741,7 +781,7 @@ cluster_map.loc["BHLHE40"]
 
 # ## 3. plot clustered motif heatmap
 
-# In[44]:
+# In[45]:
 
 
 colors = sns.husl_palette(np.max(clusters), s=0.75)
@@ -750,13 +790,13 @@ lut = dict(zip(range(np.min(clusters), np.max(clusters)+1), colors))
 row_colors = cluster_map["cluster"].map(lut)
 
 
-# In[45]:
+# In[46]:
 
 
 cmap = sns.cubehelix_palette(8, start=.5, light=1, dark=0.25, hue=0.9, rot=-0.75, as_cmap=True)
 
 
-# In[46]:
+# In[47]:
 
 
 cg = sns.clustermap(corr, method="average", row_linkage=row_linkage, robust=True,
@@ -765,7 +805,7 @@ cg = sns.clustermap(corr, method="average", row_linkage=row_linkage, robust=True
 cg.savefig("Fig_S7A.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[47]:
+# In[48]:
 
 
 cluster_map.to_csv("../../misc/02__mosbat/cluster_map.txt", sep="\t", index=True)
@@ -773,29 +813,23 @@ cluster_map.to_csv("../../misc/02__mosbat/cluster_map.txt", sep="\t", index=True
 
 # ## 4. re-plot # bp covered and max coverage per biotype *after* clustering
 # note that i sent the cluster results to marta, who re-ran her coverage scripts using them, and i re-upload them in this notebook (so in real life there is a break between the above part and the following part of this notebook)
-# 
-# 10/22/18 NOTE: MARTA NEEDS TO REDO THIS PART, OR WE CUT
 
 # In[49]:
 
 
-cluster_cov["log_bp_covered"] = np.log(cluster_cov["numBPcovered"]+1)
-cluster_cov["log_max_cov"] = np.log(cluster_cov["MaxCov"]+1)
-
-cluster_cov_exp["log_bp_covered"] = np.log(cluster_cov_exp["numBPcovered"]+1)
-cluster_cov_exp["log_max_cov"] = np.log(cluster_cov_exp["MaxCov"]+1)
+fimo_mosbat_cov.head()
 
 
-# In[ ]:
+# In[50]:
 
 
-enh_vals = cluster_cov[cluster_cov["PromType2"] == "Enhancer"]["log_bp_covered"]
-linc_vals = cluster_cov[cluster_cov["PromType2"] == "intergenic"]["log_bp_covered"]
-dlnc_vals = cluster_cov[cluster_cov["PromType2"] == "div_lnc"]["log_bp_covered"]
-pc_vals = cluster_cov[cluster_cov["PromType2"] == "protein_coding"]["log_bp_covered"]
-dpc_vals = cluster_cov[cluster_cov["PromType2"] == "div_pc"]["log_bp_covered"]
+enh_vals = fimo_mosbat_cov[fimo_mosbat_cov["PromType2"] == "Enhancer"]["log_bp_cov"]
+linc_vals = fimo_mosbat_cov[fimo_mosbat_cov["PromType2"] == "intergenic"]["log_bp_cov"]
+dlnc_vals = fimo_mosbat_cov[fimo_mosbat_cov["PromType2"] == "div_lnc"]["log_bp_cov"]
+pc_vals = fimo_mosbat_cov[fimo_mosbat_cov["PromType2"] == "protein_coding"]["log_bp_cov"]
+dpc_vals = fimo_mosbat_cov[fimo_mosbat_cov["PromType2"] == "div_pc"]["log_bp_cov"]
 
-fig = plt.figure(figsize=(2.75, 2))
+fig = plt.figure(figsize=(2.25, 2))
 ax = sns.kdeplot(data=enh_vals, cumulative=True, color=TSS_CLASS_PALETTE["Enhancer"], 
                  label="eRNAs (n=%s)" % len(enh_vals))
 sns.kdeplot(data=linc_vals, cumulative=True, color=TSS_CLASS_PALETTE["intergenic"], 
@@ -808,23 +842,25 @@ sns.kdeplot(data=dpc_vals, cumulative=True, color=TSS_CLASS_PALETTE["div_pc"],
             label="div. mRNAs (n=%s)" % len(dpc_vals), ax=ax)
 ax.set_xlabel("log(# of bp covered, deduped by motif cluster)")
 ax.set_ylabel("cumulative density")
-plt.xlim((2.5,5))
+ax.set_ylim((0, 1.05))
+ax.set_xlim((-0.5, 5))
+plt.legend(handlelength=1)
 fig.savefig("Fig_S7B.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[ ]:
+# In[51]:
 
 
 # for each group, split into tissue-sp v dynamic v ubiquitous
 idxs = list(range(0, 5))
 promtypes = ["Enhancer", "intergenic", "protein_coding"]
 names = ["eRNAs", "lincRNAs", "mRNAs"]
-df = cluster_cov_exp
-col = "log_bp_covered"
+df = mosbat_cov_exp
+col = "log_bp_cov"
 xlabel = "log(# of bp covered)"
-xlim = (2, 5)
+xlim = (-0.5, 5)
 
-f, axarr = plt.subplots(nrows=1, ncols=3, sharex=False, sharey=True, figsize=(7.2, 2))
+f, axarr = plt.subplots(nrows=1, ncols=3, sharex=False, sharey=True, figsize=(5.5, 2))
 
 for i, promtype, name in zip(idxs, promtypes, names):
     print("i: %s, promtype: %s, name: %s" % (i, promtype, name))
@@ -844,53 +880,57 @@ for i, promtype, name in zip(idxs, promtypes, names):
     
     ax.set_title("%s (%s total)" % (name, len(promtype_vals)))
     ax.set_xlabel(xlabel)
-    ax.legend(loc="bottom right")
+    ax.legend(loc="bottom right", handlelength=2)
     ax.set_xlim(xlim)
+    ax.set_ylim((0,1.05))
     
     if i == 0:
         ax.set_ylabel("cumulative density")
+plt.subplots_adjust(wspace=0.1)
 f.savefig("Fig_S7B_biotype_split.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[ ]:
+# In[52]:
 
 
-enh_vals = cluster_cov[cluster_cov["PromType2"] == "Enhancer"]["log_max_cov"]
-linc_vals = cluster_cov[cluster_cov["PromType2"] == "intergenic"]["log_max_cov"]
-dlnc_vals = cluster_cov[cluster_cov["PromType2"] == "div_lnc"]["log_max_cov"]
-pc_vals = cluster_cov[cluster_cov["PromType2"] == "protein_coding"]["log_max_cov"]
-dpc_vals = cluster_cov[cluster_cov["PromType2"] == "div_pc"]["log_max_cov"]
+enh_vals = fimo_mosbat_cov[fimo_mosbat_cov["PromType2"] == "Enhancer"]["log_max_cov"]
+linc_vals = fimo_mosbat_cov[fimo_mosbat_cov["PromType2"] == "intergenic"]["log_max_cov"]
+dlnc_vals = fimo_mosbat_cov[fimo_mosbat_cov["PromType2"] == "div_lnc"]["log_max_cov"]
+pc_vals = fimo_mosbat_cov[fimo_mosbat_cov["PromType2"] == "protein_coding"]["log_max_cov"]
+dpc_vals = fimo_mosbat_cov[fimo_mosbat_cov["PromType2"] == "div_pc"]["log_max_cov"]
 
-fig = plt.figure(figsize=(2.75, 2))
+fig = plt.figure(figsize=(2.25, 2))
 ax = sns.kdeplot(data=enh_vals, cumulative=True, color=TSS_CLASS_PALETTE["Enhancer"], 
-                 label="eRNAs")
+                 label="eRNAs (n=%s)" % len(enh_vals))
 sns.kdeplot(data=linc_vals, cumulative=True, color=TSS_CLASS_PALETTE["intergenic"], 
-            label="lincRNAs", ax=ax)
+            label="lincRNAs (n=%s)" % len(linc_vals), ax=ax)
 sns.kdeplot(data=dlnc_vals, cumulative=True, color=TSS_CLASS_PALETTE["div_lnc"], 
-            label="div. lncRNAs", ax=ax)
+            label="div. lncRNAs (n=%s)" % len(dlnc_vals), ax=ax)
 sns.kdeplot(data=pc_vals, cumulative=True, color=TSS_CLASS_PALETTE["protein_coding"], 
-            label="mRNAs", ax=ax)
+            label="mRNAs (n=%s)" % len(pc_vals), ax=ax)
 sns.kdeplot(data=dpc_vals, cumulative=True, color=TSS_CLASS_PALETTE["div_pc"], 
-            label="div. mRNAs", ax=ax)
+            label="div. mRNAs (n=%s)" % len(dpc_vals), ax=ax)
 ax.set_xlabel("log(max coverage, deduped by motif cluster)")
 ax.set_ylabel("cumulative density")
-plt.xlim((0, 2.75))
+plt.xlim((-1, 3.75))
+plt.ylim((0,1.05))
+plt.legend(handlelength=1)
 fig.savefig("Fig_S7C.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[ ]:
+# In[53]:
 
 
 # for each group, split into tissue-sp v dynamic v ubiquitous
 idxs = list(range(0, 5))
 promtypes = ["Enhancer", "intergenic", "protein_coding"]
 names = ["eRNAs", "lincRNAs", "mRNAs"]
-df = cluster_cov_exp
+df = mosbat_cov_exp
 col = "log_max_cov"
 xlabel = "log(max coverage)"
-xlim = (0, 3)
+xlim = (-1, 4)
 
-f, axarr = plt.subplots(nrows=1, ncols=3, sharex=False, sharey=True, figsize=(7.2, 2))
+f, axarr = plt.subplots(nrows=1, ncols=3, sharex=False, sharey=True, figsize=(5.5, 2))
 
 for i, promtype, name in zip(idxs, promtypes, names):
     print("i: %s, promtype: %s, name: %s" % (i, promtype, name))
@@ -910,23 +950,25 @@ for i, promtype, name in zip(idxs, promtypes, names):
     
     ax.set_title("%s (%s total)" % (name, len(promtype_vals)))
     ax.set_xlabel(xlabel)
-    ax.legend(loc="bottom right")
+    ax.legend(loc="bottom right", handlelength=2)
     ax.set_xlim(xlim)
+    ax.set_ylim((0, 1.05))
     
     if i == 0:
         ax.set_ylabel("cumulative density")
+plt.subplots_adjust(wspace=0.1)
 f.savefig("Fig_S7C_biotype_split.pdf", bbox_inches="tight", dpi="figure")
 
 
 # ## 5. find good examples of lots of motifs and few motifs
 
-# In[50]:
+# In[54]:
 
 
 motif_cov_exp.sort_values(by=["av_exp", "max_cov"], ascending=False).head()
 
 
-# In[51]:
+# In[55]:
 
 
 clust_cov_exp_tss = cluster_cov_exp[cluster_cov_exp["PromType2"] != "Enhancer"]
@@ -936,13 +978,13 @@ tss_merge = tss_merge[["unique_id", "n_motifs_chip", "n_motifs_clust", "max_cov_
 tss_merge.sample(5)
 
 
-# In[55]:
+# In[56]:
 
 
 tss_merge[(tss_merge["unique_id"].str.contains("intergenic")) & (tss_merge["tss_type_chip"] == "ubiquitous")].sort_values(by=["max_cov_chip", "max_cov_clust"], ascending=False).head(100)
 
 
-# In[62]:
+# In[57]:
 
 
 tss_merge[(tss_merge["unique_id"].str.contains("intergenic")) & (tss_merge["tss_type_chip"] == "tissue-specific") & (tss_merge["n_motifs_chip"] >= 1)].sort_values(by=["max_cov_chip", "max_cov_clust"], ascending=True).head(200)
@@ -950,7 +992,7 @@ tss_merge[(tss_merge["unique_id"].str.contains("intergenic")) & (tss_merge["tss_
 
 # ## 3. look at conservation of nucleotides vs. motif coverage
 
-# In[48]:
+# In[58]:
 
 
 res_dict = {}
@@ -973,10 +1015,10 @@ for max_motifs in [1, 10, 30, 86]:
     prev_max = max_motifs
 
 
-# In[49]:
+# In[59]:
 
 
-fig = plt.figure(figsize=(5,2))
+fig = plt.figure(figsize=(5.5,2))
 palette = {1: sns.cubehelix_palette(4, start=.75, rot=-.75)[0], 10: sns.cubehelix_palette(4, start=.75, rot=-.75)[1], 
            30: sns.cubehelix_palette(4, start=.75, rot=-.75)[2], 86: sns.cubehelix_palette(4, start=.75, rot=-.75)[3]}
 labels = ["1 motif", "2-10 motifs", "11-30 motifs", "31+ motifs"]
@@ -989,23 +1031,23 @@ for n, label in zip(res_dict.keys(), labels):
     y2 = res["y2"]
     # x = signal.savgol_filter(df["mean"], 15, 1)
     # plt.fill_between(nuc_cols, y1, y2, color=palette[n], alpha=0.5)
-    plt.plot(nuc_cols, avg, color=palette[n], linewidth=3, label="%s (n=%s)" % (label, n_motifs))
+    plt.plot(nuc_cols, avg, color=palette[n], linewidth=2, label="%s (n=%s)" % (label, n_motifs))
 # plt.xlim((lower, upper))
 # plt.axvline(x=-75, color="black", linestyle="dashed", linewidth=1)
 # plt.axvline(x=25, color="black", linestyle="dashed", linewidth=1)
-plt.legend(ncol=1, loc=1, bbox_to_anchor=(1.35, 1))
+plt.legend(ncol=1, loc=1, handlelength=1)
 plt.xlabel("nucleotide (0 = middle of motif)")
 plt.ylabel("phylop 46-way")
 fig.savefig("all_motifs_phylop.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[50]:
+# In[60]:
 
 
 fimo_chip_phylop["n_ov"].max()
 
 
-# In[51]:
+# In[61]:
 
 
 res_dict = {}
@@ -1028,10 +1070,10 @@ for max_motifs in [1, 4, 8, 13]:
     prev_max = max_motifs
 
 
-# In[52]:
+# In[62]:
 
 
-fig = plt.figure(figsize=(5,2))
+fig = plt.figure(figsize=(5.5,2))
 palette = {1: sns.cubehelix_palette(4, start=.75, rot=-.75)[0], 4: sns.cubehelix_palette(4, start=.75, rot=-.75)[1], 
            8: sns.cubehelix_palette(4, start=.75, rot=-.75)[2], 13: sns.cubehelix_palette(4, start=.75, rot=-.75)[3]}
 labels = ["1 motif", "2-4 motifs", "5-8 motifs", "9+ motifs"]
@@ -1044,23 +1086,23 @@ for n, label in zip(res_dict.keys(), labels):
     y2 = res["y2"]
     # x = signal.savgol_filter(df["mean"], 15, 1)
     # plt.fill_between(nuc_cols, y1, y2, color=palette[n], alpha=0.5)
-    plt.plot(nuc_cols, avg, color=palette[n], linewidth=3, label="%s (n=%s)" % (label, n_motifs))
+    plt.plot(nuc_cols, avg, color=palette[n], linewidth=2, label="%s (n=%s)" % (label, n_motifs))
 # plt.xlim((lower, upper))
 # plt.axvline(x=-75, color="black", linestyle="dashed", linewidth=1)
 # plt.axvline(x=25, color="black", linestyle="dashed", linewidth=1)
-plt.legend(ncol=1, loc=1, bbox_to_anchor=(1.3, 1))
+plt.legend(ncol=1, loc=1, handlelength=1)
 plt.xlabel("nucleotide (0 = middle of motif)")
 plt.ylabel("phylop 46-way")
 fig.savefig("chip_motifs_phylop.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[53]:
+# In[63]:
 
 
 fimo_clust_phylop["n_ov"].max()
 
 
-# In[54]:
+# In[64]:
 
 
 res_dict = {}
@@ -1083,10 +1125,10 @@ for max_motifs in [1, 3, 6, 13]:
     prev_max = max_motifs
 
 
-# In[55]:
+# In[66]:
 
 
-fig = plt.figure(figsize=(5,2))
+fig = plt.figure(figsize=(5.5,2))
 palette = {1: sns.cubehelix_palette(4, start=.75, rot=-.75)[0], 3: sns.cubehelix_palette(4, start=.75, rot=-.75)[1], 
            6: sns.cubehelix_palette(4, start=.75, rot=-.75)[2], 13: sns.cubehelix_palette(4, start=.75, rot=-.75)[3]}
 labels = ["1 motif", "2-3 motifs", "4-6 motifs", "7+ motifs"]
@@ -1099,11 +1141,11 @@ for n, label in zip(res_dict.keys(), labels):
     y2 = res["y2"]
     # x = signal.savgol_filter(df["mean"], 15, 1)
     # plt.fill_between(nuc_cols, y1, y2, color=palette[n], alpha=0.5)
-    plt.plot(nuc_cols, avg, color=palette[n], linewidth=3, label="%s (n=%s)" % (label, n_motifs))
+    plt.plot(nuc_cols, avg, color=palette[n], linewidth=2, label="%s (n=%s)" % (label, n_motifs))
 # plt.xlim((lower, upper))
 # plt.axvline(x=-75, color="black", linestyle="dashed", linewidth=1)
 # plt.axvline(x=25, color="black", linestyle="dashed", linewidth=1)
-plt.legend(ncol=1, loc=1, bbox_to_anchor=(1.325, 1))
+plt.legend(ncol=1, loc=2, handlelength=1)
 plt.xlabel("nucleotide (0 = middle of motif)")
 plt.ylabel("phylop 46-way")
 fig.savefig("clustered_motifs_phylop.pdf", bbox_inches="tight", dpi="figure")

@@ -15,3 +15,13 @@ bedtools intersect -wo -a ../00__index/tss_oligo_pool.no_random.single_bp.bed -b
 note that max coverage requires a bed file of every nucleotide in each 114p bp region (made using coverageBed -d -a promoters.bed -b promoters.bed!)
 note that we need a bed file of the promoters used to find motifs and the motifs themselves in 12 column format (from 00__fimo_outputs)
 also note that these files *de-dupe* by +/- (so if a motif shows up in exact same place with both + and -, only count once)
+
+
+*** for the mosbat cluster output ***
+bp covered:
+coverageBed -a ../../data/00__index/0__all_tss/All.TSS.114bp.uniq.bed -b all_fimo_map.mosbat_cluster_info.merged_with_distinct_count.txt > all_fimo_map.mosbat_clusters.bp_covered.txt
+
+max cov:
+intersectBed -wo -a ../../data/00__index/0__all_tss/All.TSS.114bp.uniq.bed -b all_fimo_map.mosbat_cluster_info.merged_with_distinct_count.txt | bedtools groupby -g 4 -c 10 -o max -i stdin > all_fimo_map.mosbat_clusters.max_coverage.txt
+
+where the merged_with_distinct_count file was merged based on the cluster number assigned from the heatmap
