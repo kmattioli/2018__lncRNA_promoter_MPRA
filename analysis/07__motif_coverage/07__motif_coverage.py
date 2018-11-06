@@ -94,6 +94,12 @@ fimo_clust_phylop_f = "../../misc/03__fimo/03__phylop_meta_plot/all_fimo_map.bul
 all_phylop_f = "../../data/00__index/0__all_tss/All.TSS.114bp.uniq.phylop46way.txt"
 
 
+# In[67]:
+
+
+dnase_f = "../../misc/05__dnase/All.TSS.114bp.uniq.count_DNase_accessible_samples.txt"
+
+
 # note: the reason why some IDs are not in the expression file is these are FANTOM CAT IDs that for some reason are not present in the FANTOM5 robust set. so, we exclude these.
 
 # ## 1. import data
@@ -134,6 +140,14 @@ fimo_chip_phylop.columns = cols
 
 fimo_clust_phylop = pd.read_table(fimo_clust_phylop_f, sep="\t", header=None)
 fimo_clust_phylop.columns = cols
+
+
+# In[69]:
+
+
+dnase = pd.read_table(dnase_f, sep="\t", header=None)
+dnase.columns = ["unique_id", "n_accessible"]
+dnase["PromType2"] = dnase.unique_id.str.split("__", expand=True)[0]
 
 
 # In[13]:
@@ -1151,10 +1165,57 @@ plt.ylabel("phylop 46-way")
 fig.savefig("clustered_motifs_phylop.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[ ]:
+# ## 4. look at motif overlap vs. dnase accessibility
+
+# In[72]:
 
 
+dnase_merged = dnase.merge(motif_cov_exp, on=["unique_id", "PromType2"])
+dnase_merged["log_n_accessible"] = np.log10(dnase_merged["n_accessible"]+1)
+dnase_merged.head()
 
+
+# In[96]:
+
+
+fig = plt.figure(figsize=(1.2, 1.2))
+ax = sns.kdeplot(dnase_merged["log_max_cov"], dnase_merged["log_n_accessible"], 
+                 cmap=sns.light_palette("firebrick", as_cmap=True), 
+                 shade=True, shade_lowest=False, bw=0.13)
+ax.set_ylabel("log(count of DNase\naccessible samples)")
+ax.set_xlabel("log(max overlapping motifs)")
+ax.set_ylim((0.5, 2.5))
+
+r, p = stats.spearmanr(dnase_merged["log_max_cov"], dnase_merged["log_n_accessible"])
+print("r: %s, spearman p: %s" % (r, p))
+ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
+
+# add n-value
+ax.annotate("n = %s" % len(dnase_merged), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
+            fontsize=fontsize)
+fig.savefig("max_cov.v.dnase.pdf", bbox_inches="tight", dpi="figure")
+
+
+# In[97]:
+
+
+fig = plt.figure(figsize=(1.2, 1.2))
+ax = sns.kdeplot(dnase_merged["log_bp_cov"], dnase_merged["log_n_accessible"], 
+                 cmap="Blues", 
+                 shade=True, shade_lowest=False, bw=0.13)
+ax.set_ylabel("log(count of DNase\naccessible samples)")
+ax.set_xlabel("log(number of bp covered by motif)")
+ax.set_ylim((0.5, 2.5))
+ax.set_xlim((3, 5.5))
+
+r, p = stats.spearmanr(dnase_merged["log_bp_cov"], dnase_merged["log_n_accessible"])
+print("r: %s, spearman p: %s" % (r, p))
+ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
+
+# add n-value
+ax.annotate("n = %s" % len(dnase_merged), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
+            fontsize=fontsize)
+fig.savefig("bp_cov.v.dnase.pdf", bbox_inches="tight", dpi="figure")
 
 
 # In[ ]:
