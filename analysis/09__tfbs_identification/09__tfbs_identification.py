@@ -557,7 +557,13 @@ results_df.columns = ["gene", "n_sig_motifs", "type"]
 results_df.head()
 
 
-# In[40]:
+# In[53]:
+
+
+results_df.type.value_counts()
+
+
+# In[63]:
 
 
 fig = plt.figure(figsize=(2.5, 2))
@@ -566,7 +572,7 @@ ax.set_xticklabels(["active in one cell type", "active in both cell types"], rot
 mimic_r_boxplot(ax)
 plt.xlabel("")
 plt.ylabel("# of significant motifs")
-plt.ylim((-0.1, 45))
+plt.ylim((-8, 33))
 
 
 # calc p-vals b/w dists
@@ -579,12 +585,14 @@ both_dist = both_dist[~np.isnan(both_dist)]
 u, pval = stats.mannwhitneyu(one_dist, both_dist, alternative="less", use_continuity=False)
 
 # statistical annotation
-annotate_pval(ax, 0.2, 0.8, 40, 0, 0, pval, fontsize, False, None, None)
+annotate_pval(ax, 0.2, 0.8, 28, 0, 0, pval, fontsize, False, None, None)
+ax.text(0, -6, len(one_dist), horizontalalignment='center', color=sns.color_palette()[0])
+ax.text(1, -6, len(both_dist), horizontalalignment='center', color=sns.color_palette()[1])
 
 fig.savefig("Fig_S11.pdf", dpi="figure", bbox_inches="tight")
 
 
-# In[41]:
+# In[64]:
 
 
 pval
@@ -592,7 +600,7 @@ pval
 
 # ## 8. plot correlation b/w number of motifs found and ref tile activity
 
-# In[42]:
+# In[38]:
 
 
 hepg2_dict = {}
@@ -612,7 +620,7 @@ for del_dict, motif_dict, d in zip([hepg2_data_peaks, k562_data_peaks],
         d[key] = [wt_activ, n_tot_sig]
 
 
-# In[43]:
+# In[39]:
 
 
 hepg2_activ = pd.DataFrame.from_dict(hepg2_dict, orient="index").reset_index()
@@ -622,13 +630,13 @@ k562_activ = pd.DataFrame.from_dict(k562_dict, orient="index").reset_index()
 k562_activ.columns = ["seq_name", "activ", "n_sig"]
 
 
-# In[44]:
+# In[40]:
 
 
 hepg2_activ.head()
 
 
-# In[48]:
+# In[41]:
 
 
 g = sns.jointplot(data=hepg2_activ, x="activ", y="n_sig", kind="reg", space=0, size=2.625, stat_func=spearmanr, 
@@ -642,7 +650,7 @@ g.ax_joint.annotate("n = %s" % len(hepg2_activ), ha="right", xy=(.95, .05), xyco
 g.set_axis_labels("reference activity", "# motifs")
 
 
-# In[49]:
+# In[42]:
 
 
 g = sns.jointplot(data=k562_activ, x="activ", y="n_sig", kind="reg", space=0, size=2.625, stat_func=spearmanr, 
@@ -656,25 +664,25 @@ g.ax_joint.annotate("n = %s" % len(k562_activ), ha="right", xy=(.95, .05), xycoo
 g.set_axis_labels("reference activity", "# motifs")
 
 
-# In[50]:
+# In[43]:
 
 
 hepg2_activ[hepg2_activ["seq_name"] == "FALEC__p1__tile2__plus"]
 
 
-# In[51]:
+# In[44]:
 
 
 k562_activ[k562_activ["seq_name"] == "FALEC__p1__tile2__plus"]
 
 
-# In[52]:
+# In[45]:
 
 
 hepg2_activ[hepg2_activ["seq_name"] == "MEG3__p1__tile2__plus"]
 
 
-# In[53]:
+# In[46]:
 
 
 k562_activ[k562_activ["seq_name"] == "MEG3__p1__tile2__plus"]

@@ -318,7 +318,7 @@ k562_pool1_repressive_snp_data = get_snp_results(k562_pool1_reps, k562_pool1_snp
                                                 "repressive", "POOL1", 0)
 
 
-# In[30]:
+# In[ ]:
 
 
 k562_pool2_repressive_snp_data = get_snp_results(k562_pool2_reps, k562_pool2_snp_map, k562_pool2_data, k562_pool2_pvals,
@@ -326,7 +326,7 @@ k562_pool2_repressive_snp_data = get_snp_results(k562_pool2_reps, k562_pool2_snp
                                                  "repressive", "POOL2", 0)
 
 
-# In[31]:
+# In[ ]:
 
 
 hepg2_pool1_repressive_snp_data = get_snp_results(hepg2_pool1_reps, hepg2_pool1_snp_map, hepg2_pool1_data, hepg2_pool1_pvals,
@@ -334,7 +334,7 @@ hepg2_pool1_repressive_snp_data = get_snp_results(hepg2_pool1_reps, hepg2_pool1_
                                                   "repressive", "POOL1", n_samples)
 
 
-# In[32]:
+# In[ ]:
 
 
 hepg2_pool2_repressive_snp_data = get_snp_results(hepg2_pool2_reps, hepg2_pool2_snp_map, hepg2_pool2_data, hepg2_pool2_pvals,
@@ -344,7 +344,7 @@ hepg2_pool2_repressive_snp_data = get_snp_results(hepg2_pool2_reps, hepg2_pool2_
 
 # ### combine and find sig SNPs
 
-# In[33]:
+# In[ ]:
 
 
 hepg2_pool1_log2fc_cols = [x for x in hepg2_pool1_active_snp_data.columns if "_l2fc" in x and "combined" not in x]
@@ -353,13 +353,13 @@ hepg2_pool2_log2fc_cols = [x for x in hepg2_pool2_active_snp_data.columns if "_l
 k562_pool2_log2fc_cols = [x for x in k562_pool2_active_snp_data.columns if "_l2fc" in x and "combined" not in x]
 
 
-# In[34]:
+# In[ ]:
 
 
 k562_pool1_log2fc_cols
 
 
-# In[35]:
+# In[ ]:
 
 
 # filter - require the same direction in at least 75% of non-na replicates
@@ -380,7 +380,7 @@ def sig_status(row, col, thresh, l2fc_cols):
         return "not sig"
 
 
-# In[36]:
+# In[ ]:
 
 
 nums = [0, 1, 2, 3]
@@ -403,19 +403,19 @@ for i, active_df, repressive_df, reps, rep_l2fcs in zip(nums, active_dfs, repres
                                                             l2fc_cols=rep_l2fcs, axis=1)
 
 
-# In[37]:
+# In[ ]:
 
 
 hepg2_pool1_active_snp_data.combined_sig.value_counts()
 
 
-# In[38]:
+# In[ ]:
 
 
 hepg2_pool1_active_snp_data.downsamp_sig.value_counts()
 
 
-# In[39]:
+# In[ ]:
 
 
 hepg2_pool1_repressive_snp_data.combined_sig.value_counts()
@@ -423,7 +423,7 @@ hepg2_pool1_repressive_snp_data.combined_sig.value_counts()
 
 # ## 5. make summary plot for snps (pool1 active only)
 
-# In[40]:
+# In[ ]:
 
 
 hepg2_pool1_active_snp_data["type"] = hepg2_pool1_active_snp_data.apply(snp_type, col="combined_sig", axis=1)
@@ -434,13 +434,13 @@ k562_pool2_active_snp_data["type"] = k562_pool2_active_snp_data.apply(snp_type, 
 hepg2_pool1_active_snp_data["downsamp_type"] = hepg2_pool1_active_snp_data.apply(snp_type, col="combined_sig", axis=1)
 
 
-# In[41]:
+# In[ ]:
 
 
 palette = {"not sig": "gray", "sig": sns.color_palette()[2]}
 
 
-# In[42]:
+# In[ ]:
 
 
 for active_snp_data, cell in zip([hepg2_pool1_active_snp_data, k562_pool1_active_snp_data], ["HepG2", "K562"]):
@@ -460,7 +460,7 @@ for active_snp_data, cell in zip([hepg2_pool1_active_snp_data, k562_pool1_active
 
 # ## 6. make control snp plots (in pool 1)
 
-# In[43]:
+# In[ ]:
 
 
 hepg2_pool1_active_snp_data = hepg2_pool1_active_snp_data.merge(pool1_index_elem[["unique_id", "SNP"]], 
@@ -478,7 +478,7 @@ print(len(hepg2_pool1_repressive_snp_data))
 print(len(k562_pool1_repressive_snp_data))
 
 
-# In[44]:
+# In[ ]:
 
 
 hepg2_pool1_active_sig_data = hepg2_pool1_active_snp_data[hepg2_pool1_active_snp_data["combined_sig"] == "sig"]
@@ -488,7 +488,7 @@ k562_pool1_active_sig_data = k562_pool1_active_snp_data[k562_pool1_active_snp_da
 k562_pool1_repressive_sig_data = k562_pool1_repressive_snp_data[k562_pool1_repressive_snp_data["combined_sig"] == "sig"]
 
 
-# In[45]:
+# In[ ]:
 
 
 hepg2_pool1_snp_data_all = hepg2_pool1_active_snp_data.append(hepg2_pool1_repressive_snp_data)
@@ -500,7 +500,7 @@ k562_pool1_ctrl_data_all = k562_pool1_snp_data_all[k562_pool1_snp_data_all["wt_i
 k562_pool1_ctrl_data_all_grp = k562_pool1_ctrl_data_all.groupby(["unique_id", "wt_id", "SNP"])["combined_sig"].apply(list).reset_index()
 
 
-# In[46]:
+# In[ ]:
 
 
 hepg2_pool1_ctrl_snps = hepg2_pool1_active_snp_data[hepg2_pool1_active_snp_data["unique_id"].str.contains("CONTROL")]
@@ -510,21 +510,21 @@ print(len(hepg2_pool1_ctrl_snps))
 print(len(k562_pool1_ctrl_snps))
 
 
-# In[47]:
+# In[ ]:
 
 
 hepg2_pool1_ctrl_snps_filt = hepg2_pool1_ctrl_snps[~hepg2_pool1_ctrl_snps["combined_sig"].str.contains("NA")]
 k562_pool1_ctrl_snps_filt = k562_pool1_ctrl_snps[~k562_pool1_ctrl_snps["combined_sig"].str.contains("NA")]
 
 
-# In[48]:
+# In[ ]:
 
 
 hepg2_pool1_data["wt_or_snp"] = hepg2_pool1_data.apply(wt_or_snp, axis=1)
 k562_pool1_data["wt_or_snp"] = k562_pool1_data.apply(wt_or_snp, axis=1)
 
 
-# In[49]:
+# In[ ]:
 
 
 print("HepG2")
@@ -532,7 +532,7 @@ paired_swarmplots_w_pval(7, 4, (7.2, 10), hepg2_pool1_ctrl_snps_filt, hepg2_pool
                          True)
 
 
-# In[50]:
+# In[ ]:
 
 
 print("K562")

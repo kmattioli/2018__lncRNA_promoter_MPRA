@@ -507,7 +507,7 @@ plt.subplots_adjust(wspace=0.1)
 f.savefig("Fig_2D_biotype_split.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[34]:
+# In[37]:
 
 
 enh_vals = fimo_chip_cov[fimo_chip_cov["PromType2"] == "Enhancer"]["log_max_cov"]
@@ -530,6 +530,7 @@ sns.kdeplot(data=dpc_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE["div
 ax.set_xlabel("log(max coverage)")
 ax.set_ylabel("cumulative density")
 ax.set_ylim((0, 1.05))
+ax.set_xlim((0.5, 3.25))
 plt.legend(handlelength=1)
 
 fig.savefig("Fig_2E.pdf", bbox_inches="tight", dpi="figure")
