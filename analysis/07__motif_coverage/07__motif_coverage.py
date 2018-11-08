@@ -516,7 +516,7 @@ dlnc_vals = fimo_chip_cov[fimo_chip_cov["PromType2"] == "div_lnc"]["log_max_cov"
 pc_vals = fimo_chip_cov[fimo_chip_cov["PromType2"] == "protein_coding"]["log_max_cov"]
 dpc_vals = fimo_chip_cov[fimo_chip_cov["PromType2"] == "div_pc"]["log_max_cov"]
 
-fig = plt.figure(figsize=(2.25, 2))
+fig = plt.figure(figsize=(2.25, 1.6))
 ax = sns.kdeplot(data=enh_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE["Enhancer"], 
                  label="eRNAs (n=%s)" % len(enh_vals))
 sns.kdeplot(data=linc_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE["intergenic"], 
@@ -545,7 +545,7 @@ names = ["eRNAs", "lincRNAs", "mRNAs"]
 df = chip_cov_exp
 col = "log_max_cov"
 xlabel = "log(max coverage)"
-xlim = (-0.75, 3)
+xlim = (-0.85, 3)
 
 f, axarr = plt.subplots(nrows=1, ncols=3, sharex=False, sharey=True, figsize=(5.5, 1.6))
 
