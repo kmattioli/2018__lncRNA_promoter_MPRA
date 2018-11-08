@@ -268,6 +268,15 @@ chip_cov_exp.PromType2.value_counts()
 cluster_cov_exp.PromType2.value_counts()
 
 
+# In[40]:
+
+
+all_tss = pd.read_table(all_tss_f, sep="\t", header=None)
+all_tss.columns = ["chr", "start", "end", "name", "score", "strand"]
+all_tss["PromType2"] = all_tss["name"].str.split("__", expand=True)[0]
+all_tss.PromType2.value_counts()
+
+
 # ## 2. plot # bp covered & max cov across biotypes
 
 # ### all motifs

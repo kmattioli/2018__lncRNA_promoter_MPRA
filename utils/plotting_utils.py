@@ -454,14 +454,14 @@ def paired_swarmplots_w_pval(n_rows, n_cols, figsize, snp_df, data_df, fontsize,
         y, h, col = df["rep_mean"].max() + 0.75, 0, "black"
         ax.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=0.5, c=col)
         if not "NA" in str(row.combined_padj) and not pd.isnull(row.combined_padj):
-            if val < 0.0005:
-                text = "{:.1e}".format(Decimal(val))
+            if float(row.combined_padj) < 0.0005:
+                text = "{:.1e}".format(Decimal(row.combined_padj))
                 #text = "**"
-            elif val < 0.05:
-                text = "%.3f" % val
+            elif float(row.combined_padj) < 0.0005 < 0.05:
+                text = "%.3f" % row.combined_padj
                 #text = "*"
             else:
-                text = "%.3f" % val
+                text = "%.3f" % row.combined_padj
                 #text = "n.s."
         else:
             text = "tile activities not sig"
