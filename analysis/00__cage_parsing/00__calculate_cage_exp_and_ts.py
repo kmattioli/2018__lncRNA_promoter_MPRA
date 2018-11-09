@@ -86,31 +86,25 @@ tss_cage_exp.head()
 # In[8]:
 
 
-tss_cage_exp[tss_cage_exp["00Annotation"] == "chr20:49575059..49575077,-"]
-
-
-# In[9]:
-
-
 tss_cage_exp["cage_id"] = tss_cage_exp["00Annotation"]
 tss_cage_exp.drop(["00Annotation", "short_description"], axis=1, inplace=True)
 
 
-# In[10]:
+# In[9]:
 
 
 enh_cage_exp = pd.read_table(enh_cage_exp_f, sep="\t")
 enh_cage_exp.head()
 
 
-# In[11]:
+# In[10]:
 
 
 enh_cage_exp["cage_id"] = enh_cage_exp["Id"]
 enh_cage_exp.drop(["Id"], axis=1, inplace=True)
 
 
-# In[12]:
+# In[11]:
 
 
 robust_enh = pd.read_table(robust_enh_f, sep="\t", skiprows=1, header=None)
@@ -118,7 +112,7 @@ robust_enh.columns = ["cage_id"]
 robust_enh.head()
 
 
-# In[13]:
+# In[12]:
 
 
 # limit enhancers to robust only!
@@ -126,22 +120,16 @@ enh_cage_exp = enh_cage_exp[enh_cage_exp["cage_id"].isin(robust_enh["cage_id"])]
 len(enh_cage_exp)
 
 
-# In[14]:
+# In[13]:
 
 
 all_cage_exp = tss_cage_exp.append(enh_cage_exp)
 all_cage_exp.sample(5)
 
 
-# In[15]:
-
-
-all_cage_exp[all_cage_exp["cage_id"] == "chr20:49575059..49575077,-"]
-
-
 # ## 2. parse CAGE IDs
 
-# In[16]:
+# In[14]:
 
 
 def get_cage_id(row):
@@ -151,7 +139,7 @@ def get_cage_id(row):
         return row["name"].split("__")[2]
 
 
-# In[17]:
+# In[15]:
 
 
 all_tss["cage_id"] = all_tss.apply(get_cage_id, axis=1)
@@ -160,7 +148,7 @@ all_tss.sample(5)
 
 # ## 3. get av exp & t.s. across all samples
 
-# In[18]:
+# In[16]:
 
 
 samples = [x for x in all_cage_exp.columns if "Group_" in x]
@@ -170,13 +158,7 @@ all_cage_exp.sample(5)
 
 # ## 4. merge
 
-# In[19]:
-
-
-all_tss[all_tss["cage_id"] == "chr20:49575059..49575077,-"]
-
-
-# In[20]:
+# In[17]:
 
 
 all_tss = all_tss.merge(all_cage_exp[["cage_id", "av_exp", "tissue_sp_all"]], on="cage_id")
@@ -185,14 +167,14 @@ all_tss.sample(5)
 
 # ## 5. define promtype2
 
-# In[21]:
+# In[18]:
 
 
 all_tss["PromType2"] = all_tss["name"].str.split("__", expand=True)[0]
 all_tss.sample(5)
 
 
-# In[22]:
+# In[19]:
 
 
 all_tss.PromType2.unique()
@@ -200,13 +182,13 @@ all_tss.PromType2.unique()
 
 # ## 5. plot
 
-# In[23]:
+# In[20]:
 
 
 all_tss["log_av_exp"] = np.log(all_tss["av_exp"]+1)
 
 
-# In[27]:
+# In[21]:
 
 
 fig = plt.figure(figsize=(3.5, 2.5))
@@ -260,17 +242,17 @@ ax.annotate(str(len(div_pcs)), xy=(x_ax_0+(x_ax_diff*4), 0.02), xycoords="axes f
             color=TSS_CLASS_PALETTE["div_pc"], size=fontsize)
     
 
-fig.savefig("cage_exp_all_proms.pdf", dpi="figure", bbox_inches="tight")
+fig.savefig("Fig_S1A.pdf", dpi="figure", bbox_inches="tight")
 
 
-# In[28]:
+# In[22]:
 
 
 print("lnc pval: %s" % lnc_pval)
 print("pc pval: %s" % pc_pval)
 
 
-# In[29]:
+# In[23]:
 
 
 fig = plt.figure(figsize=(3.5, 2.5))
@@ -322,10 +304,10 @@ ax.annotate(str(len(div_pcs)), xy=(x_ax_0+(x_ax_diff*4), 0.02), xycoords="axes f
 plt.ylim((0.2, 1.15))
 plt.xlabel("")
 plt.ylabel("CAGE tissue-specificity")
-fig.savefig("cage_ts_all_proms.pdf", dpi="figure", bbox_inches="tight")
+fig.savefig("Fig_S1B.pdf", dpi="figure", bbox_inches="tight")
 
 
-# In[30]:
+# In[24]:
 
 
 print("lnc pval: %s" % lnc_pval)
@@ -337,20 +319,20 @@ print("pc pval: %s" % pc_pval)
 # dynamic = on in < 50% of samples, in at least 1 sample on at > 10
 # tissue-sp = on in < 50% of samples
 
-# In[31]:
+# In[25]:
 
 
 all_cage_exp["n_expr"] = all_cage_exp[samples].astype(bool).sum(axis=1)
 all_cage_exp.head()
 
 
-# In[32]:
+# In[ ]:
 
 
 len(all_cage_exp)
 
 
-# In[33]:
+# In[ ]:
 
 
 def expr_type(row, samples, thresh):
@@ -370,7 +352,7 @@ all_cage_exp["tss_type"] = all_cage_exp.apply(expr_type, axis=1, samples=samples
 all_cage_exp.sample(10)
 
 
-# In[34]:
+# In[ ]:
 
 
 all_cage_exp.tss_type.value_counts()
@@ -378,33 +360,26 @@ all_cage_exp.tss_type.value_counts()
 
 # ## write file
 
-# In[35]:
+# In[ ]:
 
 
 final = all_cage_exp[["cage_id", "av_exp", "tissue_sp_all",  "tissue_sp_3", "n_expr", "tss_type"]]
 final.sample(5)
 
 
-# In[36]:
+# In[ ]:
 
 
 final[final["tss_type"] == "dynamic"].sample(5)
 
 
-# In[37]:
-
-
-# chr16:2918256-2918257
-final[final["cage_id"].str.contains("chr16:2918")]
-
-
-# In[38]:
+# In[ ]:
 
 
 final.to_csv("../../misc/01__cage/All_TSS_and_enh.CAGE_grouped_exp.tissue_sp.txt", sep="\t", index=False)
 
 
-# In[39]:
+# In[ ]:
 
 
 len(final)
