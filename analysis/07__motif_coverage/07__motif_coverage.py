@@ -216,6 +216,7 @@ cage_expr.head()
 # In[20]:
 
 
+# inner merging with this file ensures that we are only looking at robust TSSs and robust enhancers
 fimo_cov = fimo_cov.merge(cage_expr, on="cage_id", how="left")
 fimo_cov.head()
 
@@ -268,7 +269,7 @@ chip_cov_exp.PromType2.value_counts()
 cluster_cov_exp.PromType2.value_counts()
 
 
-# In[40]:
+# In[28]:
 
 
 all_tss = pd.read_table(all_tss_f, sep="\t", header=None)
@@ -281,7 +282,7 @@ all_tss.PromType2.value_counts()
 
 # ### all motifs
 
-# In[28]:
+# In[29]:
 
 
 enh_vals = fimo_cov[fimo_cov["PromType2"] == "Enhancer"]["log_bp_cov"]
@@ -308,7 +309,7 @@ ax.set_ylim((0, 1.05))
 plt.legend(handlelength=1)
 
 
-# In[29]:
+# In[30]:
 
 
 # for each group, split into tissue-sp v dynamic v ubiquitous
@@ -359,7 +360,7 @@ plt.subplots_adjust(wspace=0.1)
 plt.ylim((0, 1.05))
 
 
-# In[30]:
+# In[31]:
 
 
 enh_vals = fimo_cov[fimo_cov["PromType2"] == "Enhancer"]["log_max_cov"]
@@ -383,10 +384,10 @@ ax.set_xlabel("log(max coverage)")
 ax.set_ylabel("cumulative density")
 ax.set_ylim((0, 1.05))
 ax.legend(loc="bottom right", handlelength=1)
-fig.savefig("max_cov.all_biotypes.for_poster.pdf", dpi="figure", bbox_inches="tight")
+#fig.savefig("max_cov.all_biotypes.for_poster.pdf", dpi="figure", bbox_inches="tight")
 
 
-# In[31]:
+# In[32]:
 
 
 # for each group, split into tissue-sp v dynamic v ubiquitous
@@ -437,7 +438,7 @@ for i, promtype, name in zip(idxs, promtypes, names):
 
 # ### ChIP-validated motifs
 
-# In[32]:
+# In[33]:
 
 
 enh_vals = fimo_chip_cov[fimo_chip_cov["PromType2"] == "Enhancer"]["log_bp_cov"]
@@ -464,7 +465,7 @@ plt.legend(handlelength=1)
 fig.savefig("Fig_2D.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[33]:
+# In[34]:
 
 
 # for each group, split into tissue-sp v dynamic v ubiquitous
@@ -513,10 +514,10 @@ for i, promtype, name in zip(idxs, promtypes, names):
         ax.set_ylabel("cumulative density")
         
 plt.subplots_adjust(wspace=0.1)
-f.savefig("Fig_2D_biotype_split.pdf", bbox_inches="tight", dpi="figure")
+f.savefig("Fig_2E.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[37]:
+# In[35]:
 
 
 enh_vals = fimo_chip_cov[fimo_chip_cov["PromType2"] == "Enhancer"]["log_max_cov"]
@@ -542,10 +543,10 @@ ax.set_ylim((0, 1.05))
 ax.set_xlim((0.5, 3.25))
 plt.legend(handlelength=1)
 
-fig.savefig("Fig_2E.pdf", bbox_inches="tight", dpi="figure")
+fig.savefig("Fig_2F.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[35]:
+# In[36]:
 
 
 # for each group, split into tissue-sp v dynamic v ubiquitous
@@ -593,12 +594,12 @@ for i, promtype, name in zip(idxs, promtypes, names):
     if i == 0:
         ax.set_ylabel("cumulative density")
 plt.subplots_adjust(wspace=0.1)
-f.savefig("Fig_2E_biotype_split.pdf", bbox_inches="tight", dpi="figure")
+f.savefig("Fig_2G.pdf", bbox_inches="tight", dpi="figure")
 
 
 # ### clustered motifs
 
-# In[36]:
+# In[37]:
 
 
 enh_vals = fimo_clust_cov[fimo_clust_cov["PromType2"] == "Enhancer"]["log_bp_cov"]
@@ -622,10 +623,10 @@ ax.set_xlabel("log(# of bp covered by non-redundant 8mer motifs)")
 ax.set_ylabel("cumulative density")
 ax.set_ylim((0, 1.05))
 plt.legend(handlelength=1)
-fig.savefig("Fig_2D_clusters.pdf", bbox_inches="tight", dpi="figure")
+fig.savefig("Fig_S9C_1.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[37]:
+# In[38]:
 
 
 # for each group, split into tissue-sp v dynamic v ubiquitous
@@ -673,10 +674,9 @@ for i, promtype, name in zip(idxs, promtypes, names):
     if i == 0:
         ax.set_ylabel("cumulative density")
 plt.subplots_adjust(wspace=0.1)
-f.savefig("Fig_2D_clusters_biotype_split.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[38]:
+# In[39]:
 
 
 enh_vals = fimo_clust_cov[fimo_clust_cov["PromType2"] == "Enhancer"]["log_max_cov"]
@@ -700,10 +700,10 @@ ax.set_xlabel("log(max coverage of non-redundant 8mer motifs)")
 ax.set_ylabel("cumulative density")
 ax.set_ylim((0, 1.05))
 plt.legend(handlelength=1)
-fig.savefig("Fig_2E_clusters.pdf", bbox_inches="tight", dpi="figure")
+fig.savefig("Fig_S9C_2.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[39]:
+# In[40]:
 
 
 # for each group, split into tissue-sp v dynamic v ubiquitous
@@ -751,12 +751,11 @@ for i, promtype, name in zip(idxs, promtypes, names):
     if i == 0:
         ax.set_ylabel("cumulative density")
 plt.subplots_adjust(wspace=0.1)
-f.savefig("Fig_2E_clusters_biotype_split.pdf", bbox_inches="tight", dpi="figure")
 
 
 # ## 2. cluster the motifs using MoSBAT output
 
-# In[40]:
+# In[41]:
 
 
 corr.set_index(corr["Motif"], inplace=True)
@@ -764,32 +763,32 @@ corr.drop("Motif", axis=1, inplace=True)
 corr.head()
 
 
-# In[41]:
+# In[42]:
 
 
 row_linkage = hierarchy.linkage(distance.pdist(corr, 'correlation'), method="average")
 col_linkage = hierarchy.linkage(distance.pdist(corr.T, 'correlation'), method="average")
 
 
-# In[42]:
+# In[43]:
 
 
 dists = plot_dendrogram(row_linkage, 0.4, "correlation")
 
 
-# In[43]:
+# In[44]:
 
 
 clusters = hierarchy.fcluster(row_linkage, 0.1, criterion="distance")
 
 
-# In[44]:
+# In[45]:
 
 
 print("n clusters: %s" % np.max(clusters))
 
 
-# In[45]:
+# In[46]:
 
 
 cluster_map = pd.DataFrame.from_dict(dict(zip(list(corr.index), clusters)), orient="index")
@@ -797,7 +796,7 @@ cluster_map.columns = ["cluster"]
 cluster_map.head()
 
 
-# In[79]:
+# In[47]:
 
 
 cluster_map.loc["KLF5"]
@@ -805,7 +804,7 @@ cluster_map.loc["KLF5"]
 
 # ## 3. plot clustered motif heatmap
 
-# In[47]:
+# In[48]:
 
 
 colors = sns.husl_palette(np.max(clusters), s=0.75)
@@ -814,22 +813,22 @@ lut = dict(zip(range(np.min(clusters), np.max(clusters)+1), colors))
 row_colors = cluster_map["cluster"].map(lut)
 
 
-# In[48]:
+# In[49]:
 
 
 cmap = sns.cubehelix_palette(8, start=.5, light=1, dark=0.25, hue=0.9, rot=-0.75, as_cmap=True)
 
 
-# In[49]:
+# In[50]:
 
 
 cg = sns.clustermap(corr, method="average", row_linkage=row_linkage, robust=True,
                     col_linkage=col_linkage, cmap=cmap, figsize=(5, 5), row_colors=row_colors,
                     linewidths=0, rasterized=True)
-cg.savefig("Fig_S7A.pdf", bbox_inches="tight", dpi="figure")
+cg.savefig("Fig_S9A.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[50]:
+# In[51]:
 
 
 cluster_map.to_csv("../../misc/02__mosbat/cluster_map.txt", sep="\t", index=True)
@@ -838,13 +837,13 @@ cluster_map.to_csv("../../misc/02__mosbat/cluster_map.txt", sep="\t", index=True
 # ## 4. re-plot # bp covered and max coverage per biotype *after* clustering
 # note that i sent the cluster results to marta, who re-ran her coverage scripts using them, and i re-upload them in this notebook (so in real life there is a break between the above part and the following part of this notebook)
 
-# In[51]:
+# In[52]:
 
 
 fimo_mosbat_cov.head()
 
 
-# In[52]:
+# In[53]:
 
 
 enh_vals = fimo_mosbat_cov[fimo_mosbat_cov["PromType2"] == "Enhancer"]["log_bp_cov"]
@@ -869,10 +868,10 @@ ax.set_ylabel("cumulative density")
 ax.set_ylim((0, 1.05))
 ax.set_xlim((-0.5, 5))
 plt.legend(handlelength=1)
-fig.savefig("Fig_S7B.pdf", bbox_inches="tight", dpi="figure")
+fig.savefig("Fig_S9B_1.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[53]:
+# In[54]:
 
 
 # for each group, split into tissue-sp v dynamic v ubiquitous
@@ -881,7 +880,7 @@ promtypes = ["Enhancer", "intergenic", "protein_coding"]
 names = ["eRNAs", "lincRNAs", "mRNAs"]
 df = mosbat_cov_exp
 col = "log_bp_cov"
-xlabel = "log(# of bp covered)"
+xlabel = "log(# of bp covered, deduped by motif cluster)"
 xlim = (-0.5, 5)
 
 f, axarr = plt.subplots(nrows=1, ncols=3, sharex=False, sharey=True, figsize=(5.5, 1.6))
@@ -911,10 +910,9 @@ for i, promtype, name in zip(idxs, promtypes, names):
     if i == 0:
         ax.set_ylabel("cumulative density")
 plt.subplots_adjust(wspace=0.1)
-f.savefig("Fig_S7B_biotype_split.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[54]:
+# In[55]:
 
 
 enh_vals = fimo_mosbat_cov[fimo_mosbat_cov["PromType2"] == "Enhancer"]["log_max_cov"]
@@ -939,10 +937,10 @@ ax.set_ylabel("cumulative density")
 plt.xlim((-1, 3.75))
 plt.ylim((0,1.05))
 plt.legend(handlelength=1)
-fig.savefig("Fig_S7C.pdf", bbox_inches="tight", dpi="figure")
+fig.savefig("Fig_S9B_2.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[55]:
+# In[56]:
 
 
 # for each group, split into tissue-sp v dynamic v ubiquitous
@@ -951,7 +949,7 @@ promtypes = ["Enhancer", "intergenic", "protein_coding"]
 names = ["eRNAs", "lincRNAs", "mRNAs"]
 df = mosbat_cov_exp
 col = "log_max_cov"
-xlabel = "log(max coverage)"
+xlabel = "log(max coverage, deduped by motif cluster)"
 xlim = (-1, 4)
 
 f, axarr = plt.subplots(nrows=1, ncols=3, sharex=False, sharey=True, figsize=(5.5, 1.6))
@@ -981,42 +979,13 @@ for i, promtype, name in zip(idxs, promtypes, names):
     if i == 0:
         ax.set_ylabel("cumulative density")
 plt.subplots_adjust(wspace=0.1)
-f.savefig("Fig_S7C_biotype_split.pdf", bbox_inches="tight", dpi="figure")
 
 
-# ## 5. find good examples of lots of motifs and few motifs
+# ## 5. look at conservation of nucleotides vs. motif coverage
 
-# In[56]:
-
-
-motif_cov_exp.sort_values(by=["av_exp", "max_cov"], ascending=False).head()
-
+# ### fimo only
 
 # In[57]:
-
-
-clust_cov_exp_tss = cluster_cov_exp[cluster_cov_exp["PromType2"] != "Enhancer"]
-chip_cov_exp_tss = chip_cov_exp[chip_cov_exp["PromType2"] != "Enhancer"]
-tss_merge = clust_cov_exp_tss.merge(chip_cov_exp_tss, on=["unique_id", "cage_id"], suffixes=("_clust", "_chip"))
-tss_merge = tss_merge[["unique_id", "n_motifs_chip", "n_motifs_clust", "max_cov_clust", "max_cov_chip", "av_exp_chip", "tissue_sp_all_chip", "tss_type_chip"]]
-tss_merge.sample(5)
-
-
-# In[58]:
-
-
-tss_merge[(tss_merge["unique_id"].str.contains("intergenic")) & (tss_merge["tss_type_chip"] == "ubiquitous")].sort_values(by=["max_cov_chip", "max_cov_clust"], ascending=False).head(100)
-
-
-# In[59]:
-
-
-tss_merge[(tss_merge["unique_id"].str.contains("intergenic")) & (tss_merge["tss_type_chip"] == "tissue-specific") & (tss_merge["n_motifs_chip"] >= 1)].sort_values(by=["max_cov_chip", "max_cov_clust"], ascending=True).head(200)
-
-
-# ## 3. look at conservation of nucleotides vs. motif coverage
-
-# In[60]:
 
 
 res_dict = {}
@@ -1039,7 +1008,7 @@ for max_motifs in [1, 10, 30, 86]:
     prev_max = max_motifs
 
 
-# In[61]:
+# In[58]:
 
 
 fig = plt.figure(figsize=(5.75,1.6))
@@ -1062,16 +1031,17 @@ for n, label in zip(res_dict.keys(), labels):
 plt.legend(ncol=1, loc=1, handlelength=1)
 plt.xlabel("nucleotide (0 = middle of motif)")
 plt.ylabel("phylop 46-way")
-fig.savefig("all_motifs_phylop.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[62]:
+# ### fimo + chip
+
+# In[59]:
 
 
 fimo_chip_phylop["n_ov"].max()
 
 
-# In[63]:
+# In[60]:
 
 
 res_dict = {}
@@ -1094,7 +1064,7 @@ for max_motifs in [1, 4, 8, 13]:
     prev_max = max_motifs
 
 
-# In[64]:
+# In[61]:
 
 
 fig = plt.figure(figsize=(5.75,1.6))
@@ -1117,16 +1087,18 @@ for n, label in zip(res_dict.keys(), labels):
 plt.legend(ncol=1, loc=1, handlelength=1)
 plt.xlabel("nucleotide (0 = middle of motif)")
 plt.ylabel("phylop 46-way")
-fig.savefig("chip_motifs_phylop.pdf", bbox_inches="tight", dpi="figure")
+fig.savefig("Fig_2H.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[65]:
+# ### clusters
+
+# In[62]:
 
 
 fimo_clust_phylop["n_ov"].max()
 
 
-# In[66]:
+# In[63]:
 
 
 res_dict = {}
@@ -1149,7 +1121,7 @@ for max_motifs in [1, 3, 6, 13]:
     prev_max = max_motifs
 
 
-# In[67]:
+# In[64]:
 
 
 fig = plt.figure(figsize=(5.75,1.6))
@@ -1172,12 +1144,11 @@ for n, label in zip(res_dict.keys(), labels):
 plt.legend(ncol=1, loc=2, handlelength=1)
 plt.xlabel("nucleotide (0 = middle of motif)")
 plt.ylabel("phylop 46-way")
-fig.savefig("clustered_motifs_phylop.pdf", bbox_inches="tight", dpi="figure")
 
 
-# ## 4. look at motif overlap vs. dnase accessibility
+# ## 6. look at motif overlap vs. dnase accessibility
 
-# In[68]:
+# In[65]:
 
 
 dnase_merged = dnase.merge(motif_cov_exp, on=["unique_id", "PromType2"])
@@ -1185,7 +1156,7 @@ dnase_merged["log_n_accessible"] = np.log10(dnase_merged["n_accessible"]+1)
 dnase_merged.head()
 
 
-# In[69]:
+# In[ ]:
 
 
 fig = plt.figure(figsize=(1.2, 1.2))
@@ -1203,10 +1174,10 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 # add n-value
 ax.annotate("n = %s" % len(dnase_merged), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
             fontsize=fontsize)
-fig.savefig("max_cov.v.dnase.pdf", bbox_inches="tight", dpi="figure")
+#fig.savefig("max_cov.v.dnase.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[70]:
+# In[ ]:
 
 
 fig = plt.figure(figsize=(1.2, 1.2))
@@ -1225,11 +1196,5 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 # add n-value
 ax.annotate("n = %s" % len(dnase_merged), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
             fontsize=fontsize)
-fig.savefig("bp_cov.v.dnase.pdf", bbox_inches="tight", dpi="figure")
-
-
-# In[ ]:
-
-
-
+#fig.savefig("bp_cov.v.dnase.pdf", bbox_inches="tight", dpi="figure")
 
