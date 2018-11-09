@@ -411,22 +411,32 @@ g = sns.jointplot(data=hepg2_snp_del_nonan, x="snp_val", y="del_val", kind="reg"
                   stat_func=spearmanr, 
                   marginal_kws={"hist": False}, color="darkgrey", scatter_kws={"s": 25})
 g.set_axis_labels("SNP effect size", "deletion effect size")
+
+# add n-value
+g.ax_joint.annotate("n = %s" % len(hepg2_snp_del_nonan), ha="right", xy=(.95, .05), xycoords=g.ax_joint.transAxes, 
+                    fontsize=fontsize)
+
 g.savefig("Fig_S12A_HepG2.pdf", dpi="figure", bbox_inches="tight")
 
 
-# In[40]:
+# In[ ]:
 
 
 g = sns.jointplot(data=k562_snp_del_nonan, x="snp_val", y="del_val", kind="reg", space=0, size=2.2, 
                   stat_func=spearmanr, 
                   marginal_kws={"hist": False}, color="darkgrey", scatter_kws={"s": 25})
 g.set_axis_labels("SNP effect size", "deletion effect size")
+
+# add n-value
+g.ax_joint.annotate("n = %s" % len(k562_snp_del_nonan), ha="right", xy=(.95, .05), xycoords=g.ax_joint.transAxes, 
+                    fontsize=fontsize)
+
 g.savefig("Fig_S12A_K562.pdf", dpi="figure", bbox_inches="tight")
 
 
 # ## 9. plot overlap of SNPs & deletions
 
-# In[41]:
+# In[ ]:
 
 
 seq_len = 94

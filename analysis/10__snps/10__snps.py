@@ -889,7 +889,7 @@ ax.annotate(len(supp_table_s5[supp_table_s5["PromType2"] == "div_pc"]), ha="cent
 fig.savefig("Fig_S17_1.pdf", dpi="figure", bbox_inches="tight")
 
 
-# In[83]:
+# In[94]:
 
 
 fig = plt.figure(figsize=(3.5, 2.5))
@@ -897,14 +897,28 @@ ax = sns.boxplot(data=supp_table_s5, x="PromType2", y="K562_abs_effect_size",
                  flierprops = dict(marker='o', markersize=5), order=TSS_CLASS_ORDER, palette=TSS_CLASS_PALETTE)
 ax.set_xticklabels(["eRNAs", "lincRNAs", "div. lncRNAs", "mRNAs", "div. mRNAs"], rotation=30)
 mimic_r_boxplot(ax)
+ax.set_ylim((-0.45, 5.25))
 plt.xlabel("")
 plt.ylabel("absolute value(K562 effect size)")
+
+# add n-value
+ax.annotate(len(supp_table_s5[supp_table_s5["PromType2"] == "Enhancer"]), ha="center", va="top",
+            xy=(0, -0.1), fontsize=fontsize, color=TSS_CLASS_PALETTE["Enhancer"])
+ax.annotate(len(supp_table_s5[supp_table_s5["PromType2"] == "intergenic"]), ha="center", va="top",
+            xy=(1, -0.1), fontsize=fontsize, color=TSS_CLASS_PALETTE["intergenic"])
+ax.annotate(len(supp_table_s5[supp_table_s5["PromType2"] == "div_lnc"]), ha="center", va="top",
+            xy=(2, -0.1), fontsize=fontsize, color=TSS_CLASS_PALETTE["div_lnc"])
+ax.annotate(len(supp_table_s5[supp_table_s5["PromType2"] == "protein_coding"]), ha="center", va="top",
+            xy=(3, -0.1), fontsize=fontsize, color=TSS_CLASS_PALETTE["protein_coding"])
+ax.annotate(len(supp_table_s5[supp_table_s5["PromType2"] == "div_pc"]), ha="center", va="top",
+            xy=(4, -0.1), fontsize=fontsize, color=TSS_CLASS_PALETTE["div_pc"])
+
 fig.savefig("Fig_S17_2.pdf", dpi="figure", bbox_inches="tight")
 
 
 # ## 14. make GWAS supplemental table
 
-# In[86]:
+# In[95]:
 
 
 tss_snps = pd.read_table("../../misc/04__gwas/tss.snp.ragger.output.txt", sep="\t")
@@ -912,7 +926,7 @@ enh_snps = pd.read_table("../../misc/04__gwas/enh.snp.ragger.output.txt", sep="\
 all_snps = tss_snps.append(enh_snps)
 
 
-# In[87]:
+# In[96]:
 
 
 n_snps_ld = all_snps.groupby(["SNP1 Name"])["Population"].agg("count").reset_index()
@@ -921,13 +935,13 @@ all_snps = all_snps.merge(n_snps_ld, on="SNP1 Name", how="left")
 all_snps.head()
 
 
-# In[89]:
+# In[97]:
 
 
 gwas = pd.read_table("../../misc/04__gwas/gwas.catalog.h19.ucsc.txt", sep="\t")
 
 
-# In[90]:
+# In[98]:
 
 
 tmp_snps = all_snps[["SNP1 Name", "SNP2 Name", "R-squared", "D'", "Distance", "n_snps_in_ld"]].drop_duplicates()
@@ -936,7 +950,7 @@ tmp = tmp_snps.merge(tmp_gwas, left_on="SNP1 Name", right_on="name", how="outer"
 tmp.head()
 
 
-# In[91]:
+# In[99]:
 
 
 tmp_mpra = supp_table_s5[["SNP", "unique_id", "HepG2_effect_size", "HepG2_sig_status", "K562_effect_size", "K562_sig_status", "delta_tfs", "sig_type"]].drop_duplicates()
@@ -944,13 +958,13 @@ supp_table_s6 = tmp_mpra.merge(tmp, left_on="SNP", right_on="SNP2 Name")
 supp_table_s6.head()
 
 
-# In[92]:
+# In[100]:
 
 
 supp_table_s6 = supp_table_s6[(supp_table_s6["HepG2_sig_status"] == "sig") | (supp_table_s6["K562_sig_status"] == "sig")]
 
 
-# In[93]:
+# In[101]:
 
 
 supp_table_s6 = supp_table_s6[["unique_id", "SNP", "HepG2_effect_size", "K562_effect_size", "HepG2_sig_status",
@@ -962,31 +976,31 @@ supp_table_s6.columns = ["unique_id", "tested_SNP", "HepG2_effect_size", "K562_e
 supp_table_s6.head()
 
 
-# In[94]:
+# In[102]:
 
 
 len(supp_table_s6)
 
 
-# In[95]:
+# In[103]:
 
 
 len(supp_table_s6[(supp_table_s6["HepG2_sig_status"] == "sig") & (supp_table_s6["K562_sig_status"] == "sig")])
 
 
-# In[96]:
+# In[104]:
 
 
 supp_table_s6.HepG2_sig_status.value_counts()
 
 
-# In[97]:
+# In[105]:
 
 
 supp_table_s6.K562_sig_status.value_counts()
 
 
-# In[98]:
+# In[106]:
 
 
 supp_table_s6.to_csv("../../data/07__snps/Supplemental_Table_S6.txt", sep="\t", index=False)
