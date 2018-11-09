@@ -10,7 +10,8 @@
 # 
 # figures in this notebook:
 # - **Fig 3E**: barplot of deletion effect sizes and sequence logo plotted proportionally to the loss scores of lncRNA DLEU1 promoter (DLEU1_HepG2). 
-# - **Fig 3D, S10**: heatmap showing all of the functional TFBSs
+# - **Fig 3D, S14**: heatmap showing all of the functional TFBSs
+# - **Fig S15**: boxplot showing number of functional motifs in TSSs that are active in only one cell type vs. both
 
 # In[1]:
 
@@ -306,11 +307,11 @@ for data_peaks, data_motifs, cell in zip([hepg2_data_peaks, k562_data_peaks], [h
         elif key == "DLEU1__p1__tile2__plus":
             plot_peaks_and_fimo((5.6, 2), seq_len, key, widths, scores, yerrs, scaled_scores, bases, 
                                 motif_positions_fixed, motif_names, "DLEU1_%s.pdf" % cell, ".", True)
-            plot_peaks_and_fimo((5.6, 2), seq_len, key, [], scores, yerrs, scaled_scores, bases, 
-                                motif_positions_fixed, motif_names, "DLEU1_%s.for_talk.pdf" % cell, ".", True)
-        elif key == "ZFAS1__p1__tile2__plus":
-            plot_peaks_and_fimo((5.6, 2), seq_len, key, [], scores, yerrs, scaled_scores, bases, 
-                                motif_positions_fixed, motif_names, "ZFAS1_%s.for_talk.pdf" % cell, ".", True)
+#             plot_peaks_and_fimo((5.6, 2), seq_len, key, [], scores, yerrs, scaled_scores, bases, 
+#                                 motif_positions_fixed, motif_names, "DLEU1_%s.for_talk.pdf" % cell, ".", True)
+#         elif key == "ZFAS1__p1__tile2__plus":
+#             plot_peaks_and_fimo((5.6, 2), seq_len, key, [], scores, yerrs, scaled_scores, bases, 
+#                                 motif_positions_fixed, motif_names, "ZFAS1_%s.for_talk.pdf" % cell, ".", True)
         else:
             plot_peaks_and_fimo((5.6, 2), seq_len, key, widths, scores, yerrs, scaled_scores, bases, 
                                 motif_positions_fixed, motif_names, None, None, False)
@@ -507,7 +508,7 @@ cg.savefig("Fig_3D.pdf", bbox_inches="tight", dpi="figure")
 
 
 cg = sns.clustermap(hepg2_mo_df.T, annot=False, cmap=cmap, figsize=(5, 12))
-cg.savefig("Fig_S10.pdf", bbox_inches="tight", dpi="figure")
+cg.savefig("Fig_S14.pdf", bbox_inches="tight", dpi="figure")
 
 
 # ## 7. plot number of motifs found in seqs expressed in only one cell type vs. two
@@ -557,13 +558,13 @@ results_df.columns = ["gene", "n_sig_motifs", "type"]
 results_df.head()
 
 
-# In[53]:
+# In[36]:
 
 
 results_df.type.value_counts()
 
 
-# In[63]:
+# In[37]:
 
 
 fig = plt.figure(figsize=(2.5, 2))
@@ -589,10 +590,10 @@ annotate_pval(ax, 0.2, 0.8, 28, 0, 0, pval, fontsize, False, None, None)
 ax.text(0, -6, len(one_dist), horizontalalignment='center', color=sns.color_palette()[0])
 ax.text(1, -6, len(both_dist), horizontalalignment='center', color=sns.color_palette()[1])
 
-fig.savefig("Fig_S11.pdf", dpi="figure", bbox_inches="tight")
+fig.savefig("Fig_S15.pdf", dpi="figure", bbox_inches="tight")
 
 
-# In[64]:
+# In[38]:
 
 
 pval
@@ -600,7 +601,7 @@ pval
 
 # ## 8. plot correlation b/w number of motifs found and ref tile activity
 
-# In[38]:
+# In[39]:
 
 
 hepg2_dict = {}
@@ -620,7 +621,7 @@ for del_dict, motif_dict, d in zip([hepg2_data_peaks, k562_data_peaks],
         d[key] = [wt_activ, n_tot_sig]
 
 
-# In[39]:
+# In[40]:
 
 
 hepg2_activ = pd.DataFrame.from_dict(hepg2_dict, orient="index").reset_index()
@@ -630,66 +631,8 @@ k562_activ = pd.DataFrame.from_dict(k562_dict, orient="index").reset_index()
 k562_activ.columns = ["seq_name", "activ", "n_sig"]
 
 
-# In[40]:
-
-
-hepg2_activ.head()
-
-
 # In[41]:
 
 
-g = sns.jointplot(data=hepg2_activ, x="activ", y="n_sig", kind="reg", space=0, size=2.625, stat_func=spearmanr, 
-                  marginal_kws={"hist": True, "kde": False, "bins": 10}, color="darkgrey", scatter_kws={"s": 25},
-                  xlim=(-1, 6), ylim=(-10, 60))
-
-# add n-value
-g.ax_joint.annotate("n = %s" % len(hepg2_activ), ha="right", xy=(.95, .05), xycoords=g.ax_joint.transAxes, 
-                    fontsize=fontsize)
-
-g.set_axis_labels("reference activity", "# motifs")
-
-
-# In[42]:
-
-
-g = sns.jointplot(data=k562_activ, x="activ", y="n_sig", kind="reg", space=0, size=2.625, stat_func=spearmanr, 
-                  marginal_kws={"hist": True, "kde": False, "bins": 10}, color="darkgrey", scatter_kws={"s": 25},
-                  xlim=(-1, 6), ylim=(-10, 60))
-
-# add n-value
-g.ax_joint.annotate("n = %s" % len(k562_activ), ha="right", xy=(.95, .05), xycoords=g.ax_joint.transAxes, 
-                    fontsize=fontsize)
-
-g.set_axis_labels("reference activity", "# motifs")
-
-
-# In[43]:
-
-
-hepg2_activ[hepg2_activ["seq_name"] == "FALEC__p1__tile2__plus"]
-
-
-# In[44]:
-
-
-k562_activ[k562_activ["seq_name"] == "FALEC__p1__tile2__plus"]
-
-
-# In[45]:
-
-
-hepg2_activ[hepg2_activ["seq_name"] == "MEG3__p1__tile2__plus"]
-
-
-# In[46]:
-
-
-k562_activ[k562_activ["seq_name"] == "MEG3__p1__tile2__plus"]
-
-
-# In[ ]:
-
-
-
+hepg2_activ.head()
 
