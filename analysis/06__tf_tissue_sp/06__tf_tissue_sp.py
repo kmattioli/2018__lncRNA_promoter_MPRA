@@ -13,7 +13,7 @@
 # figures in this notebook:
 # - **Fig 2C**: KDE plot of correlations of MPRA activity & specificity with each of the 3 metrics
 
-# In[1]:
+# In[52]:
 
 
 import warnings
@@ -42,7 +42,7 @@ from norm_utils import *
 get_ipython().magic('matplotlib inline')
 
 
-# In[2]:
+# In[53]:
 
 
 sns.set(**PAPER_PRESET)
@@ -51,7 +51,7 @@ fontsize = PAPER_FONTSIZE
 
 # ## functions
 
-# In[3]:
+# In[54]:
 
 
 def fix_small_decimal(row):
@@ -61,7 +61,7 @@ def fix_small_decimal(row):
         return row.max_cov
 
 
-# In[4]:
+# In[55]:
 
 
 def get_cage_id(row):
@@ -73,14 +73,14 @@ def get_cage_id(row):
 
 # ## variables
 
-# In[5]:
+# In[56]:
 
 
 index_dir = "../../data/00__index"
 index_f = "%s/tss_oligo_pool.index.txt" % index_dir
 
 
-# In[6]:
+# In[57]:
 
 
 hepg2_activ_f = "../../data/02__activs/POOL1__pMPRA1__HepG2__activities_per_element.txt"
@@ -88,7 +88,7 @@ hela_activ_f = "../../data/02__activs/POOL1__pMPRA1__HeLa__activities_per_elemen
 k562_activ_f = "../../data/02__activs/POOL1__pMPRA1__K562__activities_per_element.txt"
 
 
-# In[7]:
+# In[58]:
 
 
 fimo_f = "../../misc/03__fimo/00__fimo_outputs/all_fimo_map.new_deduped.txt.gz"
@@ -99,18 +99,7 @@ pool1_fimo_no_ets_f = "../../misc/03__fimo/00__fimo_outputs/pool1_fimo_map.no_ET
 pool1_fimo_no_ets_chip_f = "../../misc/03__fimo/00__fimo_outputs/pool1_fimo_map.new_chip_intersected.no_ETS_motifs.new_deduped.txt"
 
 
-# In[8]:
-
-
-# fimo_f = "../../misc/03__fimo/03__grouped_fimo_outputs/all_fimo_map.grouped.uniq.txt"
-# fimo_chip_f = "../../misc/03__fimo/03__grouped_fimo_outputs/all_fimo_map.new_chip_intersected.grouped.uniq.txt"
-# pool1_fimo_f = "../../misc/03__fimo/03__grouped_fimo_outputs/pool1_fimo_map.grouped.uniq.txt"
-# pool1_fimo_chip_f = "../../misc/03__fimo/03__grouped_fimo_outputs/pool1_fimo_map.new_chip_intersected.grouped.uniq.txt"
-# pool1_fimo_no_ets_f = "../../misc/03__fimo/03__grouped_fimo_outputs/pool1_fimo_map.grouped.no_ETS_motifs.txt"
-# pool1_fimo_no_ets_chip_f = "../../misc/03__fimo/03__grouped_fimo_outputs/pool1_fimo_map.new_chip_intersected.grouped.no_ETS_motifs.txt"
-
-
-# In[116]:
+# In[59]:
 
 
 fimo_bp_cov_f = "../../data/04__coverage/all_fimo_map.new_deduped.bp_covered.txt"
@@ -126,7 +115,7 @@ fimo_mosbat_bp_cov_f = "../../data/04__coverage/all_fimo_map.mosbat_clusters.bp_
 fimo_mosbat_max_cov_f = "../../data/04__coverage/all_fimo_map.mosbat_clusters.max_coverage.txt"
 
 
-# In[10]:
+# In[60]:
 
 
 fimo_no_ets_bp_cov_f = "../../data/04__coverage/all_fimo_map.no_ETS_motifs.new_deduped.bp_covered.txt"
@@ -136,7 +125,7 @@ fimo_no_ets_chip_bp_cov_f = "../../data/04__coverage/all_fimo_map.new_chip_inter
 fimo_no_ets_chip_max_cov_f = "../../data/04__coverage/all_fimo_map.new_chip_intersected.no_ETS_motifs.new_deduped.max_coverage.txt"
 
 
-# In[11]:
+# In[61]:
 
 
 pool1_fimo_bp_cov_f = "../../data/04__coverage/pool1_fimo_map.new_deduped.bp_covered.txt"
@@ -146,7 +135,7 @@ pool1_fimo_chip_bp_cov_f = "../../data/04__coverage/pool1_fimo_map.new_chip_inte
 pool1_fimo_chip_max_cov_f = "../../data/04__coverage/pool1_fimo_map.new_chip_intersected.new_deduped.max_coverage.txt"
 
 
-# In[12]:
+# In[62]:
 
 
 pool1_fimo_no_ets_bp_cov_f = "../../data/04__coverage/pool1_fimo_map.no_ETS_motifs.new_deduped.bp_covered.txt"
@@ -156,19 +145,19 @@ pool1_fimo_no_ets_chip_bp_cov_f = "../../data/04__coverage/pool1_fimo_map.new_ch
 pool1_fimo_no_ets_chip_max_cov_f = "../../data/04__coverage/pool1_fimo_map.new_chip_intersected.no_ETS_motifs.new_deduped.max_coverage.txt"
 
 
-# In[13]:
+# In[63]:
 
 
 tf_ts_f = "../../data/04__coverage/TF_tissue_specificities.from_CAGE.txt"
 
 
-# In[14]:
+# In[64]:
 
 
 cage_v_mpra_f = "../../data/02__activs/POOL1__pMPRA1__CAGE_vs_MPRA_activs.txt"
 
 
-# In[15]:
+# In[65]:
 
 
 tss_cage_map_f = "../../misc/00__tss_properties/mpra_tss_detailed_info.txt"
@@ -177,7 +166,7 @@ enh_cage_map_f = "../../misc/00__tss_properties/enhancer_id_map.txt"
 
 # ## 1. import data
 
-# In[16]:
+# In[66]:
 
 
 fimo = pd.read_table(fimo_f, sep="\t", header=None, compression="gzip")
@@ -186,7 +175,7 @@ fimo.columns = ["motif_chr", "motif_start", "motif_end", "unique_id", "score", "
 fimo.head()
 
 
-# In[17]:
+# In[67]:
 
 
 fimo_chip = pd.read_table(fimo_chip_f, sep="\t", header=None, compression="gzip")
@@ -194,7 +183,7 @@ fimo_chip.columns = ["motif_chr", "motif_start", "motif_end", "unique_id", "scor
                      "motif", "motif_score", "motif_strand"]
 
 
-# In[18]:
+# In[68]:
 
 
 pool1_fimo = pd.read_table(pool1_fimo_f, sep="\t", header=None)
@@ -202,7 +191,7 @@ pool1_fimo.columns = ["motif_chr", "motif_start", "motif_end", "unique_id", "sco
                       "motif", "motif_score", "motif_strand"]
 
 
-# In[19]:
+# In[69]:
 
 
 pool1_fimo_chip = pd.read_table(pool1_fimo_chip_f, sep="\t", header=None)
@@ -210,7 +199,7 @@ pool1_fimo_chip.columns = ["motif_chr", "motif_start", "motif_end", "unique_id",
                            "end", "motif", "motif_score", "motif_strand"]
 
 
-# In[20]:
+# In[70]:
 
 
 pool1_fimo_no_ets = pd.read_table(pool1_fimo_no_ets_f, sep="\t", header=None)
@@ -218,7 +207,7 @@ pool1_fimo_no_ets.columns = ["motif_chr", "motif_start", "motif_end", "unique_id
                              "end", "motif", "motif_score", "motif_strand"]
 
 
-# In[21]:
+# In[71]:
 
 
 pool1_fimo_no_ets_chip = pd.read_table(pool1_fimo_no_ets_chip_f, sep="\t", header=None)
@@ -226,7 +215,7 @@ pool1_fimo_no_ets_chip.columns = ["motif_chr", "motif_start", "motif_end", "uniq
                                   "start", "end", "motif", "motif_score", "motif_strand"]
 
 
-# In[22]:
+# In[72]:
 
 
 index = pd.read_table(index_f, sep="\t")
@@ -234,7 +223,7 @@ index_elem = index[["element", "oligo_type", "unique_id", "dupe_info", "SNP", "s
 index_elem = index_elem.drop_duplicates()
 
 
-# In[23]:
+# In[73]:
 
 
 hepg2_activ = pd.read_table(hepg2_activ_f, sep="\t")
@@ -242,7 +231,7 @@ hela_activ = pd.read_table(hela_activ_f, sep="\t")
 k562_activ = pd.read_table(k562_activ_f, sep="\t")
 
 
-# In[24]:
+# In[74]:
 
 
 hepg2_reps = [x for x in hepg2_activ.columns if "rna" in x]
@@ -250,7 +239,7 @@ hela_reps = [x for x in hela_activ.columns if "rna" in x]
 k562_reps = [x for x in k562_activ.columns if "rna" in x]
 
 
-# In[25]:
+# In[75]:
 
 
 fimo_bp_cov = pd.read_table(fimo_bp_cov_f, sep="\t", header=None)
@@ -265,7 +254,7 @@ print(len(fimo_cov))
 fimo_cov.head()
 
 
-# In[26]:
+# In[76]:
 
 
 fimo_no_ets_bp_cov = pd.read_table(fimo_no_ets_bp_cov_f, sep="\t", header=None)
@@ -279,7 +268,7 @@ fimo_no_ets_cov = fimo_no_ets_bp_cov.merge(fimo_no_ets_max_cov, on="unique_id")
 print(len(fimo_no_ets_cov))
 
 
-# In[27]:
+# In[77]:
 
 
 fimo_no_ets_chip_bp_cov = pd.read_table(fimo_no_ets_chip_bp_cov_f, sep="\t", header=None)
@@ -293,7 +282,7 @@ fimo_no_ets_chip_cov = fimo_no_ets_chip_bp_cov.merge(fimo_no_ets_chip_max_cov, o
 print(len(fimo_no_ets_chip_cov))
 
 
-# In[28]:
+# In[78]:
 
 
 fimo_chip_bp_cov = pd.read_table(fimo_chip_bp_cov_f, sep="\t", header=None)
@@ -307,7 +296,7 @@ fimo_chip_cov = fimo_chip_bp_cov.merge(fimo_chip_max_cov, on="unique_id")
 print(len(fimo_chip_cov))
 
 
-# In[29]:
+# In[79]:
 
 
 fimo_clust_bp_cov = pd.read_table(fimo_clust_bp_cov_f, sep="\t", header=None)
@@ -321,7 +310,7 @@ fimo_clust_cov = fimo_clust_bp_cov.merge(fimo_clust_max_cov, on="unique_id")
 print(len(fimo_clust_cov))
 
 
-# In[117]:
+# In[80]:
 
 
 fimo_mosbat_bp_cov = pd.read_table(fimo_mosbat_bp_cov_f, sep="\t", header=None)
@@ -335,7 +324,7 @@ fimo_mosbat_cov = fimo_clust_bp_cov.merge(fimo_mosbat_max_cov, on="unique_id")
 print(len(fimo_mosbat_cov))
 
 
-# In[30]:
+# In[81]:
 
 
 pool1_fimo_bp_cov = pd.read_table(pool1_fimo_bp_cov_f, sep="\t", header=None)
@@ -349,7 +338,7 @@ pool1_fimo_cov = pool1_fimo_bp_cov.merge(pool1_fimo_max_cov, on="unique_id")
 print(len(pool1_fimo_cov))
 
 
-# In[31]:
+# In[82]:
 
 
 pool1_fimo_chip_bp_cov = pd.read_table(pool1_fimo_chip_bp_cov_f, sep="\t", header=None)
@@ -363,7 +352,7 @@ pool1_fimo_chip_cov = pool1_fimo_chip_bp_cov.merge(pool1_fimo_chip_max_cov, on="
 print(len(pool1_fimo_chip_cov))
 
 
-# In[32]:
+# In[83]:
 
 
 pool1_fimo_no_ets_bp_cov = pd.read_table(pool1_fimo_no_ets_bp_cov_f, sep="\t", header=None)
@@ -377,7 +366,7 @@ pool1_fimo_no_ets_cov = pool1_fimo_no_ets_bp_cov.merge(pool1_fimo_no_ets_max_cov
 print(len(pool1_fimo_no_ets_cov))
 
 
-# In[33]:
+# In[84]:
 
 
 pool1_fimo_no_ets_chip_bp_cov = pd.read_table(pool1_fimo_no_ets_chip_bp_cov_f, sep="\t", header=None)
@@ -391,7 +380,7 @@ pool1_fimo_no_ets_chip_cov = pool1_fimo_no_ets_chip_bp_cov.merge(pool1_fimo_no_e
 print(len(pool1_fimo_no_ets_chip_cov))
 
 
-# In[118]:
+# In[85]:
 
 
 all_cov_dfs = {"fimo": fimo_cov, "fimo_chip": fimo_chip_cov, "fimo_clust": fimo_clust_cov, 
@@ -405,7 +394,7 @@ all_motif_dfs = {"fimo": fimo, "fimo_chip": fimo_chip, "pool1_fimo": pool1_fimo,
                  "pool1_fimo_no_ets": pool1_fimo_no_ets, "pool1_fimo_no_ets_chip": pool1_fimo_no_ets_chip}
 
 
-# In[119]:
+# In[86]:
 
 
 for key in all_cov_dfs.keys():
@@ -419,7 +408,7 @@ for key in all_cov_dfs.keys():
 fimo_chip_cov.head()
 
 
-# In[36]:
+# In[87]:
 
 
 for key in all_motif_dfs.keys():
@@ -429,14 +418,14 @@ for key in all_motif_dfs.keys():
 fimo.sample(5)
 
 
-# In[37]:
+# In[88]:
 
 
 tf_ts = pd.read_table(tf_ts_f, sep="\t")
 tf_ts.head()
 
 
-# In[38]:
+# In[89]:
 
 
 cage_v_mpra = pd.read_table(cage_v_mpra_f, sep="\t")
@@ -444,14 +433,14 @@ cage_v_mpra["oligo_reg"] = cage_v_mpra["unique_id"].str.split("__", expand=True)
 cage_v_mpra.head()
 
 
-# In[39]:
+# In[90]:
 
 
 tss_cage_map = pd.read_table(tss_cage_map_f, sep="\t")
 tss_cage_map.head()
 
 
-# In[40]:
+# In[91]:
 
 
 enh_cage_map = pd.read_table(enh_cage_map_f, sep="\t")
@@ -460,7 +449,7 @@ enh_cage_map.head()
 
 # ## 2. for pool1: join coverage and motif files with MPRA expr/spec files
 
-# In[41]:
+# In[92]:
 
 
 # since enhancers have 2 TSS_ids, need to join these separately
@@ -480,7 +469,7 @@ tmp_enh.drop("enhancer_id", axis=1, inplace=True)
 tmp_enh.sample(5)
 
 
-# In[42]:
+# In[93]:
 
 
 tmp_no_enh = tmp[~tmp["unique_id"].str.contains("Enhancer")]
@@ -488,7 +477,13 @@ cage_v_mpra = tmp_no_enh.append(tmp_enh)
 cage_v_mpra.sample(5)
 
 
-# In[43]:
+# In[94]:
+
+
+cage_v_mpra.PromType2.value_counts()
+
+
+# In[95]:
 
 
 pool1_fimo_cov = pool1_fimo_cov.merge(cage_v_mpra, on="unique_id")
@@ -501,7 +496,7 @@ print(len(pool1_fimo_cov))
 pool1_fimo_cov.sample(5)
 
 
-# In[44]:
+# In[96]:
 
 
 pool1_fimo_chip_cov = pool1_fimo_chip_cov.merge(cage_v_mpra, on="unique_id")
@@ -519,7 +514,7 @@ all_motif_dfs["pool1_fimo_chip"] = pool1_fimo_chip
 print(len(pool1_fimo_chip_cov))
 
 
-# In[45]:
+# In[97]:
 
 
 pool1_fimo_no_ets_cov = pool1_fimo_no_ets_cov.merge(cage_v_mpra, on="unique_id")
@@ -531,7 +526,7 @@ all_motif_dfs["pool1_fimo_no_ets"] = pool1_fimo_no_ets
 print(len(pool1_fimo_no_ets_cov))
 
 
-# In[46]:
+# In[98]:
 
 
 pool1_fimo_no_ets_chip_cov = pool1_fimo_no_ets_chip_cov.merge(cage_v_mpra, on="unique_id")
@@ -550,7 +545,7 @@ all_motif_dfs["pool1_fimo_no_ets_chip"] = pool1_fimo_no_ets_chip
 print(len(pool1_fimo_no_ets_chip_cov))
 
 
-# In[47]:
+# In[99]:
 
 
 pool1_fimo_no_ets_chip.head()
@@ -558,7 +553,7 @@ pool1_fimo_no_ets_chip.head()
 
 # ## 3. find avg TF/motif specificity per tile
 
-# In[48]:
+# In[100]:
 
 
 all_spec_dfs = {}
@@ -578,7 +573,7 @@ avg_sp.sample(5)
 
 # ## 4. merge and write coverage files
 
-# In[120]:
+# In[101]:
 
 
 file_prefixes = {"fimo": "all_fimo_map", "fimo_chip": "all_fimo_map.chip_intersected", 
@@ -615,21 +610,21 @@ for key in all_cov_dfs.keys():
 
 # #### fimo only
 
-# In[50]:
+# In[102]:
 
 
 df = all_cov_dfs["pool1_fimo"]
 df.head()
 
 
-# In[51]:
+# In[103]:
 
 
 #cmap = sns.light_palette("#8da0cb", as_cmap=True)
 cmap = sns.light_palette("darkslategray", as_cmap=True)
 
 
-# In[52]:
+# In[104]:
 
 
 no_nan = df[~pd.isnull(df["log_avg_tf_tissue_sp"]) &
@@ -637,7 +632,7 @@ no_nan = df[~pd.isnull(df["log_avg_tf_tissue_sp"]) &
 len(no_nan)
 
 
-# In[53]:
+# In[105]:
 
 
 fig = plt.figure(figsize=(1.2, 1.2))
@@ -653,10 +648,9 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 # add n-value
 ax.annotate("n = %s" % len(no_nan), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
             fontsize=fontsize)
-fig.savefig("Fig_2C_3.fimo_only.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[54]:
+# In[106]:
 
 
 no_nan = df[~pd.isnull(df["log_avg_tf_tissue_sp"]) &
@@ -664,7 +658,7 @@ no_nan = df[~pd.isnull(df["log_avg_tf_tissue_sp"]) &
 len(no_nan)
 
 
-# In[55]:
+# In[107]:
 
 
 fig = plt.figure(figsize=(1.2, 1.2))
@@ -680,18 +674,17 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 # add n-value
 ax.annotate("n = %s" % len(no_nan), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
             fontsize=fontsize)
-fig.savefig("Fig_2C_6.fimo_only.pdf", bbox_inches="tight", dpi="figure")
 
 
 # #### fimo intersected w/ chip
 
-# In[56]:
+# In[108]:
 
 
 df = all_cov_dfs["pool1_fimo_chip"]
 
 
-# In[57]:
+# In[109]:
 
 
 no_nan = df[~pd.isnull(df["log_avg_tf_tissue_sp"]) &
@@ -699,7 +692,7 @@ no_nan = df[~pd.isnull(df["log_avg_tf_tissue_sp"]) &
 len(no_nan)
 
 
-# In[58]:
+# In[110]:
 
 
 fig = plt.figure(figsize=(1.2, 1.2))
@@ -715,10 +708,10 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 # add n-value
 ax.annotate("n = %s" % len(no_nan), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
             fontsize=fontsize)
-fig.savefig("Fig_2C_3.chip_int.pdf", bbox_inches="tight", dpi="figure")
+fig.savefig("Fig_2C_3.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[59]:
+# In[111]:
 
 
 no_nan = df[~pd.isnull(df["log_avg_tf_tissue_sp"]) &
@@ -726,7 +719,7 @@ no_nan = df[~pd.isnull(df["log_avg_tf_tissue_sp"]) &
 len(no_nan)
 
 
-# In[60]:
+# In[112]:
 
 
 fig = plt.figure(figsize=(1.2, 1.2))
@@ -742,143 +735,20 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 # add n-value
 ax.annotate("n = %s" % len(no_nan), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
             fontsize=fontsize)
-fig.savefig("Fig_2C_6.chip_int.pdf", bbox_inches="tight", dpi="figure")
-
-
-# #### fimo only -- no ETS
-
-# In[61]:
-
-
-df = all_cov_dfs["pool1_fimo_no_ets"]
-
-
-# In[62]:
-
-
-no_nan = df[~pd.isnull(df["log_avg_tf_tissue_sp"]) &
-            ~pd.isnull(df["mpra_activ"])]
-len(no_nan)
-
-
-# In[63]:
-
-
-fig = plt.figure(figsize=(1.2, 1.2))
-ax = sns.kdeplot(no_nan["log_avg_tf_tissue_sp"], no_nan["mpra_activ"], cmap=cmap, 
-                 shade=True, shade_lowest=False)
-ax.set_ylabel("mean MPRA activity")
-ax.set_xlabel("log(mean TF tissue specificity)")
-
-r, p = stats.spearmanr(no_nan["log_avg_tf_tissue_sp"], no_nan["mpra_activ"])
-print("r: %s, spearman p: %s" % (r, p))
-ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-
-# add n-value
-ax.annotate("n = %s" % len(no_nan), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
-            fontsize=fontsize)
-
-#fig.savefig("Fig_2C_3.pdf", bbox_inches="tight", dpi="figure")
-
-
-# In[64]:
-
-
-no_nan = df[~pd.isnull(df["log_avg_tf_tissue_sp"]) &
-            ~pd.isnull(df["mpra_ts"])]
-len(no_nan)
-
-
-# In[65]:
-
-
-fig = plt.figure(figsize=(1.2, 1.2))
-ax = sns.kdeplot(no_nan["log_avg_tf_tissue_sp"], no_nan["mpra_ts"], cmap=cmap, 
-                 shade=True, shade_lowest=False)
-ax.set_ylabel("tissue specificity in MPRA")
-ax.set_xlabel("log(mean TF tissue specificity)")
-
-r, p = stats.spearmanr(no_nan["log_avg_tf_tissue_sp"], no_nan["mpra_ts"])
-print("r: %s, spearman p: %s" % (r, p))
-ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-#fig.savefig("Fig_2C_6.pdf", bbox_inches="tight", dpi="figure")
-
-# add n-value
-ax.annotate("n = %s" % len(no_nan), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
-            fontsize=fontsize)
-
-
-# #### fimo intersected w/ chip -- no ETS
-
-# In[66]:
-
-
-df = all_cov_dfs["pool1_fimo_no_ets_chip"]
-
-
-# In[67]:
-
-
-no_nan = df[~pd.isnull(df["log_avg_tf_tissue_sp"]) &
-            ~pd.isnull(df["mpra_activ"])]
-len(no_nan)
-
-
-# In[68]:
-
-
-fig = plt.figure(figsize=(1.2, 1.2))
-ax = sns.kdeplot(no_nan["log_avg_tf_tissue_sp"], no_nan["mpra_activ"], cmap=cmap, 
-                 shade=True, shade_lowest=False)
-ax.set_ylabel("mean MPRA activity")
-ax.set_xlabel("log(mean TF tissue specificity)")
-
-r, p = stats.spearmanr(no_nan["log_avg_tf_tissue_sp"], no_nan["mpra_activ"])
-print("r: %s, spearman p: %s" % (r, p))
-ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-
-# add n-value
-ax.annotate("n = %s" % len(no_nan), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
-            fontsize=fontsize)
-
-
-# In[69]:
-
-
-no_nan = df[~pd.isnull(df["log_avg_tf_tissue_sp"]) &
-            ~pd.isnull(df["mpra_ts"])]
-len(no_nan)
-
-
-# In[70]:
-
-
-fig = plt.figure(figsize=(1.2, 1.2))
-ax = sns.kdeplot(no_nan["log_avg_tf_tissue_sp"], no_nan["mpra_ts"], cmap=cmap, 
-                 shade=True, shade_lowest=False)
-ax.set_ylabel("tissue specificity in MPRA")
-ax.set_xlabel("log(mean TF tissue specificity)")
-
-r, p = stats.spearmanr(no_nan["log_avg_tf_tissue_sp"], no_nan["mpra_ts"])
-print("r: %s, spearman p: %s" % (r, p))
-ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-
-# add n-value
-ax.annotate("n = %s" % len(no_nan), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
-            fontsize=fontsize)
+fig.savefig("Fig_2C_6.pdf", bbox_inches="tight", dpi="figure")
 
 
 # ## number of bp covered
 
 # #### fimo only
 
-# In[71]:
+# In[113]:
 
 
 df = all_cov_dfs["pool1_fimo"]
 
 
-# In[72]:
+# In[114]:
 
 
 no_nan = df[~pd.isnull(df["log_bp_cov"]) &
@@ -889,7 +759,7 @@ no_nan = no_nan[no_nan["n_motifs"] > 0]
 len(no_nan)
 
 
-# In[73]:
+# In[115]:
 
 
 fig = plt.figure(figsize=(1.2, 1.2))
@@ -907,10 +777,8 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 ax.annotate("n = %s" % len(no_nan), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
             fontsize=fontsize)
 
-fig.savefig("Fig_2C_1.fimo_only.pdf", bbox_inches="tight", dpi="figure")
 
-
-# In[74]:
+# In[116]:
 
 
 no_nan = df[~pd.isnull(df["log_bp_cov"]) &
@@ -921,7 +789,7 @@ no_nan = no_nan[no_nan["n_motifs"] > 0]
 len(no_nan)
 
 
-# In[75]:
+# In[117]:
 
 
 fig = plt.figure(figsize=(1.2, 1.2))
@@ -939,18 +807,16 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 ax.annotate("n = %s" % len(no_nan), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
             fontsize=fontsize)
 
-fig.savefig("Fig_2C_4.fimo_only.pdf", bbox_inches="tight", dpi="figure")
-
 
 # #### fimo intersected w/ chip
 
-# In[76]:
+# In[118]:
 
 
 df = all_cov_dfs["pool1_fimo_chip"]
 
 
-# In[77]:
+# In[119]:
 
 
 no_nan = df[~pd.isnull(df["log_bp_cov"]) &
@@ -961,7 +827,7 @@ no_nan = no_nan[no_nan["n_motifs"] > 0]
 len(no_nan)
 
 
-# In[78]:
+# In[120]:
 
 
 fig = plt.figure(figsize=(1.2, 1.2))
@@ -980,148 +846,10 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 ax.annotate("n = %s" % len(no_nan), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
             fontsize=fontsize)
 
-fig.savefig("Fig_2C_1.chip_int.pdf", bbox_inches="tight", dpi="figure")
+fig.savefig("Fig_2C_1.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[79]:
-
-
-no_nan = df[~pd.isnull(df["log_bp_cov"]) &
-            ~pd.isnull(df["mpra_ts"])]
-
-# for these, only look at those with >1 motif
-no_nan = no_nan[no_nan["n_motifs"] > 0]
-len(no_nan)
-
-
-# In[80]:
-
-
-fig = plt.figure(figsize=(1.2, 1.2))
-ax = sns.kdeplot(no_nan["log_bp_cov"], no_nan["mpra_ts"], cmap="Blues", 
-                 shade=True, shade_lowest=False)
-ax.set_ylabel("tissue specificity in MPRA")
-ax.set_xlabel("log(number of bp covered by motif)")
-
-r, p = stats.spearmanr(no_nan["log_bp_cov"], no_nan["mpra_ts"])
-print("r: %s, spearman p: %s" % (r, p))
-ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-
-# add n-value
-ax.annotate("n = %s" % len(no_nan), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
-            fontsize=fontsize)
-
-fig.savefig("Fig_2C_4.chip_int.pdf", bbox_inches="tight", dpi="figure")
-
-
-# #### fimo only -- no ETS motifs
-
-# In[81]:
-
-
-df = all_cov_dfs["pool1_fimo_no_ets"]
-
-
-# In[82]:
-
-
-no_nan = df[~pd.isnull(df["log_bp_cov"]) &
-            ~pd.isnull(df["mpra_activ"])]
-
-# for these, only look at those with >1 motif
-no_nan = no_nan[no_nan["n_motifs"] > 0]
-len(no_nan)
-
-
-# In[83]:
-
-
-fig = plt.figure(figsize=(1.2, 1.2))
-ax = sns.kdeplot(no_nan["log_bp_cov"], no_nan["mpra_activ"], cmap="Blues", 
-                 shade=True, shade_lowest=False)
-ax.set_ylabel("mean MPRA activity")
-ax.set_xlabel("log(number of bp covered by motif)")
-ax.set_xlim((3,5))
-
-r, p = stats.spearmanr(no_nan["log_bp_cov"], no_nan["mpra_activ"])
-print("r: %s, spearman p: %s" % (r, p))
-ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-
-# add n-value
-ax.annotate("n = %s" % len(no_nan), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
-            fontsize=fontsize)
-#fig.savefig("Fig_2C_1.pdf", bbox_inches="tight", dpi="figure")
-
-
-# In[84]:
-
-
-no_nan = pool1_fimo_no_ets_cov[~pd.isnull(pool1_fimo_no_ets_cov["log_bp_cov"]) &
-                               ~pd.isnull(pool1_fimo_no_ets_cov["mpra_ts"])]
-
-# for these, only look at those with >1 motif
-no_nan = no_nan[no_nan["n_motifs"] > 0]
-len(no_nan)
-
-
-# In[85]:
-
-
-fig = plt.figure(figsize=(1.2, 1.2))
-ax = sns.kdeplot(no_nan["log_bp_cov"], no_nan["mpra_ts"], cmap="Blues", 
-                 shade=True, shade_lowest=False)
-ax.set_ylabel("tissue specificity in MPRA")
-ax.set_xlabel("log(number of bp covered by motif)")
-ax.set_xlim((3, 5))
-
-r, p = stats.spearmanr(no_nan["log_bp_cov"], no_nan["mpra_ts"])
-print("r: %s, spearman p: %s" % (r, p))
-ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-
-# add n-value
-ax.annotate("n = %s" % len(no_nan), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
-            fontsize=fontsize)
-#fig.savefig("Fig_2C_4.pdf", bbox_inches="tight", dpi="figure")
-
-
-# #### fimo intersected w/ chip -- no ETS motifs
-
-# In[86]:
-
-
-df = all_cov_dfs["pool1_fimo_no_ets_chip"]
-
-
-# In[87]:
-
-
-no_nan = df[~pd.isnull(df["log_bp_cov"]) &
-            ~pd.isnull(df["mpra_activ"])]
-
-# for these, only look at those with >1 motif
-no_nan = no_nan[no_nan["n_motifs"] > 0]
-len(no_nan)
-
-
-# In[88]:
-
-
-fig = plt.figure(figsize=(1.2, 1.2))
-ax = sns.kdeplot(no_nan["log_bp_cov"], no_nan["mpra_activ"], cmap="Blues", 
-                 shade=True, shade_lowest=False)
-ax.set_ylabel("mean MPRA activity")
-ax.set_xlabel("log(number of bp covered by motif)")
-
-r, p = stats.spearmanr(no_nan["log_bp_cov"], no_nan["mpra_activ"])
-print("r: %s, spearman p: %s" % (r, p))
-ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-
-# add n-value
-ax.annotate("n = %s" % len(no_nan), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
-            fontsize=fontsize)
-
-
-# In[89]:
+# In[121]:
 
 
 no_nan = df[~pd.isnull(df["log_bp_cov"]) &
@@ -1132,7 +860,7 @@ no_nan = no_nan[no_nan["n_motifs"] > 0]
 len(no_nan)
 
 
-# In[90]:
+# In[122]:
 
 
 fig = plt.figure(figsize=(1.2, 1.2))
@@ -1148,25 +876,27 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 # add n-value
 ax.annotate("n = %s" % len(no_nan), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
             fontsize=fontsize)
+
+fig.savefig("Fig_2C_4.pdf", bbox_inches="tight", dpi="figure")
 
 
 # ## max overlapping coverage
 
 # #### fimo only
 
-# In[91]:
+# In[123]:
 
 
 df = all_cov_dfs["pool1_fimo"]
 
 
-# In[92]:
+# In[124]:
 
 
 cmap = sns.light_palette("firebrick", as_cmap=True)
 
 
-# In[93]:
+# In[125]:
 
 
 no_nan = df[~pd.isnull(df["log_max_cov"]) &
@@ -1177,7 +907,7 @@ no_nan = no_nan[no_nan["n_motifs"] > 0]
 len(no_nan)
 
 
-# In[94]:
+# In[126]:
 
 
 fig = plt.figure(figsize=(1.2, 1.2))
@@ -1194,10 +924,8 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 ax.annotate("n = %s" % len(no_nan), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
             fontsize=fontsize)
 
-fig.savefig("Fig_2C_2.fimo_only.pdf", bbox_inches="tight", dpi="figure")
 
-
-# In[95]:
+# In[127]:
 
 
 no_nan = df[~pd.isnull(df["log_max_cov"]) &
@@ -1208,7 +936,7 @@ no_nan = no_nan[no_nan["n_motifs"] > 0]
 len(no_nan)
 
 
-# In[96]:
+# In[128]:
 
 
 fig = plt.figure(figsize=(1.2, 1.2))
@@ -1224,19 +952,17 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 # add n-value
 ax.annotate("n = %s" % len(no_nan), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
             fontsize=fontsize)
-
-fig.savefig("Fig_2C_5.fimo_only.pdf", bbox_inches="tight", dpi="figure")
 
 
 # #### fimo intersected w/ chip
 
-# In[97]:
+# In[129]:
 
 
 df = all_cov_dfs["pool1_fimo_chip"]
 
 
-# In[98]:
+# In[130]:
 
 
 no_nan = df[~pd.isnull(df["log_max_cov"]) &
@@ -1247,7 +973,7 @@ no_nan = no_nan[no_nan["n_motifs"] > 0]
 len(no_nan)
 
 
-# In[99]:
+# In[131]:
 
 
 fig = plt.figure(figsize=(1.2, 1.2))
@@ -1264,10 +990,10 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 ax.annotate("n = %s" % len(no_nan), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
             fontsize=fontsize)
 
-fig.savefig("Fig_2C_2.chip_int.pdf", bbox_inches="tight", dpi="figure")
+fig.savefig("Fig_2C_2.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[100]:
+# In[132]:
 
 
 no_nan = df[~pd.isnull(df["log_max_cov"]) &
@@ -1278,7 +1004,7 @@ no_nan = no_nan[no_nan["n_motifs"] > 0]
 len(no_nan)
 
 
-# In[101]:
+# In[133]:
 
 
 fig = plt.figure(figsize=(1.2, 1.2))
@@ -1295,168 +1021,7 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 ax.annotate("n = %s" % len(no_nan), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
             fontsize=fontsize)
 
-fig.savefig("Fig_2C_5.chip_int.pdf", bbox_inches="tight", dpi="figure")
-
-
-# #### fimo only -- no ETS motifs
-
-# In[102]:
-
-
-df = all_cov_dfs["pool1_fimo_no_ets"]
-
-
-# In[103]:
-
-
-no_nan = df[~pd.isnull(df["log_max_cov"]) &
-            ~pd.isnull(df["mpra_activ"])]
-
-# for these, only look at those with >1 motif
-no_nan = no_nan[no_nan["n_motifs"] > 0]
-len(no_nan)
-
-
-# In[104]:
-
-
-fig = plt.figure(figsize=(1.2, 1.2))
-ax = sns.kdeplot(no_nan["log_max_cov"], no_nan["mpra_activ"], cmap=cmap, 
-                 shade=True, shade_lowest=False)
-ax.set_ylabel("mean MPRA activity")
-ax.set_xlabel("log(max overlapping motifs)")
-
-r, p = stats.spearmanr(no_nan["log_max_cov"], no_nan["mpra_activ"])
-print("r: %s, spearman p: %s" % (r, p))
-ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-
-# add n-value
-ax.annotate("n = %s" % len(no_nan), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
-            fontsize=fontsize)
-
-#fig.savefig("Fig_2C_2.pdf", bbox_inches="tight", dpi="figure")
-
-
-# In[105]:
-
-
-no_nan = df[~pd.isnull(df["log_max_cov"]) &
-            ~pd.isnull(df["mpra_ts"])]
-
-# for these, only look at those with >1 motif
-no_nan = no_nan[no_nan["n_motifs"] > 0]
-len(no_nan)
-
-
-# In[106]:
-
-
-fig = plt.figure(figsize=(1.2, 1.2))
-ax = sns.kdeplot(no_nan["log_max_cov"], no_nan["mpra_ts"], cmap=cmap, 
-                 shade=True, shade_lowest=False)
-ax.set_ylabel("tissue specificity in MPRA")
-ax.set_xlabel("log(max overlapping motifs)")
-
-r, p = stats.spearmanr(no_nan["log_max_cov"], no_nan["mpra_ts"])
-print("r: %s, spearman p: %s" % (r, p))
-ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-
-# add n-value
-ax.annotate("n = %s" % len(no_nan), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
-            fontsize=fontsize)
-
-#fig.savefig("Fig_2C_5.pdf", bbox_inches="tight", dpi="figure")
-
-
-# #### fimo intersected w/ chip -- no ETS motifs
-
-# In[107]:
-
-
-df = all_cov_dfs["pool1_fimo_no_ets_chip"]
-
-
-# In[108]:
-
-
-no_nan = df[~pd.isnull(df["log_max_cov"]) &
-            ~pd.isnull(df["mpra_activ"])]
-
-# for these, only look at those with >1 motif
-no_nan = no_nan[no_nan["n_motifs"] > 0]
-len(no_nan)
-
-
-# In[109]:
-
-
-fig = plt.figure(figsize=(1.2, 1.2))
-ax = sns.kdeplot(no_nan["log_max_cov"], no_nan["mpra_activ"], cmap=cmap, 
-                 shade=True, shade_lowest=False)
-ax.set_ylabel("mean MPRA activity")
-ax.set_xlabel("log(max overlapping motifs)")
-
-r, p = stats.spearmanr(no_nan["log_max_cov"], no_nan["mpra_activ"])
-print("r: %s, spearman p: %s" % (r, p))
-ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-
-# add n-value
-ax.annotate("n = %s" % len(no_nan), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
-            fontsize=fontsize)
-
-
-# In[110]:
-
-
-df.sample(5)
-
-
-# In[111]:
-
-
-no_nan = df[~pd.isnull(df["log_max_cov"]) &
-            ~pd.isnull(df["mpra_ts"])]
-
-# for these, only look at those with >1 motif
-no_nan = no_nan[no_nan["n_motifs"] > 0]
-len(no_nan)
-
-
-# In[112]:
-
-
-fig = plt.figure(figsize=(1.2, 1.2))
-ax = sns.kdeplot(no_nan["log_max_cov"], no_nan["mpra_ts"], cmap=cmap, 
-                 shade=True, shade_lowest=False)
-ax.set_ylabel("tissue specificity in MPRA")
-ax.set_xlabel("log(max overlapping motifs)")
-
-r, p = stats.spearmanr(no_nan["log_max_cov"], no_nan["mpra_ts"])
-print("r: %s, spearman p: %s" % (r, p))
-ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsize=fontsize)
-
-# add n-value
-ax.annotate("n = %s" % len(no_nan), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
-            fontsize=fontsize)
-
-
-# In[113]:
-
-
-df.max_cov.max()
-
-
-# In[114]:
-
-
-df = all_cov_dfs["pool1_fimo_chip"]
-df.sort_values(by="max_cov", ascending=False).head()
-
-
-# In[115]:
-
-
-df.iloc[1575].unique_id
+fig.savefig("Fig_2C_5.pdf", bbox_inches="tight", dpi="figure")
 
 
 # In[ ]:
