@@ -4,7 +4,7 @@
 # # 05__divergent
 # # analyzing divergent sequences: conservation and directionality preferences
 # 
-# in this notebook, i analyze two properties of divergent sequences: (1) their conservation (using phylop 100-way vertebrate alignments) and (2) their "directionality preference". by that i mean whether or not they are more likely to activate transcription in the sense direction vs. the antisense direction.
+# in this notebook, i analyze two properties of divergent sequences: (1) their conservation (using phylop 46-way placental mammal alignments) and (2) their "directionality preference". by that i mean whether or not they are more likely to activate transcription in the sense direction vs. the antisense direction.
 # 
 # ------
 # 
@@ -86,7 +86,8 @@ biotypes = ["div_lnc", "div_pc", "enhancerMid", "intergenic", "protein_coding"]
 # In[6]:
 
 
-bw_f = "../../misc/01__phylop/hg19.100way.phyloP100way.bw"
+# note - this file will have to be changed if re-running outside of harvard odyssey as it's not in the git (large)
+bw_f = "/n/rinn_data2/users/kaia/bigwig/all_chr.phyloP46way.placental.bw"
 
 
 # In[7]:
