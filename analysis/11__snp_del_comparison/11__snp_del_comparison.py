@@ -12,7 +12,7 @@
 # - **Fig S12A**: scatter plot b/w SNP and del effect sizes in HepG2 and K562
 # - **Fig S12B**: bar plot of del effect sizes with SNP plot below for MEG3
 
-# In[1]:
+# In[42]:
 
 
 import warnings
@@ -43,7 +43,7 @@ from del_utils import *
 get_ipython().magic('matplotlib inline')
 
 
-# In[2]:
+# In[43]:
 
 
 sns.set(**PAPER_PRESET)
@@ -53,28 +53,28 @@ np.random.seed(SEED)
 
 # ## variables
 
-# In[3]:
+# In[44]:
 
 
 snp_dir = "../../data/07__snps"
 del_dir = "../../data/06__tfbs_results"
 
 
-# In[4]:
+# In[45]:
 
 
 hepg2_del_dir = "%s/HepG2/0__peaks" % del_dir
 k562_del_dir = "%s/K562/0__peaks" % del_dir
 
 
-# In[5]:
+# In[46]:
 
 
 hepg2_snp_file = "%s/HepG2__POOL2_active_snp_results.txt" % snp_dir
 k562_snp_file = "%s/K562__POOL2_active_snp_results.txt" % snp_dir
 
 
-# In[6]:
+# In[47]:
 
 
 index_file = "../../data/00__index/dels_oligo_pool.index.txt"
@@ -82,7 +82,7 @@ index_file = "../../data/00__index/dels_oligo_pool.index.txt"
 
 # ## 1. import data
 
-# In[7]:
+# In[48]:
 
 
 hepg2_snps = pd.read_table(hepg2_snp_file, sep="\t")
@@ -90,14 +90,14 @@ k562_snps = pd.read_table(k562_snp_file, sep="\t")
 hepg2_snps.head()
 
 
-# In[8]:
+# In[49]:
 
 
 index = pd.read_table(index_file, sep="\t")
 index.head()
 
 
-# In[9]:
+# In[50]:
 
 
 hepg2_files = []
@@ -106,7 +106,7 @@ for (dirpath, dirnames, filenames) in walk(hepg2_del_dir):
     break
 
 
-# In[10]:
+# In[51]:
 
 
 k562_files = []
@@ -115,13 +115,13 @@ for (dirpath, dirnames, filenames) in walk(k562_del_dir):
     break
 
 
-# In[11]:
+# In[52]:
 
 
 k562_files[0:5]
 
 
-# In[12]:
+# In[53]:
 
 
 hepg2_dels = {}
@@ -133,7 +133,7 @@ for files, f_dir, dels in zip([hepg2_files, k562_files], [hepg2_del_dir, k562_de
         dels[name] = df
 
 
-# In[13]:
+# In[54]:
 
 
 hepg2_dels["ZFAS1__p1__tile2__plus"].head()
@@ -141,7 +141,7 @@ hepg2_dels["ZFAS1__p1__tile2__plus"].head()
 
 # ## 2. parse names in snps & dels so they match
 
-# In[14]:
+# In[55]:
 
 
 hepg2_snps["wt_id_new"] = hepg2_snps.apply(fix_snp_names, name_dict=NAME_DICT, loc_dict=LOC_DICT, axis=1)
@@ -151,7 +151,7 @@ hepg2_snps.sample(5)
 
 # ## 3. find bp num of SNP per tile
 
-# In[15]:
+# In[56]:
 
 
 hepg2_wt_seqs = index[index["unique_id"].isin(hepg2_snps["wt_id"])]
@@ -160,7 +160,7 @@ hepg2_wt_seqs_dict = {k:v for k,v in zip(list(hepg2_wt_seqs["unique_id"]), list(
 len(hepg2_wt_seqs_dict)
 
 
-# In[16]:
+# In[57]:
 
 
 k562_wt_seqs = index[index["unique_id"].isin(k562_snps["wt_id"])]
@@ -169,7 +169,7 @@ k562_wt_seqs_dict = {k:v for k,v in zip(list(k562_wt_seqs["unique_id"]), list(k5
 len(k562_wt_seqs_dict)
 
 
-# In[17]:
+# In[58]:
 
 
 # same in both, just make map w/ hepg2
@@ -180,14 +180,14 @@ snp_seqs_dict = {k:v for k,v in zip(list(snp_seqs["unique_id"]), list(snp_seqs["
 len(snp_seqs_dict)
 
 
-# In[18]:
+# In[59]:
 
 
 snps_grp = hepg2_snps.groupby("wt_id")["unique_id"].agg("count").reset_index()
 snps_grp.sort_values(by="unique_id", ascending=False).head()
 
 
-# In[19]:
+# In[60]:
 
 
 hepg2_snps["snp_pos"] = hepg2_snps.apply(get_snp_pos, wt_seqs_dict=wt_seqs_dict, snp_seqs_dict=snp_seqs_dict, max_snps_per_tile=11,
@@ -197,13 +197,13 @@ k562_snps["snp_pos"] = k562_snps.apply(get_snp_pos, wt_seqs_dict=wt_seqs_dict, s
 hepg2_snps.sample(5)
 
 
-# In[20]:
+# In[61]:
 
 
 hepg2_snps.snp_pos.min()
 
 
-# In[21]:
+# In[62]:
 
 
 hepg2_snps.snp_pos.max()
@@ -212,7 +212,7 @@ hepg2_snps.snp_pos.max()
 # ## 4. find SNPs that are significant
 # for now only look at SNPs that are significantly *down* from active tiles
 
-# In[22]:
+# In[63]:
 
 
 hepg2_indiv_snps = hepg2_snps[~hepg2_snps["unique_id"].str.contains("HAPLO")]
@@ -224,19 +224,19 @@ k562_sig_snps = k562_indiv_snps[k562_indiv_snps["combined_sig"] == "sig"]
 k562_not_sig_snps = k562_indiv_snps[(k562_indiv_snps["combined_sig"] == "not sig")]
 
 
-# In[23]:
+# In[64]:
 
 
 len(hepg2_indiv_snps)
 
 
-# In[24]:
+# In[65]:
 
 
 len(hepg2_sig_snps)
 
 
-# In[25]:
+# In[66]:
 
 
 len(hepg2_not_sig_snps)
@@ -244,7 +244,7 @@ len(hepg2_not_sig_snps)
 
 # ## 5. overlap peak data
 
-# In[26]:
+# In[67]:
 
 
 def get_overlap(row, del_dfs):
@@ -261,7 +261,7 @@ def get_overlap(row, del_dfs):
         return "no peak overlap"
 
 
-# In[27]:
+# In[68]:
 
 
 hepg2_sig_snps["overlap"] = hepg2_sig_snps.apply(get_overlap, del_dfs=hepg2_dels, axis=1)
@@ -269,7 +269,7 @@ k562_sig_snps["overlap"] = k562_sig_snps.apply(get_overlap, del_dfs=k562_dels, a
 hepg2_sig_snps.sample(5)
 
 
-# In[28]:
+# In[69]:
 
 
 hepg2_not_sig_snps["overlap"] = hepg2_not_sig_snps.apply(get_overlap, del_dfs=hepg2_dels, axis=1)
@@ -277,7 +277,7 @@ k562_not_sig_snps["overlap"] = k562_not_sig_snps.apply(get_overlap, del_dfs=k562
 hepg2_not_sig_snps.sample(5)
 
 
-# In[29]:
+# In[70]:
 
 
 for cell, sig_snps in zip(["HepG2", "K562"], [hepg2_sig_snps, k562_sig_snps]):
@@ -286,7 +286,7 @@ for cell, sig_snps in zip(["HepG2", "K562"], [hepg2_sig_snps, k562_sig_snps]):
     print("")
 
 
-# In[30]:
+# In[71]:
 
 
 print("significantly down-reg snps only")
@@ -297,7 +297,7 @@ for cell, sig_snps in zip(["HepG2", "K562"], [hepg2_sig_snps, k562_sig_snps]):
     print("")
 
 
-# In[31]:
+# In[72]:
 
 
 print("not significant SNPs")
@@ -309,7 +309,7 @@ for cell, not_sig_snps in zip(["HepG2", "K562"], [hepg2_not_sig_snps, k562_not_s
 
 # ## 6. which SNPs are reg but not in peaks?
 
-# In[32]:
+# In[73]:
 
 
 hepg2_sig_down_snps = hepg2_sig_snps[hepg2_sig_snps["combined_l2fc"] < 0]
@@ -319,7 +319,7 @@ hepg2_sig_down_snps[hepg2_sig_down_snps["overlap"] == "no peak overlap"]
 
 # ## 7. institute l2fc foldchange on snps
 
-# In[33]:
+# In[74]:
 
 
 hepg2_sig_down_snps_filt = hepg2_sig_down_snps[hepg2_sig_down_snps["combined_l2fc"] <= -1]
@@ -328,13 +328,13 @@ print(len(hepg2_sig_down_snps_filt))
 print(len(k562_sig_down_snps_filt))
 
 
-# In[34]:
+# In[75]:
 
 
 hepg2_sig_down_snps_filt.overlap.value_counts()
 
 
-# In[35]:
+# In[76]:
 
 
 k562_sig_down_snps_filt.overlap.value_counts()
@@ -342,7 +342,7 @@ k562_sig_down_snps_filt.overlap.value_counts()
 
 # ## 8. plot correlation b/w deletions & snps
 
-# In[36]:
+# In[77]:
 
 
 all_hepg2_snp_ids = []
@@ -378,7 +378,7 @@ for all_snp_ids, snps, dels, all_del_vals, all_snp_vals in zip([all_hepg2_snp_id
             continue
 
 
-# In[37]:
+# In[78]:
 
 
 hepg2_snp_del_df = pd.DataFrame()
@@ -391,7 +391,7 @@ hepg2_snp_del_nonan = hepg2_snp_del_df[~(pd.isnull(hepg2_snp_del_df["del_val"]))
 hepg2_snp_del_nonan.sort_values(by="snp_val").head()
 
 
-# In[38]:
+# In[79]:
 
 
 k562_snp_del_df = pd.DataFrame()
@@ -404,7 +404,7 @@ k562_snp_del_nonan = k562_snp_del_df[~(pd.isnull(k562_snp_del_df["del_val"]))
 k562_snp_del_nonan.sort_values(by="snp_val").head()
 
 
-# In[39]:
+# In[80]:
 
 
 g = sns.jointplot(data=hepg2_snp_del_nonan, x="snp_val", y="del_val", kind="reg", space=0, size=2.2, 
@@ -416,7 +416,7 @@ g.set_axis_labels("SNP effect size", "deletion effect size")
 g.ax_joint.annotate("n = %s" % len(hepg2_snp_del_nonan), ha="right", xy=(.95, .05), xycoords=g.ax_joint.transAxes, 
                     fontsize=fontsize)
 
-g.savefig("Fig_S12A_HepG2.pdf", dpi="figure", bbox_inches="tight")
+g.savefig("Fig_S16A_HepG2.pdf", dpi="figure", bbox_inches="tight")
 
 
 # In[ ]:
@@ -431,7 +431,7 @@ g.set_axis_labels("SNP effect size", "deletion effect size")
 g.ax_joint.annotate("n = %s" % len(k562_snp_del_nonan), ha="right", xy=(.95, .05), xycoords=g.ax_joint.transAxes, 
                     fontsize=fontsize)
 
-g.savefig("Fig_S12A_K562.pdf", dpi="figure", bbox_inches="tight")
+g.savefig("Fig_S16A_K562.pdf", dpi="figure", bbox_inches="tight")
 
 
 # ## 9. plot overlap of SNPs & deletions
@@ -489,7 +489,7 @@ for cell, snps, dels in zip(["HepG2", "K562"], [hepg2_snps, k562_snps], [hepg2_d
         if "MEG3__p1__tile2__plus" in seq:
             print(snp_info)
             plot_peaks_and_snps((5.6, 2), seq_len, seq, widths, scores, yerrs, scaled_scores, 
-                                snp_vals, snp_sigs, bases, "Fig_S12B_%s.pdf" % cell, ".", True)
+                                snp_vals, snp_sigs, bases, "Fig_S16B_%s.pdf" % cell, ".", True)
 
 #         else:
 #             plot_peaks_and_snps((5.6, 2), seq_len, seq, widths, scores, yerrs, scaled_scores, 
