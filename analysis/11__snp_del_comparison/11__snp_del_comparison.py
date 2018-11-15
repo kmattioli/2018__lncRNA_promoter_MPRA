@@ -9,8 +9,8 @@
 # ------
 # 
 # figures in this notebook:
-# - **Fig S12A**: scatter plot b/w SNP and del effect sizes in HepG2 and K562
-# - **Fig S12B**: bar plot of del effect sizes with SNP plot below for MEG3
+# - **Fig S16A**: scatter plot b/w SNP and del effect sizes in HepG2 and K562
+# - **Fig S16B**: bar plot of del effect sizes with SNP plot below for MEG3
 
 # In[42]:
 
@@ -419,7 +419,7 @@ g.ax_joint.annotate("n = %s" % len(hepg2_snp_del_nonan), ha="right", xy=(.95, .0
 g.savefig("Fig_S16A_HepG2.pdf", dpi="figure", bbox_inches="tight")
 
 
-# In[ ]:
+# In[81]:
 
 
 g = sns.jointplot(data=k562_snp_del_nonan, x="snp_val", y="del_val", kind="reg", space=0, size=2.2, 
@@ -436,7 +436,7 @@ g.savefig("Fig_S16A_K562.pdf", dpi="figure", bbox_inches="tight")
 
 # ## 9. plot overlap of SNPs & deletions
 
-# In[ ]:
+# In[82]:
 
 
 seq_len = 94

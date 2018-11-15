@@ -4,13 +4,14 @@
 # # 00__calculate_cage_exp_and_ts
 # # calculating CAGE expression and tissue-specificity from FANTOM5 files
 # 
-# in this notebook, i parse FANTOM5 files and calculate CAGE expression & tissue specificities. i use the groups outlined in Supplemental Table S7 to group samples by sample type and omit ambiguous samples, and then calculate average expression across these groups. i also calculate tissue specificity across these groups and assign TSSs to be either "ubiquitous" (expressed in >50% of groups), "dynamic" (expressed in <50% of groups, but expressed at >50tpm in at least 1 group), or "tissue-specific" (expressed in <50% of groups, and never above 50tpm in any group).
+# in this notebook, i parse FANTOM5 files and calculate CAGE expression & tissue specificities. i use the groups outlined in Supplemental Table S7 to group samples by sample type and omit ambiguous samples, and then calculate average expression across these groups. i also calculate tissue specificity across these groups and assign TSSs to be either "ubiquitous" (expressed in >90% of groups), "dynamic" (expressed in <90% of groups, but expressed at >50tpm in at least 1 group), or "tissue-specific" (expressed in <90% of groups, and never above 50tpm in any group).
 # 
 # i also get a list of 'robust' enhancers using the same criteria defined by fantom5 for the 'robust' TSSs: A ‘robust’ threshold, for which a peak must include a CTSS with more than 10 read counts and 1 TPM (tags per million) at least one sample, was employed to define a stringent subset of the CAGE peaks (from [here](https://www.nature.com/articles/sdata2017112))
 # 
 # ------
 # 
-# no figures in this notebook
+# figures in this notebook:
+# - **Fig S1**: average CAGE-seq expression and CAGE-seq tissue-specificity across TSS classes
 
 # In[1]:
 
@@ -326,13 +327,13 @@ all_cage_exp["n_expr"] = all_cage_exp[samples].astype(bool).sum(axis=1)
 all_cage_exp.head()
 
 
-# In[ ]:
+# In[26]:
 
 
 len(all_cage_exp)
 
 
-# In[ ]:
+# In[27]:
 
 
 def expr_type(row, samples, thresh):
@@ -352,7 +353,7 @@ all_cage_exp["tss_type"] = all_cage_exp.apply(expr_type, axis=1, samples=samples
 all_cage_exp.sample(10)
 
 
-# In[ ]:
+# In[28]:
 
 
 all_cage_exp.tss_type.value_counts()
@@ -360,26 +361,26 @@ all_cage_exp.tss_type.value_counts()
 
 # ## write file
 
-# In[ ]:
+# In[29]:
 
 
 final = all_cage_exp[["cage_id", "av_exp", "tissue_sp_all",  "tissue_sp_3", "n_expr", "tss_type"]]
 final.sample(5)
 
 
-# In[ ]:
+# In[30]:
 
 
 final[final["tss_type"] == "dynamic"].sample(5)
 
 
-# In[ ]:
+# In[31]:
 
 
 final.to_csv("../../misc/01__cage/All_TSS_and_enh.CAGE_grouped_exp.tissue_sp.txt", sep="\t", index=False)
 
 
-# In[ ]:
+# In[32]:
 
 
 len(final)

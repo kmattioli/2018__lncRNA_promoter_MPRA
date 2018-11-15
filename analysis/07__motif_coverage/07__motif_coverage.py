@@ -4,13 +4,15 @@
 # # 07__motif_coverage
 # # analyzing how motif coverage correlates with MPRA properties and biotypes; clustering similar motifs
 # 
-# in this notebook, i look at how the coverage metrics (# bp covered and max coverage of motifs; done separately, see methods) look within biotypes *after* limiting to only those motifs which have been validated by a corresponding chip peak. i also make sure the results we see aren't due to redundancies in motif databases, so i cluster the motifs using MoSBAT (done separately using their webtool) and re-calculate the metrics.
+# in this notebook, i look at how the coverage metrics (# bp covered and max coverage of motifs; done separately, see methods) look within biotypes. i look at either the motifs alone, the motifs *after* limiting to only those motifs which have been validated by a corresponding chip peak, and non-redundant 8mer motifs from Mariani et al. i also cluster the motifs using MoSBAT (done separately using their webtool) and re-calculate the metrics. finally, i examine the conservation of overlapping motifs using phylop 46-way placental mammal scores.
 # 
 # ------
 # 
 # figures in this notebook:
-# - **Fig 2D and 2E**: cumulative density plots of # bp covered and max motif coverage across biotypes
-# - **Fig S7**: heatmap of clustered motifs, and more cumulative density plots (after clustering)
+# - **Fig 2D and 2F**: cumulative density plots of # bp covered and max motif coverage across biotypes
+# - **Fig 2E and 2G**: cumulative density plots of # bp covered and max motif coverage within lincRNAs and mRNAs, separated by specificity profiles
+# - **Fig S9**: heatmap of MoSBAT clustered motifs, and more cumulative density plots (after using the two clustering methods)
+# - **Fig 2H**: conservation of overlapping motifs via phylop46way scores
 
 # In[1]:
 
@@ -59,22 +61,20 @@ fontsize = PAPER_FONTSIZE
 mosbat_file = "../../misc/02__mosbat/results.from_mosbat.txt"
 
 
-# In[4]:
+# In[30]:
 
 
-all_tss_f = "../../data/00__index/0__all_tss/All.TSS.114bp.uniq.bed"
+all_tss_f = "../../data/00__index/0__all_tss/All.TSS.114bp.uniq.new.bed"
 cage_expr_f = "../../misc/01__cage/All_TSS_and_enh.CAGE_grouped_exp.tissue_sp.txt"
 
 
-# In[5]:
+# In[31]:
 
 
 fimo_cov_f = "../../data/04__coverage/all_fimo_map.all_cov.new.txt"
 fimo_chip_cov_f = "../../data/04__coverage/all_fimo_map.chip_intersected.all_cov.new.txt"
 fimo_clust_cov_f = "../../data/04__coverage/all_fimo_map.bulyk_clusters.all_cov.new.txt"
 fimo_mosbat_cov_f = "../../data/04__coverage/all_fimo_map.mosbat_clusters.all_cov.new.txt"
-fimo_no_ets_cov_f = "../../data/04__coverage/all_fimo_map.no_ETS_motifs.all_cov.new.txt"
-fimo_no_ets_chip_cov_f = "../../data/04__coverage/all_fimo_map.chip_intersected.no_ETS_motifs.all_cov.new.txt"
 
 pool1_fimo_cov_f = "../../data/04__coverage/pool1_fimo_map.all_cov.new.txt"
 pool1_fimo_chip_cov_f = "../../data/04__coverage/all_fimo_map.chip_intersectedall_cov.new.txt"
@@ -156,8 +156,6 @@ dnase["PromType2"] = dnase.unique_id.str.split("__", expand=True)[0]
 fimo_cov = pd.read_table(fimo_cov_f, sep="\t")
 fimo_chip_cov = pd.read_table(fimo_chip_cov_f, sep="\t")
 fimo_clust_cov = pd.read_table(fimo_clust_cov_f, sep="\t")
-fimo_no_ets_cov = pd.read_table(fimo_no_ets_cov_f, sep="\t")
-fimo_no_ets_chip_cov = pd.read_table(fimo_no_ets_chip_cov_f, sep="\t")
 fimo_mosbat_cov = pd.read_table(fimo_mosbat_cov_f, sep="\t")
 fimo_chip_cov.sample(5)
 
@@ -171,19 +169,17 @@ print(len(fimo_clust_cov))
 print(len(fimo_mosbat_cov))
 
 
-# In[17]:
+# In[18]:
 
 
 fimo_cov["PromType2"] = fimo_cov["unique_id"].str.split("__", expand=True)[0]
 fimo_chip_cov["PromType2"] = fimo_chip_cov["unique_id"].str.split("__", expand=True)[0]
 fimo_clust_cov["PromType2"] = fimo_clust_cov["unique_id"].str.split("__", expand=True)[0]
-fimo_no_ets_cov["PromType2"] = fimo_no_ets_cov["unique_id"].str.split("__", expand=True)[0]
-fimo_no_ets_chip_cov["PromType2"] = fimo_no_ets_chip_cov["unique_id"].str.split("__", expand=True)[0]
 fimo_mosbat_cov["PromType2"] = fimo_mosbat_cov["unique_id"].str.split("__", expand=True)[0]
 fimo_cov.sample(5)
 
 
-# In[18]:
+# In[19]:
 
 
 # filter to those that have at least 1 motif so distributions are not 0-skewed
@@ -193,12 +189,6 @@ print(len(fimo_cov))
 fimo_chip_cov = fimo_chip_cov[fimo_chip_cov["n_motifs"] > 0]
 print(len(fimo_chip_cov))
 
-fimo_no_ets_cov = fimo_no_ets_cov[fimo_no_ets_cov["n_motifs"] > 0]
-print(len(fimo_no_ets_cov))
-
-fimo_no_ets_chip_cov = fimo_no_ets_chip_cov[fimo_no_ets_chip_cov["n_motifs"] > 0]
-print(len(fimo_no_ets_chip_cov))
-
 fimo_clust_cov = fimo_clust_cov[fimo_clust_cov["n_motifs"] > 0]
 print(len(fimo_clust_cov))
 
@@ -206,14 +196,14 @@ fimo_mosbat_cov = fimo_mosbat_cov[fimo_mosbat_cov["n_motifs"] > 0]
 print(len(fimo_mosbat_cov))
 
 
-# In[19]:
+# In[20]:
 
 
 cage_expr = pd.read_table(cage_expr_f, sep="\t")
 cage_expr.head()
 
 
-# In[20]:
+# In[21]:
 
 
 # inner merging with this file ensures that we are only looking at robust TSSs and robust enhancers
@@ -221,28 +211,28 @@ fimo_cov = fimo_cov.merge(cage_expr, on="cage_id", how="left")
 fimo_cov.head()
 
 
-# In[21]:
+# In[22]:
 
 
 fimo_chip_cov = fimo_chip_cov.merge(cage_expr, on="cage_id", how="left")
 fimo_chip_cov.sample(5)
 
 
-# In[22]:
+# In[23]:
 
 
 fimo_clust_cov = fimo_clust_cov.merge(cage_expr, on="cage_id", how="left")
 fimo_clust_cov.head()
 
 
-# In[23]:
+# In[24]:
 
 
 fimo_mosbat_cov = fimo_mosbat_cov.merge(cage_expr, on="cage_id", how="left")
 fimo_mosbat_cov.head()
 
 
-# In[24]:
+# In[25]:
 
 
 chip_cov_exp = fimo_chip_cov[~pd.isnull(fimo_chip_cov["av_exp"])]
@@ -251,25 +241,25 @@ cluster_cov_exp = fimo_clust_cov[~pd.isnull(fimo_clust_cov["av_exp"])]
 mosbat_cov_exp = fimo_mosbat_cov[~pd.isnull(fimo_mosbat_cov["av_exp"])]
 
 
-# In[25]:
+# In[26]:
 
 
 motif_cov_exp.PromType2.value_counts()
 
 
-# In[26]:
+# In[27]:
 
 
 chip_cov_exp.PromType2.value_counts()
 
 
-# In[27]:
+# In[28]:
 
 
 cluster_cov_exp.PromType2.value_counts()
 
 
-# In[28]:
+# In[32]:
 
 
 all_tss = pd.read_table(all_tss_f, sep="\t", header=None)
@@ -282,7 +272,7 @@ all_tss.PromType2.value_counts()
 
 # ### all motifs
 
-# In[29]:
+# In[33]:
 
 
 enh_vals = fimo_cov[fimo_cov["PromType2"] == "Enhancer"]["log_bp_cov"]
@@ -309,7 +299,7 @@ ax.set_ylim((0, 1.05))
 plt.legend(handlelength=1)
 
 
-# In[30]:
+# In[34]:
 
 
 # for each group, split into tissue-sp v dynamic v ubiquitous
@@ -360,7 +350,7 @@ plt.subplots_adjust(wspace=0.1)
 plt.ylim((0, 1.05))
 
 
-# In[31]:
+# In[35]:
 
 
 enh_vals = fimo_cov[fimo_cov["PromType2"] == "Enhancer"]["log_max_cov"]
@@ -387,7 +377,7 @@ ax.legend(loc="bottom right", handlelength=1)
 #fig.savefig("max_cov.all_biotypes.for_poster.pdf", dpi="figure", bbox_inches="tight")
 
 
-# In[32]:
+# In[36]:
 
 
 # for each group, split into tissue-sp v dynamic v ubiquitous
@@ -438,7 +428,7 @@ for i, promtype, name in zip(idxs, promtypes, names):
 
 # ### ChIP-validated motifs
 
-# In[33]:
+# In[37]:
 
 
 enh_vals = fimo_chip_cov[fimo_chip_cov["PromType2"] == "Enhancer"]["log_bp_cov"]
@@ -465,7 +455,7 @@ plt.legend(handlelength=1)
 fig.savefig("Fig_2D.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[34]:
+# In[38]:
 
 
 # for each group, split into tissue-sp v dynamic v ubiquitous
@@ -517,7 +507,7 @@ plt.subplots_adjust(wspace=0.1)
 f.savefig("Fig_2E.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[35]:
+# In[41]:
 
 
 enh_vals = fimo_chip_cov[fimo_chip_cov["PromType2"] == "Enhancer"]["log_max_cov"]
@@ -540,13 +530,13 @@ sns.kdeplot(data=dpc_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE["div
 ax.set_xlabel("log(max coverage)")
 ax.set_ylabel("cumulative density")
 ax.set_ylim((0, 1.05))
-ax.set_xlim((0.5, 3.25))
+ax.set_xlim((0.5, 3.45))
 plt.legend(handlelength=1)
 
 fig.savefig("Fig_2F.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[36]:
+# In[46]:
 
 
 # for each group, split into tissue-sp v dynamic v ubiquitous
@@ -556,7 +546,7 @@ names = ["eRNAs", "lincRNAs", "mRNAs"]
 df = chip_cov_exp
 col = "log_max_cov"
 xlabel = "log(max coverage)"
-xlim = (-0.85, 3)
+xlim = (-0.95, 3.1)
 
 f, axarr = plt.subplots(nrows=1, ncols=3, sharex=False, sharey=True, figsize=(5.5, 1.6))
 
@@ -587,7 +577,7 @@ for i, promtype, name in zip(idxs, promtypes, names):
     
     ax.set_title("%s (%s total)" % (name, len(promtype_vals)))
     ax.set_xlabel(xlabel)
-    ax.legend(loc="upper left", handlelength=2)
+    ax.legend(loc="upper left", handlelength=1.8)
     ax.set_ylim((0, 1.05))
     ax.set_xlim(xlim)
     
@@ -599,7 +589,7 @@ f.savefig("Fig_2G.pdf", bbox_inches="tight", dpi="figure")
 
 # ### clustered motifs
 
-# In[37]:
+# In[47]:
 
 
 enh_vals = fimo_clust_cov[fimo_clust_cov["PromType2"] == "Enhancer"]["log_bp_cov"]
@@ -626,7 +616,7 @@ plt.legend(handlelength=1)
 fig.savefig("Fig_S9C_1.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[38]:
+# In[48]:
 
 
 # for each group, split into tissue-sp v dynamic v ubiquitous
@@ -676,7 +666,7 @@ for i, promtype, name in zip(idxs, promtypes, names):
 plt.subplots_adjust(wspace=0.1)
 
 
-# In[39]:
+# In[50]:
 
 
 enh_vals = fimo_clust_cov[fimo_clust_cov["PromType2"] == "Enhancer"]["log_max_cov"]
@@ -699,11 +689,11 @@ sns.kdeplot(data=dpc_vals, cumulative=True, bw=0.1, color=TSS_CLASS_PALETTE["div
 ax.set_xlabel("log(max coverage of non-redundant 8mer motifs)")
 ax.set_ylabel("cumulative density")
 ax.set_ylim((0, 1.05))
-plt.legend(handlelength=1)
+plt.legend(handlelength=0.8)
 fig.savefig("Fig_S9C_2.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[40]:
+# In[51]:
 
 
 # for each group, split into tissue-sp v dynamic v ubiquitous
@@ -755,7 +745,7 @@ plt.subplots_adjust(wspace=0.1)
 
 # ## 2. cluster the motifs using MoSBAT output
 
-# In[41]:
+# In[52]:
 
 
 corr.set_index(corr["Motif"], inplace=True)
@@ -763,32 +753,32 @@ corr.drop("Motif", axis=1, inplace=True)
 corr.head()
 
 
-# In[42]:
+# In[53]:
 
 
 row_linkage = hierarchy.linkage(distance.pdist(corr, 'correlation'), method="average")
 col_linkage = hierarchy.linkage(distance.pdist(corr.T, 'correlation'), method="average")
 
 
-# In[43]:
+# In[54]:
 
 
 dists = plot_dendrogram(row_linkage, 0.4, "correlation")
 
 
-# In[44]:
+# In[55]:
 
 
 clusters = hierarchy.fcluster(row_linkage, 0.1, criterion="distance")
 
 
-# In[45]:
+# In[56]:
 
 
 print("n clusters: %s" % np.max(clusters))
 
 
-# In[46]:
+# In[57]:
 
 
 cluster_map = pd.DataFrame.from_dict(dict(zip(list(corr.index), clusters)), orient="index")
@@ -796,7 +786,7 @@ cluster_map.columns = ["cluster"]
 cluster_map.head()
 
 
-# In[47]:
+# In[58]:
 
 
 cluster_map.loc["KLF5"]
@@ -804,7 +794,7 @@ cluster_map.loc["KLF5"]
 
 # ## 3. plot clustered motif heatmap
 
-# In[48]:
+# In[59]:
 
 
 colors = sns.husl_palette(np.max(clusters), s=0.75)
@@ -813,13 +803,13 @@ lut = dict(zip(range(np.min(clusters), np.max(clusters)+1), colors))
 row_colors = cluster_map["cluster"].map(lut)
 
 
-# In[49]:
+# In[60]:
 
 
 cmap = sns.cubehelix_palette(8, start=.5, light=1, dark=0.25, hue=0.9, rot=-0.75, as_cmap=True)
 
 
-# In[50]:
+# In[61]:
 
 
 cg = sns.clustermap(corr, method="average", row_linkage=row_linkage, robust=True,
@@ -828,7 +818,7 @@ cg = sns.clustermap(corr, method="average", row_linkage=row_linkage, robust=True
 cg.savefig("Fig_S9A.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[51]:
+# In[62]:
 
 
 cluster_map.to_csv("../../misc/02__mosbat/cluster_map.txt", sep="\t", index=True)
@@ -837,13 +827,13 @@ cluster_map.to_csv("../../misc/02__mosbat/cluster_map.txt", sep="\t", index=True
 # ## 4. re-plot # bp covered and max coverage per biotype *after* clustering
 # note that i sent the cluster results to marta, who re-ran her coverage scripts using them, and i re-upload them in this notebook (so in real life there is a break between the above part and the following part of this notebook)
 
-# In[52]:
+# In[63]:
 
 
 fimo_mosbat_cov.head()
 
 
-# In[53]:
+# In[67]:
 
 
 enh_vals = fimo_mosbat_cov[fimo_mosbat_cov["PromType2"] == "Enhancer"]["log_bp_cov"]
@@ -866,12 +856,12 @@ sns.kdeplot(data=dpc_vals, cumulative=True, color=TSS_CLASS_PALETTE["div_pc"],
 ax.set_xlabel("log(# of bp covered, deduped by motif cluster)")
 ax.set_ylabel("cumulative density")
 ax.set_ylim((0, 1.05))
-ax.set_xlim((-0.5, 5))
+ax.set_xlim((2.5, 5))
 plt.legend(handlelength=1)
 fig.savefig("Fig_S9B_1.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[54]:
+# In[69]:
 
 
 # for each group, split into tissue-sp v dynamic v ubiquitous
@@ -881,7 +871,7 @@ names = ["eRNAs", "lincRNAs", "mRNAs"]
 df = mosbat_cov_exp
 col = "log_bp_cov"
 xlabel = "log(# of bp covered, deduped by motif cluster)"
-xlim = (-0.5, 5)
+xlim = (2.5, 5)
 
 f, axarr = plt.subplots(nrows=1, ncols=3, sharex=False, sharey=True, figsize=(5.5, 1.6))
 
@@ -912,7 +902,7 @@ for i, promtype, name in zip(idxs, promtypes, names):
 plt.subplots_adjust(wspace=0.1)
 
 
-# In[55]:
+# In[75]:
 
 
 enh_vals = fimo_mosbat_cov[fimo_mosbat_cov["PromType2"] == "Enhancer"]["log_max_cov"]
@@ -934,13 +924,13 @@ sns.kdeplot(data=dpc_vals, cumulative=True, color=TSS_CLASS_PALETTE["div_pc"],
             label="div. mRNAs (n=%s)" % len(dpc_vals), ax=ax)
 ax.set_xlabel("log(max coverage, deduped by motif cluster)")
 ax.set_ylabel("cumulative density")
-plt.xlim((-1, 3.75))
+plt.xlim((-1.35, 3.75))
 plt.ylim((0,1.05))
-plt.legend(handlelength=1)
+plt.legend(handlelength=0.8)
 fig.savefig("Fig_S9B_2.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[56]:
+# In[76]:
 
 
 # for each group, split into tissue-sp v dynamic v ubiquitous
@@ -985,7 +975,7 @@ plt.subplots_adjust(wspace=0.1)
 
 # ### fimo only
 
-# In[57]:
+# In[77]:
 
 
 res_dict = {}
@@ -1008,7 +998,7 @@ for max_motifs in [1, 10, 30, 86]:
     prev_max = max_motifs
 
 
-# In[58]:
+# In[78]:
 
 
 fig = plt.figure(figsize=(5.75,1.6))
@@ -1035,13 +1025,13 @@ plt.ylabel("phylop 46-way")
 
 # ### fimo + chip
 
-# In[59]:
+# In[79]:
 
 
 fimo_chip_phylop["n_ov"].max()
 
 
-# In[60]:
+# In[80]:
 
 
 res_dict = {}
@@ -1064,7 +1054,7 @@ for max_motifs in [1, 4, 8, 13]:
     prev_max = max_motifs
 
 
-# In[61]:
+# In[81]:
 
 
 fig = plt.figure(figsize=(5.75,1.6))
@@ -1092,13 +1082,13 @@ fig.savefig("Fig_2H.pdf", bbox_inches="tight", dpi="figure")
 
 # ### clusters
 
-# In[62]:
+# In[82]:
 
 
 fimo_clust_phylop["n_ov"].max()
 
 
-# In[63]:
+# In[83]:
 
 
 res_dict = {}
@@ -1121,7 +1111,7 @@ for max_motifs in [1, 3, 6, 13]:
     prev_max = max_motifs
 
 
-# In[64]:
+# In[84]:
 
 
 fig = plt.figure(figsize=(5.75,1.6))
@@ -1148,7 +1138,7 @@ plt.ylabel("phylop 46-way")
 
 # ## 6. look at motif overlap vs. dnase accessibility
 
-# In[65]:
+# In[85]:
 
 
 dnase_merged = dnase.merge(motif_cov_exp, on=["unique_id", "PromType2"])
@@ -1156,7 +1146,7 @@ dnase_merged["log_n_accessible"] = np.log10(dnase_merged["n_accessible"]+1)
 dnase_merged.head()
 
 
-# In[ ]:
+# In[86]:
 
 
 fig = plt.figure(figsize=(1.2, 1.2))
@@ -1177,7 +1167,7 @@ ax.annotate("n = %s" % len(dnase_merged), ha="right", xy=(.96, .9), xycoords=ax.
 #fig.savefig("max_cov.v.dnase.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[ ]:
+# In[87]:
 
 
 fig = plt.figure(figsize=(1.2, 1.2))
@@ -1197,4 +1187,10 @@ ax.annotate("r = {:.2f}".format(r), xy=(.05, .9), xycoords=ax.transAxes, fontsiz
 ax.annotate("n = %s" % len(dnase_merged), ha="right", xy=(.96, .9), xycoords=ax.transAxes, 
             fontsize=fontsize)
 #fig.savefig("bp_cov.v.dnase.pdf", bbox_inches="tight", dpi="figure")
+
+
+# In[ ]:
+
+
+
 

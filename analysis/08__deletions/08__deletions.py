@@ -9,8 +9,8 @@
 # ------
 # 
 # figures in this notebook:
-# - **Fig 3B, S9A**: scatter plots showing the comparison between deletion effect sizes and motif disruptions
-# - **Fig 3C, S9B**: specific examples of deletion profiles across a sequence (HOTAIR and DLEU1) and how they compare to motif disruption profiles
+# - **Fig 3B, S13A**: scatter plots showing the comparison between deletion effect sizes and motif disruptions
+# - **Fig 3C, S13B**: specific examples of deletion profiles across a sequence (HOTAIR and DLEU1) and how they compare to motif disruption profiles
 
 # In[1]:
 
@@ -522,13 +522,7 @@ len(sig_only)
 sig_only.head()
 
 
-# In[46]:
-
-
-g.ax_joint
-
-
-# In[ ]:
+# In[47]:
 
 
 g = sns.jointplot(data=sig_only, x="delta_tfs", y="mean.log2FC", kind="reg", space=0, size=2.5, 
@@ -544,7 +538,7 @@ g.ax_joint.annotate("n = %s" % len(sig_only), ha="right", xy=(.95, .05), xycoord
 g.savefig("Fig_3B.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[ ]:
+# In[48]:
 
 
 # k562
@@ -556,7 +550,7 @@ sig_only = k562_all_dels_tfs[k562_all_dels_tfs["sig"] == "sig"]
 len(sig_only)
 
 
-# In[ ]:
+# In[49]:
 
 
 g = sns.jointplot(data=sig_only, x="delta_tfs", y="mean.log2FC", kind="reg", space=0, size=2.5, 
