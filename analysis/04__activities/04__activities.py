@@ -661,7 +661,7 @@ pool1_hepg2_rand = pool1_hepg2_df[pool1_hepg2_df["oligo_reg"].isin(rand_sel_ids[
 pool1_k562_rand = pool1_k562_df[pool1_k562_df["oligo_reg"].isin(rand_sel_ids["oligo_reg"])]
 
 
-# In[63]:
+# In[62]:
 
 
 order = ["Enhancer", "intergenic", "div_lnc", "protein_coding", "div_pc"]
@@ -678,7 +678,7 @@ plt.tight_layout()
 f.savefig("FigS6_1.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[64]:
+# In[63]:
 
 
 pool1_hela_exp = pool1_hela_df[pool1_hela_df["oligo_reg"].isin(all_matched["oligo_reg"])]
@@ -686,7 +686,7 @@ pool1_hepg2_exp = pool1_hepg2_df[pool1_hepg2_df["oligo_reg"].isin(all_matched["o
 pool1_k562_exp = pool1_k562_df[pool1_k562_df["oligo_reg"].isin(all_matched["oligo_reg"])]
 
 
-# In[65]:
+# In[64]:
 
 
 f, axarr = plt.subplots(3, sharex=True, sharey=False, figsize=(4, 8))
@@ -704,7 +704,7 @@ f.savefig("FigS6_2.pdf", bbox_inches="tight", dpi="figure")
 
 # ## 6. barplots: find % of sequences active across cell types
 
-# In[66]:
+# In[65]:
 
 
 pool1_hela_df["cell"] = "HeLa"
@@ -714,7 +714,7 @@ pool1_k562_df["cell"] = "K562"
 all_df = pool1_hela_df[["unique_id", "better_type", "cell", "PromType2", "combined_class", "overall_mean"]].append(pool1_hepg2_df[["unique_id", "better_type", "cell", "PromType2", "combined_class", "overall_mean"]]).append(pool1_k562_df[["unique_id", "better_type", "cell", "PromType2", "combined_class", "overall_mean"]])
 
 
-# In[67]:
+# In[66]:
 
 
 df = all_df[all_df["better_type"] == "WILDTYPE"]
@@ -725,7 +725,7 @@ activ_grp = activ_grp[(activ_grp["PromType2"].isin(TSS_CLASS_ORDER)) &
 activ_grp.sample(10)
 
 
-# In[68]:
+# In[67]:
 
 
 activ_grp["active_in_only_one"] = activ_grp.apply(active_in_only_one, axis=1)
@@ -734,7 +734,7 @@ activ_grp["active_in_only_three"] = activ_grp.apply(active_in_only_three, axis=1
 activ_grp.sample(5)
 
 
-# In[69]:
+# In[68]:
 
 
 for PromType2 in TSS_CLASS_ORDER:
@@ -744,7 +744,7 @@ for PromType2 in TSS_CLASS_ORDER:
     print("%s | active in 1: %s, active in 3: %s" % (PromType2, active_in_1, active_in_3))
 
 
-# In[70]:
+# In[69]:
 
 
 activ_counts_1 = activ_grp.groupby(["PromType2", "active_in_only_one"])["unique_id"].agg("count").reset_index()
@@ -772,7 +772,7 @@ activ_counts = pd.melt(activ_counts, id_vars="PromType2")
 activ_counts.head()
 
 
-# In[71]:
+# In[70]:
 
 
 df = activ_counts[activ_counts["PromType2"] != "antisense"]
@@ -790,7 +790,7 @@ plt.xlabel("")
 plt.title("% of elements active in # of cell types")
 
 
-# In[72]:
+# In[71]:
 
 
 colors = []
@@ -799,7 +799,7 @@ for c in TSS_CLASS_ORDER:
 colors
 
 
-# In[73]:
+# In[72]:
 
 
 # better plot showing tissue sp
@@ -831,7 +831,7 @@ plt.savefig("Fig_1E.pdf", bbox_inches="tight", dpi="figure")
 
 # ## 7. kdeplot: compare to CAGE
 
-# In[74]:
+# In[73]:
 
 
 hepg2_activ = pool1_hepg2_df[["unique_id", "element", "better_type", "overall_mean", "PromType2"]]
@@ -847,7 +847,7 @@ all_activ = all_activ[(all_activ["PromType2"].isin(TSS_CLASS_ORDER)) &
 all_activ.sample(5)
 
 
-# In[75]:
+# In[74]:
 
 
 all_activ["combined_class"] = ""
@@ -856,14 +856,14 @@ all_activ.drop("combined_class", axis=1, inplace=True)
 all_activ.head()
 
 
-# In[76]:
+# In[75]:
 
 
 all_activ["oligo_reg"] = all_activ.unique_id.str.split("__", expand=True)[2]
 all_activ.sample(5)
 
 
-# In[77]:
+# In[76]:
 
 
 id_map = id_map[["oligo_reg", "gene_id", "K562_rep1", "K562_rep2", "K562_rep3", "HeLa_rep1", "HeLa_rep2", "HeLa_rep3", 
@@ -872,7 +872,7 @@ all_activ = all_activ.merge(id_map, on="oligo_reg")
 all_activ.sample(5)
 
 
-# In[78]:
+# In[77]:
 
 
 all_activ["K562_av"] = all_activ[["K562_rep1", "K562_rep2", "K562_rep3"]].mean(axis=1)
@@ -884,7 +884,7 @@ all_activ["HeLa_log_av"] = np.log10(all_activ["HeLa_av"]+1)
 all_activ["HepG2_log_av"] = np.log10(all_activ["HepG2_av"]+1)
 
 
-# In[79]:
+# In[78]:
 
 
 all_activ = all_activ[(~all_activ["unique_id"].str.contains("SNP_INDIV")) & 
@@ -893,7 +893,7 @@ all_activ = all_activ[(~all_activ["unique_id"].str.contains("SNP_INDIV")) &
 all_activ.sample(5)
 
 
-# In[80]:
+# In[79]:
 
 
 # first scale mpra ranges to be positive
@@ -902,7 +902,7 @@ all_activ["hela_scaled"] = scale_range(all_activ["HeLa"], 0, 100)
 all_activ["k562_scaled"] = scale_range(all_activ["K562"], 0, 100)
 
 
-# In[81]:
+# In[80]:
 
 
 cage_ts = calculate_tissue_specificity(all_activ[["HepG2_log_av", "K562_log_av", "HeLa_log_av"]])
@@ -915,13 +915,13 @@ all_activ["mpra_ts"] = mpra_ts
 all_activ.head()
 
 
-# In[82]:
+# In[81]:
 
 
 cmap = sns.light_palette("darkslategray", as_cmap=True)
 
 
-# In[83]:
+# In[82]:
 
 
 no_nan = all_activ[(~pd.isnull(all_activ["mpra_ts"])) & (~pd.isnull(all_activ["cage_ts"]))]
@@ -938,7 +938,7 @@ g.ax_joint.annotate("n = %s" % len(no_nan), xy=(.5, .8), xycoords=ax.transAxes,
 g.savefig("Fig_1D.pdf", bbox_inches="tight", dpi="figure")
 
 
-# In[84]:
+# In[83]:
 
 
 def cage_v_mpra_ts(row):
@@ -955,7 +955,7 @@ no_nan["ts_status"] = no_nan.apply(cage_v_mpra_ts, axis=1)
 no_nan.ts_status.value_counts()
 
 
-# In[85]:
+# In[84]:
 
 
 tot = 692+402+310+236
@@ -969,13 +969,13 @@ print("lower left: %s" % (lower_left/tot))
 print("lower right: %s" % (lower_right/tot))
 
 
-# In[86]:
+# In[85]:
 
 
 (692+402)/(692+402+310+236)
 
 
-# In[97]:
+# In[86]:
 
 
 no_nan = all_activ[(~pd.isnull(all_activ["mpra_activ"])) & (~pd.isnull(all_activ["cage_activ"]))]
@@ -992,7 +992,7 @@ g.savefig("Fig_S5.pdf", bbox_inches="tight", dpi="figure")
 
 # ## 8. compare MPRA and CAGE to RNA-seq
 
-# In[88]:
+# In[87]:
 
 
 rna_seq_exp = rna_seq_exp[["gene_id", "HepG2", "HeLa-S3", "K562"]]
@@ -1001,16 +1001,37 @@ rna_seq_exp["HepG2_rna_seq_log"] = np.log10(rna_seq_exp["HepG2_rna_seq"]+1)
 rna_seq_exp["HeLa_rna_seq_log"] = np.log10(rna_seq_exp["HeLa_rna_seq"]+1)
 rna_seq_exp["K562_rna_seq_log"] = np.log10(rna_seq_exp["K562_rna_seq"]+1)
 all_activ_rna_seq = all_activ.merge(rna_seq_exp, on="gene_id")
+all_activ_rna_seq["av_rna_seq"] = all_activ_rna_seq[["HepG2_rna_seq_log", "HeLa_rna_seq_log", "K562_rna_seq_log"]].mean(axis=1)
 all_activ_rna_seq.sample(5)
 
 
-# In[89]:
+# In[88]:
 
 
 all_activ_rna_seq.PromType2.value_counts()
 
 
-# In[90]:
+# In[91]:
+
+
+no_nan = all_activ_rna_seq[(~pd.isnull(all_activ_rna_seq["mpra_activ"])) & 
+                           (~pd.isnull(all_activ_rna_seq["av_rna_seq"]))]
+g = sns.jointplot(data=no_nan, x="mpra_activ", y="av_rna_seq", kind="kde", shade_lowest=False, size=2.3, space=0,
+                  stat_func=None, cmap=cmap, color="darkslategray", ylim=(-0.5, 3))
+g.set_axis_labels("mean MPRA activity", "mean log10(RNA-seq expression)")
+r, p = stats.spearmanr(no_nan["mpra_activ"], no_nan["av_rna_seq"])
+g.ax_joint.annotate("r = {:.2f}\np = {:.2e}".format(r, Decimal(p)), xy=(.1, .75), xycoords=ax.transAxes, 
+                    fontsize=5)
+
+# add n-value
+g.ax_joint.annotate("n = %s" % len(no_nan), xy=(.475, .8), xycoords=ax.transAxes, 
+                    fontsize=5)
+
+plt.show()
+g.savefig("Fig_S5_2.pdf", bbox_inches="tight", dpi="figure")
+
+
+# In[92]:
 
 
 for cell in ["HepG2", "HeLa", "K562"]:
@@ -1033,7 +1054,27 @@ for cell in ["HepG2", "HeLa", "K562"]:
     #g.savefig("%s_mpra_v_seq.pdf" % cell, bbox_inches="tight", dpi="figure")
 
 
-# In[91]:
+# In[94]:
+
+
+no_nan = all_activ_rna_seq[(~pd.isnull(all_activ_rna_seq["mpra_activ"])) & 
+                           (~pd.isnull(all_activ_rna_seq["cage_activ"]))]
+g = sns.jointplot(data=no_nan, x="mpra_activ", y="cage_activ", kind="kde", shade_lowest=False, size=2.3, space=0,
+                  stat_func=None, cmap=cmap, color="darkslategray", ylim=(-0.5, 2))
+g.set_axis_labels("mean MPRA activity", "mean log10(CAGE expression)")
+r, p = stats.spearmanr(no_nan["mpra_activ"], no_nan["cage_activ"])
+g.ax_joint.annotate("r = {:.2f}\np = {:.2e}".format(r, Decimal(p)), xy=(.1, .75), xycoords=ax.transAxes, 
+                    fontsize=5)
+
+# add n-value
+g.ax_joint.annotate("n = %s" % len(no_nan), xy=(.475, .8), xycoords=ax.transAxes, 
+                    fontsize=5)
+
+plt.show()
+g.savefig("Fig_S5_3.pdf", bbox_inches="tight", dpi="figure")
+
+
+# In[95]:
 
 
 for cell in ["HepG2", "HeLa", "K562"]:
@@ -1058,7 +1099,7 @@ for cell in ["HepG2", "HeLa", "K562"]:
 
 # ## 10. write final files
 
-# In[92]:
+# In[96]:
 
 
 # write file with tissue-specificities for later use
@@ -1066,7 +1107,7 @@ final = all_activ[["unique_id", "PromType2", "cage_activ", "cage_ts", "mpra_acti
 final.to_csv("../../data/02__activs/POOL1__pMPRA1__CAGE_vs_MPRA_activs.txt", sep="\t", index=False)
 
 
-# In[93]:
+# In[97]:
 
 
 # also write file with tss types
